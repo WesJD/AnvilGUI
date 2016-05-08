@@ -47,7 +47,7 @@ new AnvilGUI(myPluginInstance, holder, "What is the meaning of life?", new Anvil
 });
 ```
 The AnvilGUI takes in a parameter of your plugin, the player that the GUI should open for, a prompt, and the
-`Click Handler`. The first two parameters are quite obvious, and the third for example would be a question, just like 
+`ClickHandler`. The first two parameters are quite obvious, and the third for example would be a question, just like 
 what is shown above.
 
 ###Handling their answer
@@ -62,7 +62,7 @@ public String onClick(Player player, String reply) {
     return "Incorrect.";
 }
 ```
-The above code is what is inside your `ClickHandler`. The parameters of the method are also obvious, the player to answered 
+The above code is what is inside your `ClickHandler`. The parameters of the method are also obvious, the player who answered 
 and their reply. The method also has a return value of `String`. This string is to be used if the user is wrong, etc,
 and it will show in the dialogue box in the GUI what is supplied. If you return `null`, the inventory will close.
 
