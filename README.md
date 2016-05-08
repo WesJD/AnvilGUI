@@ -1,4 +1,5 @@
 #AnvilGUI
+
 Easily user anvil guis to get a user's input.
 
 This project was made since their is no easy way to do this with the Spigot / Bukkit APIs. It requires interaction
@@ -66,4 +67,6 @@ The above code is what is inside your `ClickHandler`. The parameters of the meth
 and their reply. The method also has a return value of `String`. This string is to be used if the user is wrong, etc,
 and it will show in the dialogue box in the GUI what is supplied. If you return `null`, the inventory will close.
 
+##License
 
+This project is licensed under the [MIT License](LICENSE).
