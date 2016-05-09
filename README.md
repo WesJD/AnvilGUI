@@ -67,6 +67,11 @@ The above code is what is inside your `ClickHandler`. The parameters of the meth
 and their reply. The method also has a return value of `String`. This string is to be used if the user is wrong, etc,
 and it will show in the dialogue box in the GUI what is supplied. If you return `null`, the inventory will close.
 
+##Compilation
+
+We use Maven to handle our dependencies: `mvn clean install`. Do note that you will need the four spigot jars in use
+in this repo to be installed on your local repository.
+
 ##License
 
 This project is licensed under the [MIT License](LICENSE).
