@@ -4,3 +4,6 @@
 
 # Maven
 target
+
+# Libs
+src/libs
