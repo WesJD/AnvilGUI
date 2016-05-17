@@ -6,6 +6,9 @@ This project was made since their is no easy way to do this with the Spigot / Bu
 with NMS and that is a pain in a non-private plugin where users will have lots of different versions of the server
 running.
 
+##Requirements
+Java 8 and Bukkit / Spigot. Most server versions in the [Spigot Repository](https://hub.spigotmc.org/nexus/) are supported.
+
 ##How to use
 
 ###As a dependency
