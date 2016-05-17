@@ -1,6 +1,6 @@
-#AnvilGUI
+#AnvilGUI [![Build Status](http://ci.buildstatic.net/buildStatus/icon?job=AnvilGUI)](http://ci.buildstatic.net/job/AnvilGUI/)
 
-Easily user anvil guis to get a user's input.
+Easily use anvil guis to get a user's input.
 
 This project was made since their is no easy way to do this with the Spigot / Bukkit APIs. It requires interaction
 with NMS and that is a pain in a non-private plugin where users will have lots of different versions of the server
