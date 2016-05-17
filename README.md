@@ -1,5 +1,4 @@
 #AnvilGUI [![Build Status](http://ci.buildstatic.net/buildStatus/icon?job=AnvilGUI)](http://ci.buildstatic.net/job/AnvilGUI/)
-
 Easily use anvil guis to get a user's input.
 
 This project was made since their is no easy way to do this with the Spigot / Bukkit APIs. It requires interaction
@@ -8,6 +7,10 @@ running.
 
 ##Requirements
 Java 8 and Bukkit / Spigot. Most server versions in the [Spigot Repository](https://hub.spigotmc.org/nexus/) are supported.
+
+###My version isn't supported
+If you are a developer, submit a pull request adding a wrapper class for your version. Otherwise, please create an issue
+on the issues tab. 
 
 ##How to use
 
