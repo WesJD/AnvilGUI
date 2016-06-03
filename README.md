@@ -35,7 +35,6 @@ on the issues tab.
     ...
 </repositories>
 ```
-alternatively, you can download a jar [here](http://ci.buildstatic.net/job/AnvilGUI/).
 
 ###In your plugin
 
