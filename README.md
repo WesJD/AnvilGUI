@@ -1,4 +1,4 @@
-#AnvilGUI [![Build Status](http://ci.buildstatic.net/buildStatus/icon?job=AnvilGUI)](http://ci.buildstatic.net/job/AnvilGUI/)
+#AnvilGUI
 Easily use anvil guis to get a user's input.
 
 This project was made since their is no easy way to do this with the Spigot / Bukkit APIs. It requires interaction
