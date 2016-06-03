@@ -6,7 +6,7 @@
 
     <groupId>net.buildstatic.util</groupId>
     <artifactId>anvilgui</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
@@ -37,6 +37,12 @@
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-1.9</artifactId>
             <version>1.9-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-1.9.4</artifactId>
+            <version>1.9.4-R0.2-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

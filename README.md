@@ -21,7 +21,7 @@ on the issues tab.
     <dependency>
         <groupId>net.buildstatic.util</groupId>
         <artifactId>anvilgui</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.1-SNAPSHOT</version>
     </dependency>
     ...
 </dependencies>
@@ -76,7 +76,7 @@ and it will show in the dialogue box in the GUI what is supplied. If you return 
 ##Compilation
 
 We use Maven to handle our dependencies: `mvn clean install`. Do note that you will need the four spigot jars in use
-in this repo to be installed on your local repository.
+in this repo to be installed on your local repository. To make this easier, you can use [this shell script](https://gist.github.com/WesJD/39b8f0c88f74bc952e27a737d3a67234).
 
 ##License
 
