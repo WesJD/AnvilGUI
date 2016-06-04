@@ -3,10 +3,7 @@ package net.buildstatic.util.anvilgui.version;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import net.buildstatic.util.anvilgui.version.impl.Wrapper1_8_R1;
-import net.buildstatic.util.anvilgui.version.impl.Wrapper1_8_R2;
-import net.buildstatic.util.anvilgui.version.impl.Wrapper1_8_R3;
-import net.buildstatic.util.anvilgui.version.impl.Wrapper1_9_R1;
+import net.buildstatic.util.anvilgui.version.impl.*;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -39,7 +36,8 @@ public enum Version {
     ONE_EIGHT_R1("1_8_R1", Wrapper1_8_R1.class),
     ONE_EIGHT_R2("1_8_R2", Wrapper1_8_R2.class),
     ONE_EIGHT_R3("1_8_R3", Wrapper1_8_R3.class),
-    ONE_NINE_R1("1_9_R1", Wrapper1_9_R1.class);
+    ONE_NINE_R1("1_9_R1", Wrapper1_9_R1.class),
+    ONE_NINE_R2("1_9_R2", Wrapper1_9_R2.class);
 
     private static final LoadingCache<Class<? extends VersionWrapper>, VersionWrapper> WRAPPER_CACHE =
             CacheBuilder.newBuilder()
