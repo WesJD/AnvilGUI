@@ -1,9 +1,9 @@
-package net.buildstatic.util.anvilgui.version.impl;
+package net.wesjd.anvilgui.version.impl;
 
-import net.buildstatic.util.anvilgui.version.VersionWrapper;
-import net.minecraft.server.v1_9_R2.*;
-import org.bukkit.craftbukkit.v1_9_R2.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_9_R2.event.CraftEventFactory;
+import net.wesjd.anvilgui.version.VersionWrapper;
+import net.minecraft.server.v1_8_R2.*;
+import org.bukkit.craftbukkit.v1_8_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_8_R2.event.CraftEventFactory;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
@@ -30,7 +30,7 @@ import org.bukkit.inventory.Inventory;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-public class Wrapper1_9_R2 extends VersionWrapper {
+public class Wrapper1_8_R2 extends VersionWrapper {
 
     @Override
     public int getNextContainerId(Player player) {
@@ -93,7 +93,7 @@ public class Wrapper1_9_R2 extends VersionWrapper {
         }
 
         @Override
-        public boolean a(EntityHuman entityhuman) {
+        public boolean a(EntityHuman human) {
             return true;
         }
 

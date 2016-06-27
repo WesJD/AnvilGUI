@@ -19,18 +19,17 @@ on the issues tab.
 ```xml
 <dependencies>
     <dependency>
-        <groupId>net.buildstatic.util</groupId>
+        <groupId>net.wesjd</groupId>
         <artifactId>anvilgui</artifactId>
-        <version>1.0.1-SNAPSHOT</version>
+        <version>1.0-SNAPSHOT</version>
     </dependency>
     ...
 </dependencies>
 
 <repositories>
     <repository>
-        <id>buildstatic-repo</id>
-        <name>BuildStatic Repository</name>
-        <url>http://serv.buildstatic.net/maven-repo</url>
+        <id>wesjd-repo</id>
+        <url>http://wesjd.net:8081/repository/thirdparty/</url>
     </repository>
     ...
 </repositories>
@@ -74,7 +73,7 @@ and it will show in the dialogue box in the GUI what is supplied. If you return 
 
 ##Compilation
 
-We use Maven to handle our dependencies: `mvn clean install`. Do note that you will need the four spigot jars in use
+We use Maven to handle our dependencies: `mvn clean install`. Do note that you will need the spigot jars
 in this repo to be installed on your local repository. To make this easier, you can use [this shell script](https://gist.github.com/WesJD/39b8f0c88f74bc952e27a737d3a67234).
 
 ##License

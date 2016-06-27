@@ -1,9 +1,9 @@
-package net.buildstatic.util.anvilgui.version;
+package net.wesjd.anvilgui.version;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import net.buildstatic.util.anvilgui.version.impl.*;
+import net.wesjd.anvilgui.version.impl.*;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;

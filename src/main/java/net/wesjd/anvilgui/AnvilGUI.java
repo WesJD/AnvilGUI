@@ -1,7 +1,7 @@
-package net.buildstatic.util.anvilgui;
+package net.wesjd.anvilgui;
 
-import net.buildstatic.util.anvilgui.version.Version;
-import net.buildstatic.util.anvilgui.version.VersionWrapper;
+import net.wesjd.anvilgui.version.Version;
+import net.wesjd.anvilgui.version.VersionWrapper;
 import org.apache.commons.lang3.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
