@@ -37,7 +37,8 @@ public enum Version {
     ONE_EIGHT_R2("1_8_R2", Wrapper1_8_R2.class),
     ONE_EIGHT_R3("1_8_R3", Wrapper1_8_R3.class),
     ONE_NINE_R1("1_9_R1", Wrapper1_9_R1.class),
-    ONE_NINE_R2("1_9_R2", Wrapper1_9_R2.class);
+    ONE_NINE_R2("1_9_R2", Wrapper1_9_R2.class),
+    ONE_TEN_R1("1_10_R1", Wrapper1_10_R1.class);
 
     private static final LoadingCache<Class<? extends VersionWrapper>, VersionWrapper> WRAPPER_CACHE =
             CacheBuilder.newBuilder()
