@@ -55,8 +55,7 @@ what is shown above.
 ###Handling their answer
 
 ```java
-@Override
-public String onClick(Player player, String reply) {
+(player, reply) -> {
     if (reply.equalsIgnoreCase("you")) {
         player.sendMessage("You have magical powers!");
         return null;
