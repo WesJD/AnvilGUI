@@ -9,12 +9,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
+
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 
 /*
  * The MIT License (MIT)
@@ -43,7 +47,7 @@ public class AnvilGUI implements Listener {
 
     private final Player holder;
     private final ItemStack insert;
-    private final ClickHandler clickHandler;
+    private final BiFunction<Player, String, String> biFunction;
 
     private final VersionWrapper wrapper;
     private final int containerId;
@@ -51,9 +55,14 @@ public class AnvilGUI implements Listener {
 
     private boolean open = false;
 
+    @Deprecated
     public AnvilGUI(Plugin plugin, Player holder, String insert, ClickHandler clickHandler) {
+        this(plugin, holder, insert, clickHandler::onClick);
+    }
+
+    public AnvilGUI(Plugin plugin, Player holder, String insert, BiFunction<Player, String, String> biFunction) {
         this.holder = holder;
-        this.clickHandler = clickHandler;
+        this.biFunction = biFunction;
 
         final ItemStack paper = new ItemStack(Material.PAPER);
         final ItemMeta paperMeta = paper.getItemMeta();
@@ -102,7 +111,7 @@ public class AnvilGUI implements Listener {
             final Player clicker = (Player) e.getWhoClicked();
             if(e.getRawSlot() == Slot.OUTPUT) {
                 final ItemStack clicked = inventory.getItem(e.getRawSlot());
-                final String ret = clickHandler.onClick(clicker, clicked.hasItemMeta() ? clicked.getItemMeta().getDisplayName() : clicked.getType().toString());
+                final String ret = biFunction.apply(clicker, clicked.hasItemMeta() ? clicked.getItemMeta().getDisplayName() : clicked.getType().toString());
                 if(ret != null) {
                     final ItemMeta meta = clicked.getItemMeta();
                     meta.setDisplayName(ret);
@@ -118,6 +127,7 @@ public class AnvilGUI implements Listener {
         if(open && e.getInventory().equals(inventory)) closeInventory();
     }
 
+    @Deprecated
     public static abstract class ClickHandler {
 
         public abstract String onClick(Player clicker, String input);

@@ -40,19 +40,16 @@ on the issues tab.
 ####Prompting a user for input
 
 ```java
-new AnvilGUI(myPluginInstance, holder, "What is the meaning of life?", new AnvilGUI.ClickHandler() {
-    @Override
-    public String onClick(Player player, String reply) {
-        if (reply.equalsIgnoreCase("you")) {
-            player.sendMessage("You have magical powers!");
-            return null;
-        }
-        return "Incorrect.";
+new AnvilGUI(myPluginInstance, myPlayer, "What is the meaning of life?", (player, reply) -> {
+    if (reply.equalsIgnoreCase("you")) {
+        player.sendMessage("You have magical powers!");
+        return null;
     }
+    return "Incorrect.";
 });
 ```
 The AnvilGUI takes in a parameter of your plugin, the player that the GUI should open for, a prompt, and the
-`ClickHandler`. The first two parameters are quite obvious, and the third for example would be a question, just like 
+`BiFunction`. The first two parameters are quite obvious, and the third for example would be a question, just like
 what is shown above.
 
 ###Handling their answer
@@ -67,14 +64,14 @@ public String onClick(Player player, String reply) {
     return "Incorrect.";
 }
 ```
-The above code is what is inside your `ClickHandler`. The parameters of the method are also obvious, the player who answered 
-and their reply. The method also has a return value of `String`. This string is to be used if the user is wrong, etc,
+The above code is what is inside your `BiFunction`. The parameters of the function are also obvious, the player who answered
+and their reply. The finction also returns a `String``. This string is to be used if the user is wrong, etc,
 and it will show in the dialogue box in the GUI what is supplied. If you return `null`, the inventory will close.
 
 ##Compilation
 
-We use Maven to handle our dependencies: `mvn clean install`. Do note that you will need the spigot jars
-in this repo to be installed on your local repository. To make this easier, you can use [this shell script](https://gist.github.com/WesJD/39b8f0c88f74bc952e27a737d3a67234).
+Build with `mvn clean install`. Do note that you will need the spigot jars in this repo to be installed on your
+local repository. To make this easier, you can use [this shell script](https://gist.github.com/WesJD/39b8f0c88f74bc952e27a737d3a67234).
 
 ##License
 
