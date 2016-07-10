@@ -29,7 +29,7 @@ on the issues tab.
 <repositories>
     <repository>
         <id>wesjd-repo</id>
-        <url>http://wesjd.net:8081/repository/thirdparty/</url>
+        <url>http://nexus.wesjd.net/repository/thirdparty/</url>
     </repository>
     ...
 </repositories>
