@@ -52,7 +52,7 @@ The AnvilGUI takes in a parameter of your plugin, the player that the GUI should
 `BiFunction`. The first two parameters are quite obvious, and the third for example would be a question, just like
 what is shown above.
 
-###Handling their answer
+####Handling their answer
 
 ```java
 (player, reply) -> {
