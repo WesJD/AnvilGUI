@@ -111,6 +111,7 @@ public class AnvilGUI implements Listener {
             final Player clicker = (Player) e.getWhoClicked();
             if(e.getRawSlot() == Slot.OUTPUT) {
                 final ItemStack clicked = inventory.getItem(e.getRawSlot());
+                if(clicked == null || clicked.getType() == Material.AIR)  return;
                 final String ret = biFunction.apply(clicker, clicked.hasItemMeta() ? clicked.getItemMeta().getDisplayName() : clicked.getType().toString());
                 if(ret != null) {
                     final ItemMeta meta = clicked.getItemMeta();
