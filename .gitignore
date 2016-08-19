@@ -4,6 +4,7 @@
 
 # Maven
 target
+src/test
 
 # Libs
 src/libs
