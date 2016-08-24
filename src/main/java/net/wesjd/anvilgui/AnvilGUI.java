@@ -17,49 +17,74 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
-/*
- * The MIT License (MIT)
- *
- * Copyright (c) 2016 Wesley Smith
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+/**
+ * An anvil gui, used for gathering a user's input
+ * @since 1.0
  */
 public class AnvilGUI implements Listener {
 
+    /**
+     * The player who has the GUI open
+     */
     private final Player holder;
+    /**
+     * The ItemStack that is in the {@link Slot#INPUT_LEFT} slot.
+     */
     private final ItemStack insert;
+    /**
+     * Called when the player clicks the {@link Slot#OUTPUT} slot
+     */
     private final BiFunction<Player, String, String> biFunction;
 
+    /**
+     * The {@link VersionWrapper} for this server
+     */
     private final VersionWrapper wrapper;
+    /**
+     * The container id of the inventory, used for NMS methods
+     */
     private final int containerId;
+    /**
+     * The inventory that is used on the Bukkit side of things
+     */
     private final Inventory inventory;
 
+    /**
+     * Represents the state of the inventory being open
+     */
     private boolean open = false;
 
+    /**
+     * @deprecated As of version 1.1, use {@link #AnvilGUI(Plugin, Player, String, BiFunction)}
+     * Create an AnvilGUI and open it for the player
+     * @param plugin A {@link org.bukkit.plugin.java.JavaPlugin} instance
+     * @param holder The {@link Player} to open the inventory for
+     * @param insert What to have the text already set to
+     * @param clickHandler A {@link ClickHandler} that is called when the player clicks the {@link Slot#OUTPUT} slot
+     * @throws NullPointerException If the server version isn't supported
+     *
+     * @since 1.0
+     */
     @Deprecated
     public AnvilGUI(Plugin plugin, Player holder, String insert, ClickHandler clickHandler) {
         this(plugin, holder, insert, clickHandler::onClick);
     }
 
+    /**
+     * Create an AnvilGUI and open it for the player.
+     * @param plugin A {@link org.bukkit.plugin.java.JavaPlugin} instance
+     * @param holder The {@link Player} to open the inventory for
+     * @param insert What to have the text already set to
+     * @param biFunction A {@link BiFunction} that is called when the player clicks the {@link Slot#OUTPUT} slot
+     * @throws NullPointerException If the server version isn't supported
+     *
+     * @since 1.1
+     */
     public AnvilGUI(Plugin plugin, Player holder, String insert, BiFunction<Player, String, String> biFunction) {
         this.holder = holder;
         this.biFunction = biFunction;
@@ -93,6 +118,12 @@ public class AnvilGUI implements Listener {
         open = true;
     }
 
+    /**
+     * Closes the inventory if it's open.
+     * @throws IllegalArgumentException If the inventory isn't open
+     *
+     * @since 1.1
+     */
     public void closeInventory() {
         Validate.isTrue(open, "You can't close an inventory that isn't open!");
         open = false;
@@ -128,17 +159,53 @@ public class AnvilGUI implements Listener {
         if(open && e.getInventory().equals(inventory)) closeInventory();
     }
 
+    /**
+     * @deprecated Since version 1.1, use {@link #AnvilGUI(Plugin, Player, String, BiFunction)} instead
+     * Handles the click of the output slot
+     *
+     * @since 1.0
+     */
     @Deprecated
     public static abstract class ClickHandler {
 
+        /**
+         * Is called when a {@link Player} clicks on the output in the GUI
+         * @param clicker The {@link Player} who clicked the output
+         * @param input What the item was renamed to
+         * @return What to replace the text with, or null to close the inventory
+         *
+         * @since 1.0
+         */
         public abstract String onClick(Player clicker, String input);
 
     }
 
+    /**
+     * Class wrapping the magic constants of slot numbers in an anvil GUI
+     *
+     * @since 1.0
+     */
     public static class Slot {
 
+        /**
+         * The slot on the far left, where the first input is inserted. An {@link ItemStack} is always inserted
+         * here to be renamed
+         *
+         * @since 1.0
+         */
         public static final int INPUT_LEFT = 0;
+        /**
+         * Not used, but in a real anvil you are able to put the second item you want to combine here
+         *
+         * @since 1.0
+         */
         public static final int INPUT_RIGHT = 1;
+        /**
+         * The output slot, where an item is put when two items are combined from {@link #INPUT_LEFT} and
+         * {@link #INPUT_RIGHT} or {@link #INPUT_LEFT} is renamed
+         *
+         * @since 1.0
+         */
         public static final int OUTPUT = 2;
 
     }

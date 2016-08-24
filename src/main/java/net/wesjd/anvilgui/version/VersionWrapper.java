@@ -3,49 +3,98 @@ package net.wesjd.anvilgui.version;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
-/*
- * The MIT License (MIT)
- *
- * Copyright (c) 2016 Wesley Smith
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+/**
+ * Wraps versions to be able to easily use different NMS server versions
+ * @since 1.0
  */
-public abstract class VersionWrapper {
+public interface VersionWrapper {
 
-    public abstract int getNextContainerId(Player player);
+    /**
+     * Gets the next available NMS container id for the player
+     * @param player The player to get the next container id of
+     * @return The next available NMS container id
+     *
+     * @since 1.0
+     */
+    int getNextContainerId(Player player);
 
-    public abstract void handleInventoryCloseEvent(Player player);
+    /**
+     * Closes the current inventory for the player
+     * @param player The player that needs their current inventory closed
+     *
+     * @since 1.0
+     */
+    void handleInventoryCloseEvent(Player player);
 
-    public abstract void sendPacketOpenWindow(Player player, int containerId);
+    /**
+     * Sends PacketPlayOutOpenWindow to the player with the container id
+     * @param player The player to send the packet to
+     * @param containerId The container id to open
+     *
+     * @since 1.0
+     */
+    void sendPacketOpenWindow(Player player, int containerId);
 
-    public abstract void sendPacketCloseWindow(Player player, int containerId);
+    /**
+     * Sends PacketPlayOutCloseWindow to the player with the contaienr id
+     * @param player The player to send the packet to
+     * @param containerId The container id to close
+     *
+     * @since 1.0
+     */
+    void sendPacketCloseWindow(Player player, int containerId);
 
-    public abstract void setActiveContainerDefault(Player player);
+    /**
+     * Sets the NMS player's active container to the default one
+     * @param player The player to set the active container of
+     *
+     * @since 1.0
+     */
+    void setActiveContainerDefault(Player player);
 
-    public abstract void setActiveContainer(Player player, Object container);
+    /**
+     * Sets the NMS player's active container to the one supplied
+     * @param player The player to set the active container of
+     * @param container The container to set as active
+     *
+     * @since 1.0
+     */
+    void setActiveContainer(Player player, Object container);
 
-    public abstract void setActiveContainerId(Object container, int containerId);
+    /**
+     * Sets the supplied windowId of the supplied Container
+     * @param container The container to set the windowId of
+     * @param containerId The new windowId
+     *
+     * @since 1.0
+     */
+    void setActiveContainerId(Object container, int containerId);
 
-    public abstract void addActiveContainerSlotListener(Object container, Player player);
+    /**
+     * Adds a slot listener to the supplied container for the player
+     * @param container The container to add the slot listener to
+     * @param player The player to have as a listener
+     *
+     * @since 1.0
+     */
+    void addActiveContainerSlotListener(Object container, Player player);
 
-    public abstract Inventory toBukkitInventory(Object container);
+    /**
+     * Gets the {@link Inventory} wrapper of the supplied NMS container
+     * @param container The NMS container to get the {@link Inventory} of
+     * @return The inventory of the NMS container
+     *
+     * @since 1.0
+     */
+    Inventory toBukkitInventory(Object container);
 
-    public abstract Object newContainerAnvil(Player player);
+    /**
+     * Creates a new ContainerAnvil
+     * @param player The player to get the container of
+     * @return The Container instance
+     *
+     * @since 1.0
+     */
+    Object newContainerAnvil(Player player);
 
 }
