@@ -67,8 +67,6 @@ public class AnvilGUI implements Listener {
      * @param insert What to have the text already set to
      * @param clickHandler A {@link ClickHandler} that is called when the player clicks the {@link Slot#OUTPUT} slot
      * @throws NullPointerException If the server version isn't supported
-     *
-     * @since 1.0
      */
     @Deprecated
     public AnvilGUI(Plugin plugin, Player holder, String insert, ClickHandler clickHandler) {
@@ -82,8 +80,6 @@ public class AnvilGUI implements Listener {
      * @param insert What to have the text already set to
      * @param biFunction A {@link BiFunction} that is called when the player clicks the {@link Slot#OUTPUT} slot
      * @throws NullPointerException If the server version isn't supported
-     *
-     * @since 1.1
      */
     public AnvilGUI(Plugin plugin, Player holder, String insert, BiFunction<Player, String, String> biFunction) {
         this.holder = holder;
@@ -121,8 +117,6 @@ public class AnvilGUI implements Listener {
     /**
      * Closes the inventory if it's open.
      * @throws IllegalArgumentException If the inventory isn't open
-     *
-     * @since 1.1
      */
     public void closeInventory() {
         Validate.isTrue(open, "You can't close an inventory that isn't open!");
@@ -162,8 +156,6 @@ public class AnvilGUI implements Listener {
     /**
      * @deprecated Since version 1.1, use {@link #AnvilGUI(Plugin, Player, String, BiFunction)} instead
      * Handles the click of the output slot
-     *
-     * @since 1.0
      */
     @Deprecated
     public static abstract class ClickHandler {
@@ -173,8 +165,6 @@ public class AnvilGUI implements Listener {
          * @param clicker The {@link Player} who clicked the output
          * @param input What the item was renamed to
          * @return What to replace the text with, or null to close the inventory
-         *
-         * @since 1.0
          */
         public abstract String onClick(Player clicker, String input);
 
@@ -182,29 +172,21 @@ public class AnvilGUI implements Listener {
 
     /**
      * Class wrapping the magic constants of slot numbers in an anvil GUI
-     *
-     * @since 1.0
      */
     public static class Slot {
 
         /**
          * The slot on the far left, where the first input is inserted. An {@link ItemStack} is always inserted
          * here to be renamed
-         *
-         * @since 1.0
          */
         public static final int INPUT_LEFT = 0;
         /**
          * Not used, but in a real anvil you are able to put the second item you want to combine here
-         *
-         * @since 1.0
          */
         public static final int INPUT_RIGHT = 1;
         /**
          * The output slot, where an item is put when two items are combined from {@link #INPUT_LEFT} and
          * {@link #INPUT_RIGHT} or {@link #INPUT_LEFT} is renamed
-         *
-         * @since 1.0
          */
         public static final int OUTPUT = 2;
 
