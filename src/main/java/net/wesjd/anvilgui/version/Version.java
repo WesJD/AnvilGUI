@@ -38,7 +38,11 @@ public enum Version {
     /**
      * The {@link Wrapper1_10_R1} value
      */
-    ONE_TEN_R1("1_10_R1", Wrapper1_10_R1.class);
+    ONE_TEN_R1("1_10_R1", Wrapper1_10_R1.class),
+    /**
+     * The {@link Wrapper1_11_R1} value
+     */
+    ONE_ELEVEN_R1("1_11_R1", Wrapper1_11_R1.class);
 
     /**
      * A {@link LoadingCache} of VersionWrappers that are kept until 5 minutes of no use
