@@ -1,0 +1,24 @@
+-classpath
+'/home/wesley/.m2/repository/org/spigotmc/spigot-1.8.3/1.8.3-R0.1-SNAPSHOT/spigot-1.8.3-1.8.3-R0.1-SNAPSHOT.jar:/home/wesley/.m2/repository/org/spigotmc/spigot-1.9/1.9-R0.1-SNAPSHOT/spigot-1.9-1.9-R0.1-SNAPSHOT.jar:/home/wesley/.m2/repository/org/spigotmc/spigot-1.8/1.8-R0.1-SNAPSHOT/spigot-1.8-1.8-R0.1-SNAPSHOT.jar:/home/wesley/.m2/repository/org/spigotmc/spigot-1.9.4/1.9.4-R0.2-SNAPSHOT/spigot-1.9.4-1.9.4-R0.2-SNAPSHOT.jar:/home/wesley/.m2/repository/org/spigotmc/spigot-1.8.8/1.8.8-R0.1-SNAPSHOT/spigot-1.8.8-1.8.8-R0.1-SNAPSHOT.jar:/home/wesley/.m2/repository/org/spigotmc/spigot-1.10.2/1.10.2-R0.1-SNAPSHOT/spigot-1.10.2-1.10.2-R0.1-SNAPSHOT.jar:/home/wesley/.m2/repository/org/spigotmc/spigot-1.11/1.11-R0.1-SNAPSHOT/spigot-1.11-1.11-R0.1-SNAPSHOT.jar:/home/wesley/.m2/repository/com/google/guava/guava/19.0/guava-19.0.jar'
+-encoding
+'UTF-8'
+-protected
+-sourcepath
+'/home/wesley/Dropbox/Java/Dev/AnvilGUI/src/main/java'
+-author
+-bottom
+'Copyright &#169; 2017. All rights reserved.'
+-charset
+'UTF-8'
+-d
+'/home/wesley/Dropbox/Java/Dev/AnvilGUI/javadocs'
+-docencoding
+'UTF-8'
+-doctitle
+'anvilgui 1.1.1-SNAPSHOT API'
+-linkoffline
+'http://docs.oracle.com/javase/8/docs/api' '/home/wesley/Dropbox/Java/Dev/AnvilGUI/target/javadoc-bundle-options'
+-use
+-version
+-windowtitle
+'anvilgui 1.1.1-SNAPSHOT API'
