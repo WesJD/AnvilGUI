@@ -24,9 +24,10 @@ import java.util.function.BiFunction;
 
 /**
  * An anvil gui, used for gathering a user's input
+ * @author Wesley Smith
  * @since 1.0
  */
-public class AnvilGUI implements Listener {
+public class AnvilGUI {
 
     /**
      * The player who has the GUI open
@@ -53,6 +54,10 @@ public class AnvilGUI implements Listener {
      * The inventory that is used on the Bukkit side of things
      */
     private final Inventory inventory;
+    /**
+     * The listener holder class
+     */
+    private final ListenUp listener = new ListenUp();
 
     /**
      * Represents the state of the inventory being open
@@ -60,13 +65,14 @@ public class AnvilGUI implements Listener {
     private boolean open = false;
 
     /**
-     * @deprecated As of version 1.1, use {@link #AnvilGUI(Plugin, Player, String, BiFunction)}
      * Create an AnvilGUI and open it for the player
      * @param plugin A {@link org.bukkit.plugin.java.JavaPlugin} instance
      * @param holder The {@link Player} to open the inventory for
      * @param insert What to have the text already set to
      * @param clickHandler A {@link ClickHandler} that is called when the player clicks the {@link Slot#OUTPUT} slot
      * @throws NullPointerException If the server version isn't supported
+     *
+     * @deprecated As of version 1.1, use {@link AnvilGUI(Plugin, Player, String, BiFunction)}
      */
     @Deprecated
     public AnvilGUI(Plugin plugin, Player holder, String insert, ClickHandler clickHandler) {
@@ -98,7 +104,7 @@ public class AnvilGUI implements Listener {
         wrapper.handleInventoryCloseEvent(holder);
         wrapper.setActiveContainerDefault(holder);
 
-        Bukkit.getPluginManager().registerEvents(this, plugin);
+        Bukkit.getPluginManager().registerEvents(listener, plugin);
 
         final Object container = wrapper.newContainerAnvil(holder);
 
@@ -126,36 +132,44 @@ public class AnvilGUI implements Listener {
         wrapper.setActiveContainerDefault(holder);
         wrapper.sendPacketCloseWindow(holder, containerId);
 
-        HandlerList.unregisterAll(this);
-    }
-
-    @EventHandler
-    public void onInventoryClick(InventoryClickEvent e) {
-        if(e.getInventory().equals(inventory)) {
-            e.setCancelled(true);
-            final Player clicker = (Player) e.getWhoClicked();
-            if(e.getRawSlot() == Slot.OUTPUT) {
-                final ItemStack clicked = inventory.getItem(e.getRawSlot());
-                if(clicked == null || clicked.getType() == Material.AIR) return;
-                final String ret = biFunction.apply(clicker, clicked.hasItemMeta() ? clicked.getItemMeta().getDisplayName() : clicked.getType().toString());
-                if(ret != null) {
-                    final ItemMeta meta = clicked.getItemMeta();
-                    meta.setDisplayName(ret);
-                    clicked.setItemMeta(meta);
-                    inventory.setItem(e.getRawSlot(), clicked);
-                } else closeInventory();
-            }
-        }
-    }
-
-    @EventHandler
-    public void onInventoryClose(InventoryCloseEvent e) {
-        if(open && e.getInventory().equals(inventory)) closeInventory();
+        HandlerList.unregisterAll(listener);
     }
 
     /**
-     * @deprecated Since version 1.1, use {@link #AnvilGUI(Plugin, Player, String, BiFunction)} instead
+     * Simply holds the listeners for the GUI
+     */
+    private class ListenUp implements Listener {
+
+        @EventHandler
+        public void onInventoryClick(InventoryClickEvent e) {
+            if(e.getInventory().equals(inventory)) {
+                e.setCancelled(true);
+                final Player clicker = (Player) e.getWhoClicked();
+                if(e.getRawSlot() == Slot.OUTPUT) {
+                    final ItemStack clicked = inventory.getItem(e.getRawSlot());
+                    if(clicked == null || clicked.getType() == Material.AIR) return;
+                    final String ret = biFunction.apply(clicker, clicked.hasItemMeta() ? clicked.getItemMeta().getDisplayName() : clicked.getType().toString());
+                    if(ret != null) {
+                        final ItemMeta meta = clicked.getItemMeta();
+                        meta.setDisplayName(ret);
+                        clicked.setItemMeta(meta);
+                        inventory.setItem(e.getRawSlot(), clicked);
+                    } else closeInventory();
+                }
+            }
+        }
+
+        @EventHandler
+        public void onInventoryClose(InventoryCloseEvent e) {
+            if(open && e.getInventory().equals(inventory)) closeInventory();
+        }
+
+    }
+
+    /**
      * Handles the click of the output slot
+     *
+     * @deprecated Since version 1.1, use {@link AnvilGUI(Plugin, Player, String, BiFunction)} instead
      */
     @Deprecated
     public static abstract class ClickHandler {

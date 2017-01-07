@@ -9,6 +9,7 @@ import org.bukkit.inventory.Inventory;
 
 /**
  * {@link VersionWrapper} implemented for NMS version 1_9_R2
+ * @author Wesley Smith
  * @since 1.0
  */
 public class Wrapper1_9_R2 implements VersionWrapper {

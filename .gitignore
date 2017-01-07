@@ -8,3 +8,6 @@ src/test
 
 # Libs
 src/libs
+
+# Javadocs
+/javadocs

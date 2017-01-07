@@ -29,7 +29,7 @@ on the issues tab.
 <repositories>
     <repository>
         <id>wesjd-repo</id>
-        <url>http://nexus.wesjd.net/repository/thirdparty/</url>
+        <url>https://nexus.wesjd.net/repository/thirdparty/</url>
     </repository>
     ...
 </repositories>
@@ -66,6 +66,8 @@ what is shown above.
 The above code is what is inside your `BiFunction`. The parameters of the function are also obvious, the player who answered
 and their reply. The function also returns a `String`. This string is to be used if the user is wrong, etc,
 and it will show in the dialogue box in the GUI what is supplied. If you return `null`, the inventory will close.
+
+###[Javadocs](http://docs.wesjd.net/AnvilGUI/)
 
 ##Compilation
 

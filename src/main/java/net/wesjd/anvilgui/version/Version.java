@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Contains all of the {@link VersionWrapper}s
+ * @author Wesley Smith
  * @since 1.0
  */
 public enum Version {
