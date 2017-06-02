@@ -58,6 +58,7 @@ public enum Version {
                             return aClass.newInstance();
                         }
                     });
+    private static FallbackWrapper fallback = null;
 
     /**
      * The package value of this NMS version
@@ -105,6 +106,12 @@ public enum Version {
      */
     public static Version of(final String pkg) {
         return Arrays.stream(values()).filter(ver -> pkg.equals("v" + ver.getPkg())).findFirst().orElse(null);
+    }
+
+    public static FallbackWrapper getFallback() {
+        if(fallback == null)
+            fallback = new FallbackWrapper();
+        return fallback;
     }
 
 }
