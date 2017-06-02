@@ -12,6 +12,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -168,7 +169,11 @@ public class AnvilGUI {
 
         @EventHandler
         public void onInventoryClose(InventoryCloseEvent e) {
-            if(open && e.getInventory().equals(inventory)) closeInventory();
+            if(e.getInventory().equals(inventory)) {
+                if(open)
+                    closeInventory();
+                e.getInventory().clear();
+            }
         }
 
     }
