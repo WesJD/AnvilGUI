@@ -11,6 +11,17 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+/**
+ * This class tries to do what all the other wrappers did but using reflections, this doesn't require the version to be
+ * known compile-time but it has some really serious drawbacks: it's slower, dirtier and it could not work in newer versions
+ *
+ * in the static block we init every used reflection util, the classes are named &lt;className&gt;Class (like playerClass),
+ * the methods are named &lt;className&gt;&lt;methodName&gt; (like playerGetHandle),
+ * constructors are named &lt;className&gt;Constructor (like chatMessageConstructor),
+ * fields are named &lt;className&gt;&lt;fieldName&gt; (like playerActiveContainer)
+ *
+ * Every method written with reflection has his real-code version commented before
+ */
 public class FallbackWrapper implements VersionWrapper {
     private static final String version;
 
