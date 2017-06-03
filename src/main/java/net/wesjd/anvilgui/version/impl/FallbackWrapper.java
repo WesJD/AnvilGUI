@@ -242,7 +242,12 @@ public class FallbackWrapper implements VersionWrapper {
      */
     @Override
     public Object newContainerAnvil(Player player) {
-        //TODO try to make containerAnvil.a() return always true
+        /*
+        This is a workaround for the ContainerAnvil overridation:
+        Instead of overriding the method a() and forcing it to return true
+        We set the container.checkReachable flag, making the method always return true
+         */
+
         try {
             final Object nms = toNMS(player);
             Object obj = containerAnvilConstructor.newInstance(
