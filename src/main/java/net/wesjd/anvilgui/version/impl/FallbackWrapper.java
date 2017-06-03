@@ -97,8 +97,7 @@ public class FallbackWrapper implements VersionWrapper {
             );
             containerCheckReachable = getNMSClass("Container").getField("checkReachable");
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new IllegalStateException(e);
+            throw new UnsupportedVersionException(version, e);
         }
     }
 
@@ -111,8 +110,8 @@ public class FallbackWrapper implements VersionWrapper {
         try {
             return (int) playerNextContainerCounter.invoke(toNMS(player));//nms(player).nextContainerCounter();
         } catch (Exception e) {
-            //TODO better errors;
-            throw new IllegalStateException(e);
+            handleException(e);
+            return -1;
         }
     }
 
@@ -125,8 +124,7 @@ public class FallbackWrapper implements VersionWrapper {
         try {
             eventFactoryHandleInventoryCloseEvent.invoke(craftEventFactory, toNMS(player));
         } catch (Exception e) {
-            //TODO better errors;
-            throw new IllegalStateException(e);
+            handleException(e);
         }
     }
 
@@ -146,8 +144,7 @@ public class FallbackWrapper implements VersionWrapper {
                     )//)
             );//);
         } catch (Exception e) {
-           //TODO better errors;
-            throw new IllegalStateException(e);
+           handleException(e);
         }
     }
 
@@ -163,8 +160,7 @@ public class FallbackWrapper implements VersionWrapper {
                     packetPlayOutCloseWindowConstructor.newInstance(containerId)//new PacketPlayOutCloseWindow(containerId)
             );//);
         } catch (Exception e) {
-            //TODO better errors;
-            throw new IllegalStateException(e);
+            handleException(e);
         }
     }
 
@@ -177,8 +173,7 @@ public class FallbackWrapper implements VersionWrapper {
             Object nmsPlayer = toNMS(player);
             playerActiveContainer.set(nmsPlayer, playerDefaultContainer.get(nmsPlayer));
         } catch (Exception e) {
-            //TODO better errors;
-            throw new IllegalStateException(e);
+            handleException(e);
         }
     }
 
@@ -190,8 +185,7 @@ public class FallbackWrapper implements VersionWrapper {
         try {
             playerActiveContainer.set(toNMS(player), container);
         } catch (Exception e) {
-            //TODO better errors;
-            throw new IllegalStateException(e);
+            handleException(e);
         }
     }
 
@@ -203,8 +197,7 @@ public class FallbackWrapper implements VersionWrapper {
         try {
             containerWindowId.set(container, containerId);
         } catch (Exception e) {
-            //TODO better errors;
-            throw new IllegalStateException(e);
+            handleException(e);
         }
     }
 
@@ -216,8 +209,7 @@ public class FallbackWrapper implements VersionWrapper {
         try {
             containerAddSlotListener.invoke(container, toNMS(player));
         } catch (Exception e) {
-            //TODO better errors;
-            throw new IllegalStateException(e);
+            handleException(e);
         }
     }
 
@@ -229,8 +221,8 @@ public class FallbackWrapper implements VersionWrapper {
         try {
             return ((InventoryView)containerGetBukkitView.invoke(container)).getTopInventory();
         } catch (Exception e) {
-            //TODO better errors;
-            throw new IllegalStateException(e);
+            handleException(e);
+            return null;
         }
     }
 
@@ -251,8 +243,8 @@ public class FallbackWrapper implements VersionWrapper {
             containerCheckReachable.set(obj, false);
             return obj;
         } catch (Exception e) {
-            //TODO better errors;
-            throw new IllegalStateException(e);
+            handleException(e);
+            return null;
         }
     }
 
@@ -263,6 +255,10 @@ public class FallbackWrapper implements VersionWrapper {
      */
     private Object toNMS(Player player) throws InvocationTargetException, IllegalAccessException {
         return playerGetHandle.invoke(player);
+    }
+
+    protected void handleException(Exception e) {
+        throw new UnsupportedVersionException(version, e);
     }
 
 
@@ -281,6 +277,19 @@ public class FallbackWrapper implements VersionWrapper {
         } catch(ClassNotFoundException e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public static class UnsupportedVersionException extends RuntimeException {
+        private final String version;
+
+        public UnsupportedVersionException(String version, Exception e) {
+            super("Unsupported version \"" + version + "\", report this to the developers", e);
+            this.version = version;
+        }
+
+        public String getVersion() {
+            return version;
         }
     }
 }
