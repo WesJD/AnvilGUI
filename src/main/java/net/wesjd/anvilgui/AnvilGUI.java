@@ -22,7 +22,6 @@ import org.bukkit.plugin.Plugin;
  * @since 1.0
  */
 public class AnvilGUI {
-    private static final String GITHUB_LINK = "https://github.com/WesJD/AnvilGUI";
 
     /**
      * The player who has the GUI open
@@ -77,15 +76,7 @@ public class AnvilGUI {
         paper.setItemMeta(paperMeta);
         this.insert = paper;
 
-        final String strVersion = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
-        final Version version = Version.of(strVersion);
-        //Validate.notNull(version, "Your server version isn't supported in AnvilGUI!");
-        if (version != null)
-            wrapper = version.getWrapper();
-        else {
-            plugin.getLogger().warning("[AnvilGUI] Using fallback wrapper, please ask the developers to implement \"" + strVersion + "\" too (" + GITHUB_LINK + ")");
-            wrapper = Version.getFallback();
-        }
+        this.wrapper = Version.getWrapper();
 
         wrapper.handleInventoryCloseEvent(holder);
         wrapper.setActiveContainerDefault(holder);
