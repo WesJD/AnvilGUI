@@ -9,18 +9,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 
 /**
  * An anvil gui, used for gathering a user's input
@@ -40,7 +34,7 @@ public class AnvilGUI {
     /**
      * Called when the player clicks the {@link Slot#OUTPUT} slot
      */
-    private final BiFunction<Player, String, String> biFunction;
+    private final ClickHandler clickHandler;
 
     /**
      * The {@link VersionWrapper} for this server
@@ -65,31 +59,16 @@ public class AnvilGUI {
     private boolean open = false;
 
     /**
-     * Create an AnvilGUI and open it for the player
+     * Create an AnvilGUI and open it for the player.
      * @param plugin A {@link org.bukkit.plugin.java.JavaPlugin} instance
      * @param holder The {@link Player} to open the inventory for
      * @param insert What to have the text already set to
      * @param clickHandler A {@link ClickHandler} that is called when the player clicks the {@link Slot#OUTPUT} slot
      * @throws NullPointerException If the server version isn't supported
-     *
-     * @deprecated As of version 1.1, use {@link AnvilGUI(Plugin, Player, String, BiFunction)}
      */
-    @Deprecated
     public AnvilGUI(Plugin plugin, Player holder, String insert, ClickHandler clickHandler) {
-        this(plugin, holder, insert, clickHandler::onClick);
-    }
-
-    /**
-     * Create an AnvilGUI and open it for the player.
-     * @param plugin A {@link org.bukkit.plugin.java.JavaPlugin} instance
-     * @param holder The {@link Player} to open the inventory for
-     * @param insert What to have the text already set to
-     * @param biFunction A {@link BiFunction} that is called when the player clicks the {@link Slot#OUTPUT} slot
-     * @throws NullPointerException If the server version isn't supported
-     */
-    public AnvilGUI(Plugin plugin, Player holder, String insert, BiFunction<Player, String, String> biFunction) {
         this.holder = holder;
-        this.biFunction = biFunction;
+        this.clickHandler = clickHandler;
 
         final ItemStack paper = new ItemStack(Material.PAPER);
         final ItemMeta paperMeta = paper.getItemMeta();
@@ -97,9 +76,7 @@ public class AnvilGUI {
         paper.setItemMeta(paperMeta);
         this.insert = paper;
 
-        final Version version = Version.of(Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3]);
-        Validate.notNull(version, "Your server version isn't supported in AnvilGUI!");
-        wrapper = version.getWrapper();
+        this.wrapper = Version.getWrapper();
 
         wrapper.handleInventoryCloseEvent(holder);
         wrapper.setActiveContainerDefault(holder);
@@ -148,12 +125,12 @@ public class AnvilGUI {
                 if(e.getRawSlot() == Slot.OUTPUT) {
                     final ItemStack clicked = inventory.getItem(e.getRawSlot());
                     if(clicked == null || clicked.getType() == Material.AIR) return;
-                    final String ret = biFunction.apply(clicker, clicked.hasItemMeta() ? clicked.getItemMeta().getDisplayName() : clicked.getType().toString());
+                    final String ret = clickHandler.onClick(clicker, clicked.hasItemMeta() ? clicked.getItemMeta().getDisplayName() : clicked.getType().toString());
                     if(ret != null) {
                         final ItemMeta meta = clicked.getItemMeta();
                         meta.setDisplayName(ret);
                         clicked.setItemMeta(meta);
-                        inventory.setItem(e.getRawSlot(), clicked);
+                        inventory.setItem(Slot.INPUT_LEFT, clicked);
                     } else closeInventory();
                 }
             }
@@ -161,18 +138,19 @@ public class AnvilGUI {
 
         @EventHandler
         public void onInventoryClose(InventoryCloseEvent e) {
-            if(open && e.getInventory().equals(inventory)) closeInventory();
+            if(e.getInventory().equals(inventory)) {
+                if(open)
+                    closeInventory();
+                e.getInventory().clear();
+            }
         }
 
     }
 
     /**
      * Handles the click of the output slot
-     *
-     * @deprecated Since version 1.1, use {@link AnvilGUI(Plugin, Player, String, BiFunction)} instead
      */
-    @Deprecated
-    public static abstract class ClickHandler {
+    public interface ClickHandler{
 
         /**
          * Is called when a {@link Player} clicks on the output in the GUI
@@ -180,7 +158,7 @@ public class AnvilGUI {
          * @param input What the item was renamed to
          * @return What to replace the text with, or null to close the inventory
          */
-        public abstract String onClick(Player clicker, String input);
+        String onClick(Player clicker, String input);
 
     }
 

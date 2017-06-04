@@ -4,9 +4,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>net.wesjd</groupId>
+    <groupId>xyz.upperlevel.spigot.anvilgui</groupId>
     <artifactId>anvilgui</artifactId>
-    <version>1.1.1-SNAPSHOT</version>
+    <version>1.2</version>
+
+    <description>Upperlevel's fork of WesJD/AnvilGui.</description>
 
     <dependencies>
         <dependency>
