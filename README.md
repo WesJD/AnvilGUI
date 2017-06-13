@@ -1,20 +1,20 @@
-#AnvilGUI
+# AnvilGUI
 Easily use anvil guis to get a user's input.
 
 This project was made since their is no easy way to do this with the Spigot / Bukkit APIs. It requires interaction
 with NMS and that is a pain in a non-private plugin where users will have lots of different versions of the server
 running.
 
-##Requirements
+## Requirements
 Java 8 and Bukkit / Spigot. Most server versions in the [Spigot Repository](https://hub.spigotmc.org/nexus/) are supported.
 
-###My version isn't supported
+### My version isn't supported
 If you are a developer, submit a pull request adding a wrapper class for your version. Otherwise, please create an issue
 on the issues tab. 
 
-##How to use
+## How to use
 
-###As a dependency
+### As a dependency
 
 ```xml
 <dependencies>
@@ -35,9 +35,9 @@ on the issues tab.
 </repositories>
 ```
 
-###In your plugin
+### In your plugin
 
-####Prompting a user for input
+#### Prompting a user for input
 
 ```java
 new AnvilGUI(myPluginInstance, myPlayer, "What is the meaning of life?", (player, reply) -> {
@@ -52,7 +52,7 @@ The AnvilGUI takes in a parameter of your plugin, the player that the GUI should
 `BiFunction`. The first two parameters are quite obvious, and the third for example would be a question, just like
 what is shown above.
 
-####Handling their answer
+#### Handling their answer
 
 ```java
 (player, reply) -> {
@@ -67,13 +67,13 @@ The above code is what is inside your `BiFunction`. The parameters of the functi
 and their reply. The function also returns a `String`. This string is to be used if the user is wrong, etc,
 and it will show in the dialogue box in the GUI what is supplied. If you return `null`, the inventory will close.
 
-###[Javadocs](http://docs.wesjd.net/AnvilGUI/)
+### [Javadocs](http://docs.wesjd.net/AnvilGUI/)
 
-##Compilation
+## Compilation
 
 Build with `mvn clean install`. Do note that you will need the spigot jars in this repo to be installed on your
 local repository. To make this easier, you can use [this shell script](https://gist.github.com/WesJD/39b8f0c88f74bc952e27a737d3a67234).
 
-##License
+## License
 
 This project is licensed under the [MIT License](LICENSE).
