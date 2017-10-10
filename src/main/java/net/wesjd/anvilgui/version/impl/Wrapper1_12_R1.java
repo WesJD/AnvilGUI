@@ -110,11 +110,7 @@ public class Wrapper1_12_R1 implements VersionWrapper {
 
         public AnvilContainer(EntityHuman entityhuman) {
             super(entityhuman.inventory, entityhuman.world, new BlockPosition(0, 0, 0), entityhuman);
-        }
-
-        @Override
-        public boolean a(EntityHuman entityhuman) {
-            return true;
+            this.checkReachable = false;
         }
 
     }
