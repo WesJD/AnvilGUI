@@ -23,7 +23,6 @@ on the issues tab.
         <artifactId>anvilgui</artifactId>
         <version>1.1.1-SNAPSHOT</version>
     </dependency>
-    ...
 </dependencies>
 
 <repositories>
@@ -31,7 +30,6 @@ on the issues tab.
         <id>wesjd-repo</id>
         <url>https://nexus.wesjd.net/repository/thirdparty/</url>
     </repository>
-    ...
 </repositories>
 ```
 
