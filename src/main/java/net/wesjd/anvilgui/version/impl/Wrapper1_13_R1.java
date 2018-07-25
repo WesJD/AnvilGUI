@@ -8,9 +8,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
 /**
- * {@link VersionWrapper} implemented for NMS version 1_12_R2
+ * {@link VersionWrapper} implemented for NMS version 1_13_R2
  * @author Wesley Smith
- * @since 1.1.1
+ * @since 1.1.2
  */
 public class Wrapper1_13_R1 implements VersionWrapper {
 
