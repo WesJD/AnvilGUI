@@ -5,62 +5,24 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.wesjd</groupId>
-    <artifactId>anvilgui</artifactId>
-    <version>1.1.1-SNAPSHOT</version>
+    <artifactId>anvilgui-parent</artifactId>
+    <version>1.2-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-1.8</artifactId>
-            <version>1.8-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-1.8.3</artifactId>
-            <version>1.8.3-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-1.8.8</artifactId>
-            <version>1.8.8-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-1.9</artifactId>
-            <version>1.9-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-1.9.4</artifactId>
-            <version>1.9.4-R0.2-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-1.10.2</artifactId>
-            <version>1.10.2-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-1.11</artifactId>
-            <version>1.11-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-1.12</artifactId>
-            <version>1.12-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
+    <modules>
+        <module>api</module>
+        <module>abstraction</module>
+        <module>1_8_R1</module>
+        <module>1_8_R2</module>
+        <module>1_8_R3</module>
+        <module>1_9_R1</module>
+        <module>1_9_R2</module>
+        <module>1_10_R1</module>
+        <module>1_11_R1</module>
+        <module>1_12_R1</module>
+    </modules>
 
     <build>
-        <defaultGoal>clean install javadoc:javadoc</defaultGoal>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -71,32 +33,7 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.4</version>
-                <configuration>
-                    <outputDirectory>${project.basedir}/javadocs</outputDirectory>
-                    <reportOutputDirectory>${project.basedir}/javadocs</reportOutputDirectory>
-                    <destDir>javadocs</destDir>
-                    <failOnError>false</failOnError> <!-- if any fix is possible around @deprecated, please let me know -->
-                </configuration>
-            </plugin>
         </plugins>
-        <extensions>
-            <extension>
-                <groupId>org.apache.maven.wagon</groupId>
-                <artifactId>wagon-ssh</artifactId>
-                <version>1.0-beta-6</version>
-            </extension>
-        </extensions>
     </build>
-
-    <distributionManagement>
-        <repository>
-            <id>wesjd-repo</id>
-            <url>https://nexus.wesjd.net/repository/thirdparty/</url>
-        </repository>
-    </distributionManagement>
 
 </project>

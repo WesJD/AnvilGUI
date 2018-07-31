@@ -11,3 +11,5 @@ src/libs
 
 # Javadocs
 /javadocs
+
+dependency-reduced-pom.xml
