@@ -37,4 +37,11 @@
         </plugins>
     </build>
 
+    <distributionManagement>
+        <repository>
+            <id>wesjd-repo</id>
+            <url>https://nexus.wesjd.net/repository/thirdparty/</url>
+        </repository>
+    </distributionManagement>
+
 </project>

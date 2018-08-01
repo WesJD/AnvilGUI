@@ -21,61 +21,61 @@
         </dependency>
         <dependency>
             <groupId>net.wesjd</groupId>
-            <artifactId>abstraction</artifactId>
+            <artifactId>anvilgui-abstraction</artifactId>
             <version>1.2-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.wesjd</groupId>
-            <artifactId>1_8_R1</artifactId>
+            <artifactId>anvilgui-1_8_R1</artifactId>
             <version>1.2-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.wesjd</groupId>
-            <artifactId>1_8_R2</artifactId>
+            <artifactId>anvilgui-1_8_R2</artifactId>
             <version>1.2-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.wesjd</groupId>
-            <artifactId>1_8_R3</artifactId>
+            <artifactId>anvilgui-1_8_R3</artifactId>
             <version>1.2-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.wesjd</groupId>
-            <artifactId>1_9_R1</artifactId>
+            <artifactId>anvilgui-1_9_R1</artifactId>
             <version>1.2-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.wesjd</groupId>
-            <artifactId>1_8_R2</artifactId>
+            <artifactId>anvilgui-1_9_R2</artifactId>
             <version>1.2-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.wesjd</groupId>
-            <artifactId>1_10_R1</artifactId>
+            <artifactId>anvilgui-1_10_R1</artifactId>
             <version>1.2-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.wesjd</groupId>
-            <artifactId>1_11_R1</artifactId>
+            <artifactId>anvilgui-1_11_R1</artifactId>
             <version>1.2-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.wesjd</groupId>
-            <artifactId>1_12_R1</artifactId>
+            <artifactId>anvilgui-1_12_R1</artifactId>
             <version>1.2-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.wesjd</groupId>
-            <artifactId>1_13_R1</artifactId>
+            <artifactId>anvilgui-1_13_R1</artifactId>
             <version>1.2-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
@@ -117,12 +117,5 @@
             </extension>
         </extensions>
     </build>
-
-    <distributionManagement>
-        <repository>
-            <id>wesjd-repo</id>
-            <url>https://nexus.wesjd.net/repository/thirdparty/</url>
-        </repository>
-    </distributionManagement>
     
 </project>
