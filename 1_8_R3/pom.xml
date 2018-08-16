@@ -9,7 +9,7 @@
     <parent>
         <groupId>net.wesjd</groupId>
         <artifactId>anvilgui-parent</artifactId>
-        <version>1.2-SNAPSHOT</version>
+        <version>1.2.1-SNAPSHOT</version>
     </parent>
 
     <dependencies>
@@ -21,8 +21,8 @@
         </dependency>
         <dependency>
             <groupId>net.wesjd</groupId>
-            <artifactId>abstraction</artifactId>
-            <version>1.2-SNAPSHOT</version>
+            <artifactId>anvilgui-abstraction</artifactId>
+            <version>1.2.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>

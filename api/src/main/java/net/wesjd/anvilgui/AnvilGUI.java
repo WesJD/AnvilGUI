@@ -28,7 +28,7 @@ public class AnvilGUI {
     /**
      * The local {@link VersionWrapper} object for the server's version
      */
-    private static VersionWrapper WRAPPER = VersionMatcher.match();
+    private static VersionWrapper WRAPPER = new VersionMatcher().match();
 
     /**
      * The player who has the GUI open
@@ -59,7 +59,7 @@ public class AnvilGUI {
     /**
      * Represents the state of the inventory being open
      */
-    private boolean open = false;
+    private boolean open;
 
     /**
      * Create an AnvilGUI and open it for the player
