@@ -129,6 +129,14 @@ public class AnvilGUI {
     }
 
     /**
+     * Returns the Bukkit inventory for this anvil gui
+     * @return the {@link Inventory} for this anvil gui
+     */
+    public Inventory getInventory() {
+        return inventory;
+    }
+
+    /**
      * Simply holds the listeners for the GUI
      */
     private class ListenUp implements Listener {
