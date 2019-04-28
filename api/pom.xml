@@ -85,6 +85,11 @@
             <version>1.2.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>net.wesjd</groupId>
+            <artifactId>anvilgui-1_14_R1</artifactId>
+            <version>1.2.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>

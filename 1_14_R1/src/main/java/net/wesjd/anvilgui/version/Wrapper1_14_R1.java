@@ -33,7 +33,7 @@ public class Wrapper1_14_R1 implements VersionWrapper {
      */
     @Override
     public void sendPacketOpenWindow(Player player, int containerId) {
-        toNMS(player).playerConnection.sendPacket(new PacketPlayOutOpenWindow(containerId, Containers.ANVIL, new ChatMessage(Blocks.ANVIL.T_() + ".name")));
+        toNMS(player).playerConnection.sendPacket(new PacketPlayOutOpenWindow(containerId, Containers.ANVIL, new ChatMessage("Repair & Name")));
     }
 
     /**
@@ -127,6 +127,7 @@ public class Wrapper1_14_R1 implements VersionWrapper {
             super(Wrapper1_14_R1.this.getNextContainerId(player), ((CraftPlayer) player).getHandle().inventory,
                     ContainerAccess.at(((CraftWorld) player.getWorld()).getHandle(), new BlockPosition(0, 0, 0)));
             this.checkReachable = false;
+            setTitle(new ChatMessage("Repair & Name"));
         }
 
     }
