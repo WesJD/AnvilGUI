@@ -21,8 +21,16 @@
         <module>1_11_R1</module>
         <module>1_12_R1</module>
         <module>1_13_R1</module>
-	<module>1_13_R2</module>
+        <module>1_13_R2</module>
+        <module>1_14_R1</module>
     </modules>
+
+    <repositories>
+        <repository>
+            <id>nms-repo</id>
+            <url>https://repo.codemc.org/repository/nms/</url>
+        </repository>
+    </repositories>
 
     <build>
         <plugins>
