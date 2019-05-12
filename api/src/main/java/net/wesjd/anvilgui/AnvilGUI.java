@@ -16,6 +16,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 
 /**
@@ -134,6 +135,30 @@ public class AnvilGUI {
      */
     public Inventory getInventory() {
         return inventory;
+    }
+
+    /**
+     * Opens an AnvilGUI for a player and returns the future response
+     * @param plugin The {@link org.bukkit.plugin.java.JavaPlugin} instance
+     * @param holder The {@link Player] to open the inventory for}
+     * @param insert What to have the text already set to
+     * @return A future that will be completed with the player's response
+     * @throws NullPointerException If the server version isn't supported
+     */
+    public static CompletableFuture<String> open(Plugin plugin, Player holder, String insert) {
+        CompletableFuture<String> yield = new CompletableFuture<>();
+
+        Bukkit.getScheduler()
+                .runTask(plugin, () -> {
+                    AnvilGUI[] inst = new AnvilGUI[1];
+                    inst[0] = new AnvilGUI(plugin, holder, insert, (player, response) -> {
+                        inst[0].closeInventory();
+                        yield.complete(response);
+                        return response;
+                    });
+                });
+
+        return yield;
     }
 
     /**
