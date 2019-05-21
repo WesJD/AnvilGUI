@@ -1,7 +1,6 @@
 package net.wesjd.anvilgui;
 
-import net.wesjd.anvilgui.version.VersionMatcher;
-import net.wesjd.anvilgui.version.VersionWrapper;
+import net.wesjd.anvilgui.version.*;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -9,6 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
@@ -18,193 +18,111 @@ import org.bukkit.plugin.Plugin;
 
 import java.util.function.BiFunction;
 
-/**
- * An anvil gui, used for gathering a user's input
- * @author Wesley Smith
- * @since 1.0
- */
 public class AnvilGUI {
 
-    /**
-     * The local {@link VersionWrapper} object for the server's version
-     */
-    private static VersionWrapper WRAPPER = new VersionMatcher().match();
+    private static final VersionMatcher versions = new VersionMatcher(
+        7,
+        Wrapper1_8_R1.class,
+        Wrapper1_8_R2.class,
+        Wrapper1_8_R3.class,
+        Wrapper1_9_R1.class,
+        Wrapper1_9_R2.class,
+        Wrapper1_10_R1.class,
+        Wrapper1_11_R1.class,
+        Wrapper1_12_R1.class,
+        Wrapper1_13_R1.class,
+        Wrapper1_13_R2.class,
+        Wrapper1_14_R1.class
+    );
 
-    /**
-     * The player who has the GUI open
-     */
-    private final Player holder;
-    /**
-     * The ItemStack that is in the {@link Slot#INPUT_LEFT} slot.
-     */
-    private final ItemStack insert;
-    /**
-     * Called when the player clicks the {@link Slot#OUTPUT} slot
-     */
-    private final BiFunction<Player, String, String> biFunction;
-
-    /**
-     * The container id of the inventory, used for NMS methods
-     */
-    private final int containerId;
-    /**
-     * The inventory that is used on the Bukkit side of things
-     */
+    private final Listener listener = new AnvilListener();
+    private final VersionWrapper anvil;
     private final Inventory inventory;
-    /**
-     * The listener holder class
-     */
-    private final ListenUp listener = new ListenUp();
+    private final BiFunction<Player, String, String> function;
+    private Boolean isOpen;
 
-    /**
-     * Represents the state of the inventory being open
-     */
-    private boolean open;
-
-    /**
-     * Create an AnvilGUI and open it for the player
-     * @param plugin A {@link org.bukkit.plugin.java.JavaPlugin} instance
-     * @param holder The {@link Player} to open the inventory for
-     * @param insert What to have the text already set to
-     * @param clickHandler A {@link ClickHandler} that is called when the player clicks the {@link Slot#OUTPUT} slot
-     * @throws NullPointerException If the server version isn't supported
-     *
-     * @deprecated As of version 1.1, use {@link AnvilGUI(Plugin, Player, String, BiFunction)}
-     */
-    @Deprecated
-    public AnvilGUI(Plugin plugin, Player holder, String insert, ClickHandler clickHandler) {
-        this(plugin, holder, insert, clickHandler::onClick);
-    }
-
-    /**
-     * Create an AnvilGUI and open it for the player.
-     * @param plugin A {@link org.bukkit.plugin.java.JavaPlugin} instance
-     * @param holder The {@link Player} to open the inventory for
-     * @param insert What to have the text already set to
-     * @param biFunction A {@link BiFunction} that is called when the player clicks the {@link Slot#OUTPUT} slot
-     * @throws NullPointerException If the server version isn't supported
-     */
-    public AnvilGUI(Plugin plugin, Player holder, String insert, BiFunction<Player, String, String> biFunction) {
-        this.holder = holder;
-        this.biFunction = biFunction;
-
-        final ItemStack paper = new ItemStack(Material.PAPER);
-        final ItemMeta paperMeta = paper.getItemMeta();
-        paperMeta.setDisplayName(insert);
-        paper.setItemMeta(paperMeta);
-        this.insert = paper;
-
-        WRAPPER.handleInventoryCloseEvent(holder);
-        WRAPPER.setActiveContainerDefault(holder);
+    public AnvilGUI(Plugin plugin, Player player, String insert, BiFunction<Player, String, String> function) {
+        this.function = function;
+        anvil = versions.nms(player);
 
         Bukkit.getPluginManager().registerEvents(listener, plugin);
 
-        final Object container = WRAPPER.newContainerAnvil(holder);
+        inventory = anvil.create();
 
-        inventory = WRAPPER.toBukkitInventory(container);
-        inventory.setItem(Slot.INPUT_LEFT, this.insert);
+        ItemStack paper = new ItemStack(Material.PAPER);
+        ItemMeta meta = paper.getItemMeta();
+        meta.setDisplayName(insert);
+        paper.setItemMeta(meta);
 
-        containerId = WRAPPER.getNextContainerId(holder);
-        WRAPPER.sendPacketOpenWindow(holder, containerId);
-        WRAPPER.setActiveContainer(holder, container);
-        WRAPPER.setActiveContainerId(container, containerId);
-        WRAPPER.addActiveContainerSlotListener(container, holder);
+        inventory.setItem(SlotType.INPUT_LEFT.id, paper);
 
-        open = true;
+        Bukkit.getScheduler().runTask(plugin, anvil::open);
+
+        isOpen = true;
     }
 
-    /**
-     * Closes the inventory if it's open.
-     * @throws IllegalArgumentException If the inventory isn't open
-     */
-    public void closeInventory() {
-        Validate.isTrue(open, "You can't close an inventory that isn't open!");
-        open = false;
+    public void close() {
+        Validate.isTrue(isOpen, "You can't close an inventory that isn't open!");
 
-        WRAPPER.handleInventoryCloseEvent(holder);
-        WRAPPER.setActiveContainerDefault(holder);
-        WRAPPER.sendPacketCloseWindow(holder, containerId);
+        isOpen = false;
+
+        anvil.close();
 
         HandlerList.unregisterAll(listener);
     }
 
-    /**
-     * Returns the Bukkit inventory for this anvil gui
-     * @return the {@link Inventory} for this anvil gui
-     */
-    public Inventory getInventory() {
-        return inventory;
-    }
-
-    /**
-     * Simply holds the listeners for the GUI
-     */
-    private class ListenUp implements Listener {
+    private class AnvilListener implements Listener {
 
         @EventHandler
-        public void onInventoryClick(InventoryClickEvent e) {
-            if(e.getInventory().equals(inventory)) {
-                e.setCancelled(true);
-                final Player clicker = (Player) e.getWhoClicked();
-                if(e.getRawSlot() == Slot.OUTPUT) {
-                    final ItemStack clicked = inventory.getItem(e.getRawSlot());
-                    if(clicked == null || clicked.getType() == Material.AIR) return;
-                    final String ret = biFunction.apply(clicker, clicked.hasItemMeta() ? clicked.getItemMeta().getDisplayName() : clicked.getType().toString());
-                    if(ret != null) {
-                        final ItemMeta meta = clicked.getItemMeta();
-                        meta.setDisplayName(ret);
-                        clicked.setItemMeta(meta);
-                        inventory.setItem(e.getRawSlot(), clicked);
-                    } else closeInventory();
+        public void onInventoryClick(InventoryClickEvent event) {
+            if (inventory == event.getInventory()) {
+                event.setCancelled(true);
+
+                if (event.getClick() != ClickType.LEFT)
+                    return;
+
+                if (event.getRawSlot() == SlotType.OUTPUT.id) {
+                    ItemStack clicked = inventory.getItem(event.getRawSlot());
+                    final ItemMeta meta = clicked.getItemMeta();
+
+                    if (clicked.getType() == Material.AIR)
+                        return;
+
+                    final String ret = function.apply(
+                        (Player) event.getWhoClicked(),
+                        clicked.hasItemMeta() ? meta.getDisplayName() : clicked.getType().toString()
+                    );
+
+                    if (ret == null) {
+                        event.getWhoClicked().closeInventory();
+                        return;
+                    }
+
+                    meta.setDisplayName(ret);
+                    clicked.setItemMeta(meta);
+                    inventory.setItem(event.getRawSlot(), clicked);
                 }
             }
         }
 
         @EventHandler
-        public void onInventoryClose(InventoryCloseEvent e) {
-            if(open && e.getInventory().equals(inventory)) closeInventory();
+        public void onInventoryClose(InventoryCloseEvent event) {
+            if (isOpen && inventory == event.getInventory())
+                close();
         }
 
     }
 
-    /**
-     * Handles the click of the output slot
-     *
-     * @deprecated Since version 1.1, use {@link AnvilGUI(Plugin, Player, String, BiFunction)} instead
-     */
-    @Deprecated
-    public static abstract class ClickHandler {
+    enum SlotType {
+        INPUT_LEFT(0),
+        INPUT_RIGHT(1),
+        OUTPUT(2);
 
-        /**
-         * Is called when a {@link Player} clicks on the output in the GUI
-         * @param clicker The {@link Player} who clicked the output
-         * @param input What the item was renamed to
-         * @return What to replace the text with, or null to close the inventory
-         */
-        public abstract String onClick(Player clicker, String input);
+        private int id;
 
-    }
-
-    /**
-     * Class wrapping the magic constants of slot numbers in an anvil GUI
-     */
-    public static class Slot {
-
-        /**
-         * The slot on the far left, where the first input is inserted. An {@link ItemStack} is always inserted
-         * here to be renamed
-         */
-        public static final int INPUT_LEFT = 0;
-        /**
-         * Not used, but in a real anvil you are able to put the second item you want to combine here
-         */
-        public static final int INPUT_RIGHT = 1;
-        /**
-         * The output slot, where an item is put when two items are combined from {@link #INPUT_LEFT} and
-         * {@link #INPUT_RIGHT} or {@link #INPUT_LEFT} is renamed
-         */
-        public static final int OUTPUT = 2;
-
+        SlotType(int id) {
+            this.id = id;
+        }
     }
 
 }
