@@ -1,14 +1,11 @@
 package net.wesjd.anvilgui.version;
 
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.PluginLogger;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
 
 public class VersionMatcher {
 

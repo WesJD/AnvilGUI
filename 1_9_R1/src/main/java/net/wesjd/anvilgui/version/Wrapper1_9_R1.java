@@ -3,7 +3,6 @@ package net.wesjd.anvilgui.version;
 import net.minecraft.server.v1_9_R1.*;
 import org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_9_R1.event.CraftEventFactory;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
 public class Wrapper1_9_R1 implements VersionWrapper {
