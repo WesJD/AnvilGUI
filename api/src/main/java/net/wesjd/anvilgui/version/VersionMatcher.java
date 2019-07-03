@@ -35,41 +35,6 @@ public class VersionMatcher {
 	);
 
 	/**
-	 * All available {@link VersionWrapper}s
-	 */
-	private final List<Class<? extends VersionWrapper>> versionsLegacy = Arrays.asList(
-			Wrapper1_8_R1.class,
-			Wrapper1_8_R2.class,
-			Wrapper1_8_R3.class,
-			Wrapper1_9_R1.class,
-			Wrapper1_9_R2.class,
-			Wrapper1_10_R1.class,
-			Wrapper1_11_R1.class,
-			Wrapper1_12_R1.class,
-			Wrapper1_13_R1.class,
-			Wrapper1_13_R2.class
-	);
-
-	/**
-	 * Matches the server version to it's {@link VersionWrapper}
-	 *
-	 * @return The {@link VersionWrapper} for this server
-	 * @throws RuntimeException If AnvilGUI doesn't support this server version
-	 */
-	public VersionWrapper matchLegacy() {
-		for (Class<? extends VersionWrapper> version : versionsLegacy) {
-			if (version.getSimpleName().substring(7).equals(serverVersion)) {
-				try {
-					return version.newInstance();
-				} catch (InstantiationException | IllegalAccessException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return null;
-	}
-
-	/**
 	 * Matches the server version to it's {@link VersionWrapper}
 	 *
 	 * @return The {@link VersionWrapper} for this server
