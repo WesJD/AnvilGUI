@@ -1,14 +1,10 @@
 package net.wesjd.anvilgui.version;
 
 import net.minecraft.server.v1_14_R1.*;
-import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.reflect.FieldUtils;
-import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_14_R1.event.CraftEventFactory;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-
-import java.lang.reflect.Field;
 
 public class Wrapper1_14_R1 implements VersionWrapper {
 
@@ -64,29 +60,6 @@ public class Wrapper1_14_R1 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
-    public void setActiveContainerId(Object container, int containerId) {
-        //((Container) container).windowId = containerId; windowId is now a final field
-        Field field = null;
-
-        try {
-            field = Container.class.getField("windowId");
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        }
-
-        FieldUtils.removeFinalModifier(field);
-
-        try {
-            FieldUtils.writeField(field, container, containerId);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void addActiveContainerSlotListener(Object container, Player player) {
         ((Container) container).addSlotListener(toNMS(player));
     }
@@ -103,8 +76,8 @@ public class Wrapper1_14_R1 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
-    public Object newContainerAnvil(Player player) {
-        return new Wrapper1_14_R1.AnvilContainer(player);
+    public IAnvilContainer newContainerAnvil(Player player) {
+        return new Wrapper1_14_R1.AnvilContainer(toNMS(player));
     }
 
     /**
@@ -120,14 +93,17 @@ public class Wrapper1_14_R1 implements VersionWrapper {
     /**
      * Modifications to ContainerAnvil that makes it so you don't have to have xp to use this anvil
      */
-    private class AnvilContainer extends ContainerAnvil {
+    private class AnvilContainer extends ContainerAnvil implements IAnvilContainer {
 
-        public AnvilContainer(Player player) {
-            //super(entityhuman.inventory, entityhuman.world, new BlockPosition(0, 0, 0), entityhuman);
-            super(Wrapper1_14_R1.this.getNextContainerId(player), ((CraftPlayer) player).getHandle().inventory,
-                    ContainerAccess.at(((CraftWorld) player.getWorld()).getHandle(), new BlockPosition(0, 0, 0)));
+        AnvilContainer(EntityPlayer entityPlayer) {
+            super(entityPlayer.nextContainerCounter(), entityPlayer.inventory, ContainerAccess.at(entityPlayer.world, new BlockPosition(0, 0, 0)));
             this.checkReachable = false;
             setTitle(new ChatMessage("Repair & Name"));
+        }
+
+        @Override
+        public int getContainerId() {
+            return windowId;
         }
 
     }
