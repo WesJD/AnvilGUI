@@ -105,6 +105,12 @@ public class Wrapper1_13_R2 implements VersionWrapper {
             return windowId;
         }
 
+        @Override
+        public void d() {
+            super.d();
+            this.levelCost = 0;
+        }
+
     }
 
 }
