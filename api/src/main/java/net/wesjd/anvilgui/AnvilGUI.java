@@ -12,9 +12,12 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.Repairable;
 import org.bukkit.plugin.Plugin;
 
 import java.util.function.BiFunction;
@@ -96,37 +99,21 @@ public class AnvilGUI {
 		paperMeta.setDisplayName(insert);
 		paper.setItemMeta(paperMeta);
 		this.insert = paper;
-		if (new VersionMatcher().matchLegacy() != null) {
-			WRAPPER.handleInventoryCloseEvent(holder);
-			WRAPPER.setActiveContainerDefault(holder);
+		WRAPPER.handleInventoryCloseEvent(holder);
+		WRAPPER.setActiveContainerDefault(holder);
 
-			Bukkit.getPluginManager().registerEvents(listener, plugin);
+		Bukkit.getPluginManager().registerEvents(listener, plugin);
 
-			final IAnvilContainer container = WRAPPER.newContainerAnvil(holder);
+		final IAnvilContainer container = WRAPPER.newContainerAnvil(holder);
 
-			inventory = WRAPPER.toBukkitInventory(container);
-			inventory.setItem(Slot.INPUT_LEFT, this.insert);
+		inventory = WRAPPER.toBukkitInventory(container);
+		inventory.setItem(Slot.INPUT_LEFT, this.insert);
 
-			containerId = container.getContainerId();
-			WRAPPER.sendPacketOpenWindow(holder, containerId);
-			WRAPPER.setActiveContainer(holder, container);
-			WRAPPER.addActiveContainerSlotListener(container, holder);
-			open = true;
-		} else {
-			holder.closeInventory();
-
-			Bukkit.getPluginManager().registerEvents(listener, plugin);
-
-			final IAnvilContainer container = WRAPPER.newContainerAnvil(holder);
-
-			inventory = WRAPPER.toBukkitInventory(container);
-			inventory.setItem(Slot.INPUT_LEFT, this.insert);
-
-			containerId = WRAPPER.getNextContainerId(holder);
-			WRAPPER.sendPacketOpenWindow(holder, containerId);
-			WRAPPER.addActiveContainerSlotListener(container, holder);
-			open = true;
-		}
+		containerId = container.getContainerId();
+		WRAPPER.sendPacketOpenWindow(holder, containerId);
+		WRAPPER.setActiveContainer(holder, container);
+		WRAPPER.addActiveContainerSlotListener(container, holder);
+		open = true;
 	}
 
 	/**
@@ -135,23 +122,14 @@ public class AnvilGUI {
 	 * @throws IllegalArgumentException If the inventory isn't open
 	 */
 	public void closeInventory() {
-		if (new VersionMatcher().matchLegacy() != null) {
-			Validate.isTrue(open, "You can't close an inventory that isn't open!");
-			open = false;
+		Validate.isTrue(open, "You can't close an inventory that isn't open!");
+		open = false;
 
-			WRAPPER.handleInventoryCloseEvent(holder);
-			WRAPPER.setActiveContainerDefault(holder);
-			WRAPPER.sendPacketCloseWindow(holder, containerId);
+		WRAPPER.handleInventoryCloseEvent(holder);
+		WRAPPER.setActiveContainerDefault(holder);
+		WRAPPER.sendPacketCloseWindow(holder, containerId);
 
-			HandlerList.unregisterAll(listener);
-		} else {
-			if (open)
-				return;
-
-			holder.closeInventory();
-			HandlerList.unregisterAll(listener);
-		}
-
+		HandlerList.unregisterAll(listener);
 	}
 
 	/**
