@@ -1,5 +1,6 @@
 package net.wesjd.anvilgui;
 
+import net.wesjd.anvilgui.version.IAnvilContainer;
 import net.wesjd.anvilgui.version.VersionMatcher;
 import net.wesjd.anvilgui.version.VersionWrapper;
 import org.apache.commons.lang.Validate;
@@ -101,15 +102,14 @@ public class AnvilGUI {
 
 			Bukkit.getPluginManager().registerEvents(listener, plugin);
 
-			final Object container = WRAPPER.newContainerAnvil(holder);
+			final IAnvilContainer container = WRAPPER.newContainerAnvil(holder);
 
 			inventory = WRAPPER.toBukkitInventory(container);
 			inventory.setItem(Slot.INPUT_LEFT, this.insert);
 
-			containerId = WRAPPER.getNextContainerId(holder);
+			containerId = container.getContainerId();
 			WRAPPER.sendPacketOpenWindow(holder, containerId);
 			WRAPPER.setActiveContainer(holder, container);
-			WRAPPER.setActiveContainerId(container, containerId);
 			WRAPPER.addActiveContainerSlotListener(container, holder);
 			open = true;
 		} else {
@@ -117,7 +117,7 @@ public class AnvilGUI {
 
 			Bukkit.getPluginManager().registerEvents(listener, plugin);
 
-			final Object container = WRAPPER.newContainerAnvil(holder);
+			final IAnvilContainer container = WRAPPER.newContainerAnvil(holder);
 
 			inventory = WRAPPER.toBukkitInventory(container);
 			inventory.setItem(Slot.INPUT_LEFT, this.insert);
@@ -148,10 +148,7 @@ public class AnvilGUI {
 			if (open)
 				return;
 
-			open = false;
-
 			holder.closeInventory();
-
 			HandlerList.unregisterAll(listener);
 		}
 
