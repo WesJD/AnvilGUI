@@ -106,13 +106,12 @@ public class AnvilGUI {
 
 		final IAnvilContainer container = WRAPPER.newContainerAnvil(holder);
 
-		inventory = WRAPPER.toBukkitInventory(container);
-		inventory.setItem(Slot.INPUT_LEFT, this.insert);
-
 		containerId = container.getContainerId();
 		WRAPPER.sendPacketOpenWindow(holder, containerId);
 		WRAPPER.setActiveContainer(holder, container);
 		WRAPPER.addActiveContainerSlotListener(container, holder);
+		inventory = WRAPPER.toBukkitInventory(container);
+		inventory.setItem(Slot.INPUT_LEFT, this.insert);
 		open = true;
 	}
 
