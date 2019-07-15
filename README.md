@@ -13,67 +13,46 @@ If you are a developer, submit a pull request adding a wrapper class for your ve
 on the issues tab. 
 
 ## How to use
-
 ### As a dependency
-
 ```xml
-<dependencies>
-    <dependency>
-        <groupId>net.wesjd</groupId>
-        <artifactId>anvilgui</artifactId>
-        <version>1.2.2-SNAPSHOT</version>
-    </dependency>
-    ...
-</dependencies>
+<dependency>
+    <groupId>com.github.WesJD</groupId>
+    <artifactId>AnvilGUI</artifactId>
+    <version>master-SNAPSHOT</version>
+</dependency>
 
 <repositories>
     <repository>
-        <id>wesjd-repo</id>
-        <url>https://nexus.wesjd.net/repository/thirdparty/</url>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
     </repository>
-    ...
 </repositories>
 ```
 
 ### In your plugin
-
-#### Prompting a user for input
-
 ```java
-new AnvilGUI(myPluginInstance, myPlayer, "What is the meaning of life?", (player, reply) -> {
-    if (reply.equalsIgnoreCase("you")) {
-        player.sendMessage("You have magical powers!");
-        return null;
-    }
-    return "Incorrect.";
-});
+new AnvilGUI.Builder()
+    .onClose(player -> {                   //called when the inventory is closing
+        player.sendMessage("You closed the inventory.");
+    })
+    .onComplete((player, text) -> {        //called when the inventory output slot is clicked
+        if(text.equalsIgnoreCase("you")) {
+            player.sendMessage("You have magical powers!");
+            return AnvilGUI.Response.close();
+        } else {
+            return AnvilGUI.Response.text("Incorrect.");
+        }
+    })
+    .preventClose()                        //prevents the inventory from being closed
+    .text("What is the meaning of life?")  //sets the text the GUI should start with
+    .plugin(myPluginInstance)              //set the plugin instance
+    .open(myPlayer);                       //opens the GUI for the player provided
 ```
-The AnvilGUI takes in a parameter of your plugin, the player that the GUI should open for, a prompt, and the
-`BiFunction`. The first two parameters are quite obvious, and the third for example would be a question, just like
-what is shown above.
-
-#### Handling their answer
-
-```java
-(player, reply) -> {
-    if (reply.equalsIgnoreCase("you")) {
-        player.sendMessage("You have magical powers!");
-        return null;
-    }
-    return "Incorrect.";
-}
-```
-The above code is what is inside your `BiFunction`. The parameters of the function are also obvious, the player who answered
-and their reply. The function also returns a `String`. This string is to be used if the user is wrong, etc,
-and it will show in the dialogue box in the GUI what is supplied. If you return `null`, the inventory will close.
 
 ### [Javadocs](http://docs.wesjd.net/AnvilGUI/)
 
 ## Compilation
-
-Build with `mvn clean install`. Do note that you will need the spigot jars in this repo to be installed on your
-local repository. To make this easier, you can use [this shell script](https://gist.github.com/WesJD/39b8f0c88f74bc952e27a737d3a67234).
+Build with `mvn clean install`.
 
 ## License
-
 This project is licensed under the [MIT License](LICENSE).

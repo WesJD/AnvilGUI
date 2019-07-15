@@ -11,7 +11,7 @@ import org.bukkit.inventory.Inventory;
 public interface VersionWrapper {
 
     /**
-     * Gets the next available NMS container id for player
+     * Gets the next available NMS container id for the player
      * @param player The player to get the next container id of
      * @return The next available NMS container id0
      */
@@ -51,6 +51,13 @@ public interface VersionWrapper {
     void setActiveContainer(Player player, Object container);
 
     /**
+     * Sets the supplied windowId of the supplied Container
+     * @param container The container to set the windowId of
+     * @param containerId The new windowId
+     */
+    void setActiveContainerId(Object container, int containerId);
+
+    /**
      * Adds a slot listener to the supplied container for the player
      * @param container The container to add the slot listener to
      * @param player The player to have as a listener
@@ -69,6 +76,6 @@ public interface VersionWrapper {
      * @param player The player to get the container of
      * @return The Container instance
      */
-    IAnvilContainer newContainerAnvil(Player player);
+    Object newContainerAnvil(Player player);
 
 }

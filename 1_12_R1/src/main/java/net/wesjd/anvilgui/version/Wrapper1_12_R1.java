@@ -65,6 +65,14 @@ public class Wrapper1_12_R1 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
+    public void setActiveContainerId(Object container, int containerId) {
+        ((Container) container).windowId = containerId;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void addActiveContainerSlotListener(Object container, Player player) {
         ((Container) container).addSlotListener(toNMS(player));
     }
@@ -81,7 +89,7 @@ public class Wrapper1_12_R1 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
-    public IAnvilContainer newContainerAnvil(Player player) {
+    public Object newContainerAnvil(Player player) {
         return new Wrapper1_12_R1.AnvilContainer(toNMS(player));
     }
 
@@ -97,16 +105,11 @@ public class Wrapper1_12_R1 implements VersionWrapper {
     /**
      * Modifications to ContainerAnvil that makes it so you don't have to have xp to use this anvil
      */
-    private class AnvilContainer extends ContainerAnvil implements IAnvilContainer {
+    private class AnvilContainer extends ContainerAnvil {
 
-        AnvilContainer(EntityHuman entityhuman) {
+        public AnvilContainer(EntityHuman entityhuman) {
             super(entityhuman.inventory, entityhuman.world, new BlockPosition(0, 0, 0), entityhuman);
             this.checkReachable = false;
-        }
-
-        @Override
-        public int getContainerId() {
-            return windowId;
         }
 
         @Override
