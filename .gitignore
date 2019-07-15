@@ -12,4 +12,8 @@ src/libs
 # Javadocs
 /javadocs
 
+*/javadocs
+*/javadoc-bundle-options
+*/google-java-format.xml
+
 dependency-reduced-pom.xml

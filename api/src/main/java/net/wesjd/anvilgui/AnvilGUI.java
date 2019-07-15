@@ -49,11 +49,11 @@ public class AnvilGUI {
 	 */
 	private final boolean preventClose;
 	/**
-	 * An {@link Consumer<Player>} that is called when the anvil GUI is closed
+	 * An {@link Consumer} that is called when the anvil GUI is closed
 	 */
 	private final Consumer<Player> closeListener;
 	/**
-	 * An {@link BiFunction<Player, String, Response>} that is called when the {@link Slot#OUTPUT} slot has been clicked
+	 * An {@link BiFunction} that is called when the {@link Slot#OUTPUT} slot has been clicked
 	 */
 	private final BiFunction<Player, String, Response> completeFunction;
 
@@ -108,7 +108,7 @@ public class AnvilGUI {
 	 * @param player The {@link Player} to open the inventory for
 	 * @param text What to have the text already set to
 	 * @param preventClose Whether to prevent the inventory from closing
-	 * @param closeListener A {@link Consumer<Player>} when the inventory closes
+	 * @param closeListener A {@link Consumer} when the inventory closes
 	 * @param completeFunction A {@link BiFunction} that is called when the player clicks the {@link Slot#OUTPUT} slot
 	 */
 	private AnvilGUI(
@@ -229,7 +229,7 @@ public class AnvilGUI {
 	public static class Builder {
 
 		/**
-		 * An {@link Consumer<Player>} that is called when the anvil GUI is closed
+		 * An {@link Consumer} that is called when the anvil GUI is closed
 		 */
 		private Consumer<Player> closeListener;
 		/**
@@ -237,7 +237,7 @@ public class AnvilGUI {
 		 */
 		private boolean preventClose = false;
 		/**
-		 * An {@link BiFunction<Player, String, Response>} that is called when the anvil output slot has been clicked
+		 * An {@link BiFunction} that is called when the anvil output slot has been clicked
 		 */
 		private BiFunction<Player, String, Response> completeFunction;
 		/**
@@ -260,7 +260,7 @@ public class AnvilGUI {
 
 		/**
 		 * Listens for when the inventory is closed
-		 * @param closeListener An {@link Consumer<Player>} that is called when the anvil GUI is closed
+		 * @param closeListener An {@link Consumer} that is called when the anvil GUI is closed
 		 * @return The {@link Builder} instance
 		 * @throws IllegalArgumentException when the closeListener is null
 		 */
@@ -272,7 +272,7 @@ public class AnvilGUI {
 
 		/**
 		 * Handles the inventory output slot when it is clicked
-		 * @param completeFunction An {@link BiFunction<Player, String, Response>} that is called when the user clicks the output slot
+		 * @param completeFunction An {@link BiFunction} that is called when the user clicks the output slot
 		 * @return The {@link Builder} instance
 		 * @throws IllegalArgumentException when the completeFunction is null
 		 */
