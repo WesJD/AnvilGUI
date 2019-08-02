@@ -1,6 +1,8 @@
 package net.wesjd.anvilgui.version;
 
 import net.minecraft.server.v1_14_R1.*;
+import net.wesjd.version.special.AnvilContainer1_14_4_R1;
+import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_14_R1.event.CraftEventFactory;
@@ -99,6 +101,9 @@ public class Wrapper1_14_R1 implements VersionWrapper {
      */
     @Override
     public Object newContainerAnvil(Player player) {
+        if (Bukkit.getBukkitVersion().contains("1.14.4")) {
+            return new AnvilContainer1_14_4_R1(player, getNextContainerId(player));
+        }
         return new Wrapper1_14_R1.AnvilContainer(player);
     }
 

@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>anvilgui-1_14_4</artifactId>
+    <artifactId>anvilgui-1_14_4_R1</artifactId>
 
     <parent>
         <artifactId>anvilgui-parent</artifactId>
@@ -17,11 +17,6 @@
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot</artifactId>
             <version>1.14.4-R0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>net.wesjd</groupId>
-            <artifactId>anvilgui-1_14_R1</artifactId>
-            <version>1.2.3-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

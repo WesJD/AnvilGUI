@@ -1,6 +1,5 @@
 package net.wesjd.anvilgui.version;
 
-import net.wesjd.version.Wrapper1_14_4;
 import org.bukkit.Bukkit;
 
 import java.util.Arrays;
@@ -43,9 +42,6 @@ public class VersionMatcher {
 	 */
 	public VersionWrapper match() {
 		try {
-			if (Bukkit.getBukkitVersion().contains("1.14.4"))
-				return new Wrapper1_14_4();
-
 			return versions.stream()
 					.filter(version -> version.getSimpleName().substring(7).equals(serverVersion))
 					.findFirst().orElseThrow(() -> new RuntimeException("Your server version isn't supported in AnvilGUI!"))
