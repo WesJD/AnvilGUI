@@ -1,13 +1,11 @@
 package net.wesjd.anvilgui.version;
 
 import net.minecraft.server.v1_14_R1.*;
-import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.reflect.FieldUtils;
 import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_14_R1.event.CraftEventFactory;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -70,7 +68,7 @@ public class Wrapper1_14_R1 implements VersionWrapper {
         try {
             final Field field = Container.class.getField("windowId");
 
-            final Field modifiersField = Field.class.getField("modifiers");
+            final Field modifiersField = Field.class.getDeclaredField("modifiers");
             modifiersField.setAccessible(true);
             modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
 
