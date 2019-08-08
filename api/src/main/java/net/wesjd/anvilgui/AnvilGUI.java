@@ -334,7 +334,7 @@ public class AnvilGUI {
      * Sets the ItemStack that will be inserted into the
      * Anvil GUI.
      *
-     * @param itemStack The {@link ItemStack that will be displayed}
+     * @param itemStack The {@link ItemStack} that will be displayed
      * @return The {@link Builder} instance
      * @throws IllegalArgumentException if the {@link ItemStack} is null
      */
