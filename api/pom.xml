@@ -90,6 +90,11 @@
             <artifactId>anvilgui-1_14_R1</artifactId>
             <version>1.2.3-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>net.wesjd</groupId>
+            <artifactId>anvilgui-1_14_4_R1</artifactId>
+            <version>1.2.3-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>
