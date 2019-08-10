@@ -91,10 +91,10 @@ public class AnvilGUI {
      * @deprecated As of version 1.2.3, use {@link AnvilGUI.Builder}
      */
     @Deprecated
-    public AnvilGUI(Plugin plugin, Player holder, String inputMessage, ItemStack insert, BiFunction<Player, String, String> biFunction) {
-        this(plugin, holder, inputMessage, insert, false, null, (player, text) -> {
+    public AnvilGUI(Plugin plugin, Player holder, String insert, BiFunction<Player, String, String> biFunction) {
+        this(plugin, holder, insert,null, false, null, (player, text) -> {
             String response = biFunction.apply(player, text);
-            if (response != null) {
+            if(response != null) {
                 return Response.text(response);
             } else {
                 return Response.close();
@@ -105,18 +105,19 @@ public class AnvilGUI {
     /**
      * Create an AnvilGUI and open it for the player.
      *
-     * @param plugin           A {@link org.bukkit.plugin.java.JavaPlugin} instance
-     * @param player           The {@link Player} to open the inventory for
-     * @param text             What to have the text already set to
-     * @param preventClose     Whether to prevent the inventory from closing
-     * @param closeListener    A {@link Consumer} when the inventory closes
+     * @param plugin A {@link org.bukkit.plugin.java.JavaPlugin} instance
+     * @param player The {@link Player} to open the inventory for
+     * @param text What to have the text already set to
+     * @param itemStack The {@link ItemStack} that is going to be inserted in the GUI
+     * @param preventClose Whether to prevent the inventory from closing
+     * @param closeListener A {@link Consumer} when the inventory closes
      * @param completeFunction A {@link BiFunction} that is called when the player clicks the {@link Slot#OUTPUT} slot
      */
     private AnvilGUI(
             Plugin plugin,
             Player player,
             String text,
-            ItemStack insert,
+            ItemStack itemStack,
             boolean preventClose,
             Consumer<Player> closeListener,
             BiFunction<Player, String, Response> completeFunction
@@ -124,10 +125,10 @@ public class AnvilGUI {
         this.plugin = plugin;
         this.player = player;
         this.text = text;
+        this.insert = itemStack;
         this.preventClose = preventClose;
         this.closeListener = closeListener;
         this.completeFunction = completeFunction;
-        this.insert = insert;
         openInventory();
     }
 
@@ -185,14 +186,13 @@ public class AnvilGUI {
 
         HandlerList.unregisterAll(listener);
 
-        if (closeListener != null) {
+        if(closeListener != null) {
             closeListener.accept(player);
         }
     }
 
     /**
      * Returns the Bukkit inventory for this anvil gui
-     *
      * @return the {@link Inventory} for this anvil gui
      */
     public Inventory getInventory() {
@@ -214,7 +214,7 @@ public class AnvilGUI {
                     if (clicked == null || clicked.getType() == Material.AIR) return;
 
                     final Response response = completeFunction.apply(clicker, clicked.hasItemMeta() ? clicked.getItemMeta().getDisplayName() : "");
-                    if (response.getText() != null) {
+                    if(response.getText() != null) {
                         final ItemMeta meta = clicked.getItemMeta();
                         meta.setDisplayName(response.getText());
                         clicked.setItemMeta(meta);
@@ -230,7 +230,7 @@ public class AnvilGUI {
         public void onInventoryClose(InventoryCloseEvent event) {
             if (open && event.getInventory().equals(inventory)) {
                 closeInventory();
-                if (preventClose) {
+                if(preventClose) {
                     Bukkit.getScheduler().runTask(plugin, AnvilGUI.this::openInventory);
                 }
             }
@@ -270,7 +270,6 @@ public class AnvilGUI {
 
         /**
          * Prevents the closing of the anvil GUI by the user
-         *
          * @return The {@link Builder} instance
          */
         public Builder preventClose() {
@@ -280,7 +279,6 @@ public class AnvilGUI {
 
         /**
          * Listens for when the inventory is closed
-         *
          * @param closeListener An {@link Consumer} that is called when the anvil GUI is closed
          * @return The {@link Builder} instance
          * @throws IllegalArgumentException when the closeListener is null
@@ -293,7 +291,6 @@ public class AnvilGUI {
 
         /**
          * Handles the inventory output slot when it is clicked
-         *
          * @param completeFunction An {@link BiFunction} that is called when the user clicks the output slot
          * @return The {@link Builder} instance
          * @throws IllegalArgumentException when the completeFunction is null
@@ -306,7 +303,6 @@ public class AnvilGUI {
 
         /**
          * Sets the plugin for the {@link AnvilGUI}
-         *
          * @param plugin The {@link Plugin} this anvil GUI is associated with
          * @return The {@link Builder} instance
          * @throws IllegalArgumentException if the plugin is null
@@ -319,7 +315,6 @@ public class AnvilGUI {
 
         /**
          * Sets the text that is to be displayed to the user
-         *
          * @param text The text that is to be displayed to the user
          * @return The {@link Builder} instance
          * @throws IllegalArgumentException if the text is null
@@ -346,7 +341,6 @@ public class AnvilGUI {
 
         /**
          * Creates the anvil GUI and opens it for the player
-         *
          * @param player The {@link Player} the anvil GUI should open for
          * @return The {@link AnvilGUI} instance from this builder
          * @throws IllegalArgumentException when the onComplete function, plugin, or player is null
@@ -357,6 +351,7 @@ public class AnvilGUI {
             Validate.notNull(player, "Player cannot be null");
             return new AnvilGUI(plugin, player, text, itemStack, preventClose, closeListener, completeFunction);
         }
+
     }
 
     /**
@@ -371,7 +366,6 @@ public class AnvilGUI {
 
         /**
          * Creates a response to the user's input
-         *
          * @param text The text that is to be displayed to the user, which can be null to close the inventory
          */
         private Response(String text) {
@@ -380,7 +374,6 @@ public class AnvilGUI {
 
         /**
          * Gets the text that is to be displayed to the user
-         *
          * @return The text that is to be displayed to the user
          */
         public String getText() {
@@ -389,7 +382,6 @@ public class AnvilGUI {
 
         /**
          * Returns an {@link Response} object for when the anvil GUI is to close
-         *
          * @return An {@link Response} object for when the anvil GUI is to close
          */
         public static Response close() {
@@ -398,7 +390,6 @@ public class AnvilGUI {
 
         /**
          * Returns an {@link Response} object for when the anvil GUI is to display text to the user
-         *
          * @param text The text that is to be displayed to the user
          * @return An {@link Response} object for when the anvil GUI is to display text to the user
          */
