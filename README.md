@@ -13,22 +13,7 @@ If you are a developer, submit a pull request adding a wrapper class for your ve
 on the issues tab. 
 
 ## How to use
-### As a dependency
-```xml
-<dependency>
-    <groupId>com.github.WesJD</groupId>
-    <artifactId>AnvilGUI</artifactId>
-    <version>master-SNAPSHOT</version>
-</dependency>
-
-<repositories>
-    <repository>
-        <id>jitpack.io</id>
-        <url>https://jitpack.io</url>
-    </repository>
-</repositories>
-```
-
+### [As a dependency](https://jitpack.io/#WesJD/AnvilGUI)
 ### In your plugin
 ```java
 new AnvilGUI.Builder()
