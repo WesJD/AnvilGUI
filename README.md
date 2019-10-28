@@ -1,9 +1,7 @@
 # AnvilGUI
 Easily use anvil guis to get a user's input.
 
-This project was made since their is no easy way to do this with the Spigot / Bukkit APIs. It requires interaction
-with NMS and that is a pain in a non-private plugin where users will have lots of different versions of the server
-running.
+This project was made since there is no way to prompt users with an anvil input with the Spigot / Bukkit API. It requires interaction with NMS and that is a pain in plugins where users have different versions of the server running.
 
 ## Requirements
 Java 8 and Bukkit / Spigot. Most server versions in the [Spigot Repository](https://hub.spigotmc.org/nexus/) are supported.
