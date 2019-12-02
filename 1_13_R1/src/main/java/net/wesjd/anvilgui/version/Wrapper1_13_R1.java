@@ -120,6 +120,9 @@ public class Wrapper1_13_R1 implements VersionWrapper {
             this.levelCost = 0;
         }
 
+        @Override
+        protected void a(EntityHuman entityhuman, World world, IInventory iinventory) {}
+
     }
 
 }
