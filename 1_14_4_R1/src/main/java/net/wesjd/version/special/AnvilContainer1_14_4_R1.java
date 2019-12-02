@@ -23,4 +23,8 @@ public class AnvilContainer1_14_4_R1 extends ContainerAnvil {
         this.levelCost.set(0);
     }
 
+    public int getContainerId() {
+        return windowId;
+    }
+
 }

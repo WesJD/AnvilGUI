@@ -148,7 +148,7 @@ public class AnvilGUI {
 		inventory = WRAPPER.toBukkitInventory(container);
 		inventory.setItem(Slot.INPUT_LEFT, this.insert);
 
-		containerId = WRAPPER.getNextContainerId(player);
+		containerId = WRAPPER.getNextContainerId(player, container);
 		WRAPPER.sendPacketOpenWindow(player, containerId);
 		WRAPPER.setActiveContainer(player, container);
 		WRAPPER.setActiveContainerId(container, containerId);

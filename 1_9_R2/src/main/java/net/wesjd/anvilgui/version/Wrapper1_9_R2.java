@@ -17,7 +17,7 @@ public class Wrapper1_9_R2 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
-    public int getNextContainerId(Player player) {
+    public int getNextContainerId(Player player, Object container) {
         return toNMS(player).nextContainerCounter();
     }
 

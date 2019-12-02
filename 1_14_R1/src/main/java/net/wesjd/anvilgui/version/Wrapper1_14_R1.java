@@ -9,17 +9,24 @@ import org.bukkit.craftbukkit.v1_14_R1.event.CraftEventFactory;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-
 public class Wrapper1_14_R1 implements VersionWrapper {
+
+    private final boolean IS_ONE_FOURTEEN = Bukkit.getBukkitVersion().contains("1.14.4");
+
+    private int getRealNextContainerId(Player player) {
+        return toNMS(player).nextContainerCounter();
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public int getNextContainerId(Player player) {
-        return toNMS(player).nextContainerCounter();
+    public int getNextContainerId(Player player, Object container) {
+        if(IS_ONE_FOURTEEN) {
+            return ((AnvilContainer1_14_4_R1) container).getContainerId();
+        } else {
+            return ((AnvilContainer) container).getContainerId();
+        }
     }
 
     /**
@@ -67,17 +74,7 @@ public class Wrapper1_14_R1 implements VersionWrapper {
      */
     @Override
     public void setActiveContainerId(Object container, int containerId) {
-        try {
-            final Field field = Container.class.getField("windowId");
-
-            final Field modifiersField = Field.class.getDeclaredField("modifiers");
-            modifiersField.setAccessible(true);
-            modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-
-            field.set(container, containerId);
-        } catch(Exception ex) {
-            throw new RuntimeException(ex);
-        }
+        //noop
     }
 
     /**
@@ -101,10 +98,11 @@ public class Wrapper1_14_R1 implements VersionWrapper {
      */
     @Override
     public Object newContainerAnvil(Player player) {
-        if (Bukkit.getBukkitVersion().contains("1.14.4")) {
-            return new AnvilContainer1_14_4_R1(player, getNextContainerId(player));
+        if (IS_ONE_FOURTEEN) {
+            return new AnvilContainer1_14_4_R1(player, getRealNextContainerId(player));
+        } else {
+            return new Wrapper1_14_R1.AnvilContainer(player);
         }
-        return new Wrapper1_14_R1.AnvilContainer(player);
     }
 
     /**
@@ -123,7 +121,7 @@ public class Wrapper1_14_R1 implements VersionWrapper {
     private class AnvilContainer extends ContainerAnvil {
 
         public AnvilContainer(Player player) {
-            super(Wrapper1_14_R1.this.getNextContainerId(player), ((CraftPlayer) player).getHandle().inventory,
+            super(getRealNextContainerId(player), ((CraftPlayer) player).getHandle().inventory,
                     ContainerAccess.at(((CraftWorld) player.getWorld()).getHandle(), new BlockPosition(0, 0, 0)));
             this.checkReachable = false;
             setTitle(new ChatMessage("Repair & Name"));
@@ -133,6 +131,10 @@ public class Wrapper1_14_R1 implements VersionWrapper {
         public void e() {
             super.e();
             this.levelCost.a(0);
+        }
+
+        public int getContainerId() {
+            return windowId;
         }
 
     }

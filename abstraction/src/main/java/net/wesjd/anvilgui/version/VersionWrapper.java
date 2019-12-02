@@ -13,9 +13,10 @@ public interface VersionWrapper {
     /**
      * Gets the next available NMS container id for the player
      * @param player The player to get the next container id of
-     * @return The next available NMS container id0
+     * @param container The container that a new id is being generated for
+     * @return The next available NMS container id
      */
-    int getNextContainerId(Player player);
+    int getNextContainerId(Player player, Object container);
 
     /**
      * Closes the current inventory for the player
