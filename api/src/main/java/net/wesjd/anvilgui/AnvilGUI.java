@@ -158,8 +158,6 @@ public class AnvilGUI {
 
 	/**
 	 * Closes the inventory if it's open.
-	 *
-	 * @throws IllegalArgumentException If the inventory isn't open
 	 */
 	public void closeInventory() {
 		if (!open) {
