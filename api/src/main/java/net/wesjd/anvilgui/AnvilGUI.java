@@ -162,7 +162,10 @@ public class AnvilGUI {
 	 * @throws IllegalArgumentException If the inventory isn't open
 	 */
 	public void closeInventory() {
-		Validate.isTrue(open, "You can't close an inventory that isn't open!");
+		if (!open) {
+			return;
+		}
+
 		open = false;
 
 		WRAPPER.handleInventoryCloseEvent(player);
