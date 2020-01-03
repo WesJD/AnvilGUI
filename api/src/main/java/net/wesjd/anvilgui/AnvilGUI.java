@@ -192,7 +192,7 @@ public class AnvilGUI {
 
 		@EventHandler
 		public void onInventoryClick(InventoryClickEvent event) {
-			if (event.getInventory().equals(inventory) && event.getRawSlot() < 3) {
+			if (event.getInventory().equals(inventory)) {
 				event.setCancelled(true);
 				final Player clicker = (Player) event.getWhoClicked();
 				if (event.getRawSlot() == Slot.OUTPUT) {
