@@ -43,7 +43,15 @@ public class AnvilGUI {
 	/**
 	 * The text that will be displayed to the user
 	 */
-	private String text = "";
+	private String textGuiTitle = "";
+	/**
+	 * The text that will be displayed to the user
+	 */
+	private String itemText;
+	/**
+	 * The text that will be displayed to the user
+	 */
+	private Material itemMaterial;
 	/**
 	 * A state that decides where the anvil GUI is able to be closed by the user
 	 */
@@ -91,7 +99,7 @@ public class AnvilGUI {
 	 */
 	@Deprecated
 	public AnvilGUI(Plugin plugin, Player holder, String insert, BiFunction<Player, String, String> biFunction) {
-		this(plugin, holder, insert, false, null, (player, text) -> {
+		this(plugin, holder, insert, "Repair & Name", Material.PAPER, false, null, (player, text) -> {
 			String response = biFunction.apply(player, text);
 			if(response != null) {
 				return Response.text(response);
@@ -106,7 +114,9 @@ public class AnvilGUI {
 	 *
 	 * @param plugin A {@link org.bukkit.plugin.java.JavaPlugin} instance
 	 * @param player The {@link Player} to open the inventory for
-	 * @param text What to have the text already set to
+	 * @param textGuiTitle What to have the text already set to
+	 * @param itemText The name of the item in the first slot of the anvilGui
+	 * @param itemMaterial The material of the item in the first slot of the anvilGUI
 	 * @param preventClose Whether to prevent the inventory from closing
 	 * @param closeListener A {@link Consumer} when the inventory closes
 	 * @param completeFunction A {@link BiFunction} that is called when the player clicks the {@link Slot#OUTPUT} slot
@@ -114,14 +124,18 @@ public class AnvilGUI {
 	private AnvilGUI(
 			Plugin plugin,
 			Player player,
-			String text,
+			String textGuiTitle,
+			String itemText,
+			Material itemMaterial,
 			boolean preventClose,
 			Consumer<Player> closeListener,
 			BiFunction<Player, String, Response> completeFunction
 	) {
 		this.plugin = plugin;
 		this.player = player;
-		this.text = text;
+		this.textGuiTitle = textGuiTitle;
+		this.itemText = itemText;
+		this.itemMaterial = itemMaterial;
 		this.preventClose = preventClose;
 		this.closeListener = closeListener;
 		this.completeFunction = completeFunction;
@@ -132,9 +146,9 @@ public class AnvilGUI {
 	 * Opens the anvil GUI
 	 */
 	private void openInventory() {
-		final ItemStack paper = new ItemStack(Material.PAPER);
+		final ItemStack paper = new ItemStack(itemMaterial);
 		final ItemMeta paperMeta = paper.getItemMeta();
-		paperMeta.setDisplayName(text);
+		paperMeta.setDisplayName(itemText);
 		paper.setItemMeta(paperMeta);
 		this.insert = paper;
 
@@ -143,13 +157,13 @@ public class AnvilGUI {
 
 		Bukkit.getPluginManager().registerEvents(listener, plugin);
 
-		final Object container = WRAPPER.newContainerAnvil(player);
+		final Object container = WRAPPER.newContainerAnvil(player, textGuiTitle);
 
 		inventory = WRAPPER.toBukkitInventory(container);
 		inventory.setItem(Slot.INPUT_LEFT, this.insert);
 
 		containerId = WRAPPER.getNextContainerId(player, container);
-		WRAPPER.sendPacketOpenWindow(player, containerId);
+		WRAPPER.sendPacketOpenWindow(player, containerId, textGuiTitle);
 		WRAPPER.setActiveContainer(player, container);
 		WRAPPER.setActiveContainerId(container, containerId);
 		WRAPPER.addActiveContainerSlotListener(container, player);
@@ -249,6 +263,14 @@ public class AnvilGUI {
 		 * The text that will be displayed to the user
 		 */
 		private String text = "";
+		/**
+		 * The starting text on the item
+		 */
+		private String itemText = "Repair & Name";
+		/**
+		 * The material of the item in the anvilGui
+		 */
+		private Material itemMaterial = Material.PAPER;
 
 		/**
 		 * Prevents the closing of the anvil GUI by the user
@@ -296,14 +318,38 @@ public class AnvilGUI {
 		}
 
 		/**
-		 * Sets the text that is to be displayed to the user
-		 * @param text The text that is to be displayed to the user
+		 * Sets the inital item-text that is displayed to the user
+		 * @param text The initial name of the item in the anvil
 		 * @return The {@link Builder} instance
 		 * @throws IllegalArgumentException if the text is null
 		 */
 		public Builder text(String text) {
 			Validate.notNull(text, "Text cannot be null");
-			this.text = text;
+			this.text = itemText;
+			return this;
+		}
+
+		/**
+		 * Sets the AnvilGUI title that is to be displayed to the user
+		 * @param guiTitle The guiTitle that is to be displayed to the user
+		 * @return The {@link Builder} instance
+		 * @throws IllegalArgumentException if the guiTitle is null
+		 */
+		public Builder guiTitke(String guiTitle) {
+			Validate.notNull(guiTitle, "ItemText cannot be null");
+			this.itemText = guiTitle;
+			return this;
+		}
+
+		/**
+		 * Sets the material of the item in the first slot of the anvil
+		 * @param material The material of the item in the first slot of the anvil
+		 * @return The {@link Builder} instance
+		 * @throws IllegalArgumentException if the material is null
+		 */
+		public Builder itemMaterial(Material material) {
+			Validate.notNull(material, "ItemText cannot be null");
+			this.itemMaterial = material;
 			return this;
 		}
 
@@ -317,7 +363,7 @@ public class AnvilGUI {
 			Validate.notNull(plugin, "Plugin cannot be null");
 			Validate.notNull(completeFunction, "Complete function cannot be null");
 			Validate.notNull(player, "Player cannot be null");
-			return new AnvilGUI(plugin, player, text, preventClose, closeListener, completeFunction);
+			return new AnvilGUI(plugin, player, text, itemText, itemMaterial, preventClose, closeListener, completeFunction);
 		}
 
 	}

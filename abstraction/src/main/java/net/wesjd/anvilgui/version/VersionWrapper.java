@@ -29,7 +29,7 @@ public interface VersionWrapper {
      * @param player The player to send the packet to
      * @param containerId The container id to open
      */
-    void sendPacketOpenWindow(Player player, int containerId);
+    void sendPacketOpenWindow(Player player, int containerId, String inventoryTitle);
 
     /**
      * Sends PacketPlayOutCloseWindow to the player with the contaienr id
@@ -77,6 +77,6 @@ public interface VersionWrapper {
      * @param player The player to get the container of
      * @return The Container instance
      */
-    Object newContainerAnvil(Player player);
+    Object newContainerAnvil(Player player, String anvilGuiTitle);
 
 }
