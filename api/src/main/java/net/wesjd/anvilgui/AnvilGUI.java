@@ -112,7 +112,6 @@ public class AnvilGUI {
 	 * @param preventClose Whether to prevent the inventory from closing
 	 * @param closeListener A {@link Consumer} when the inventory closes
 	 * @param completeFunction A {@link BiFunction} that is called when the player clicks the {@link Slot#OUTPUT} slot
-	 * @throws IllegalStateException If both itemText and insert are supplied
 	 */
 	private AnvilGUI(
 			Plugin plugin,
@@ -133,15 +132,13 @@ public class AnvilGUI {
 		this.completeFunction = completeFunction;
 
 		if(itemText != null) {
-			if(insert != null) {
-				ItemStack paper = new ItemStack(Material.PAPER);
-				ItemMeta paperMeta = paper.getItemMeta();
-				paperMeta.setDisplayName(itemText);
-				paper.setItemMeta(paperMeta);
-				this.insert = paper;
-			} else {
-				throw new IllegalStateException("Both itemText and an ItemStack cannot be supplied.");
+			if(insert == null) {
+				this.insert = new ItemStack(Material.PAPER);
 			}
+
+			ItemMeta paperMeta = this.insert.getItemMeta();
+			paperMeta.setDisplayName(itemText);
+			this.insert.setItemMeta(paperMeta);
 		}
 
 		openInventory();
@@ -357,7 +354,6 @@ public class AnvilGUI {
 		 * @param player The {@link Player} the anvil GUI should open for
 		 * @return The {@link AnvilGUI} instance from this builder
 		 * @throws IllegalArgumentException when the onComplete function, plugin, or player is null
-		 * @throws IllegalStateException If both text and item are supplied
 		 */
 		public AnvilGUI open(Player player) {
 			Validate.notNull(plugin, "Plugin cannot be null");
