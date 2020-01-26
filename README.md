@@ -15,10 +15,10 @@ on the issues tab.
 ### In your plugin
 ```java
 new AnvilGUI.Builder()
-    .onClose(player -> {                   //called when the inventory is closing
+    .onClose(player -> {                      //called when the inventory is closing
         player.sendMessage("You closed the inventory.");
     })
-    .onComplete((player, text) -> {        //called when the inventory output slot is clicked
+    .onComplete((player, text) -> {           //called when the inventory output slot is clicked
         if(text.equalsIgnoreCase("you")) {
             player.sendMessage("You have magical powers!");
             return AnvilGUI.Response.close();
@@ -26,10 +26,12 @@ new AnvilGUI.Builder()
             return AnvilGUI.Response.text("Incorrect.");
         }
     })
-    .preventClose()                        //prevents the inventory from being closed
-    .text("What is the meaning of life?")  //sets the text the GUI should start with
-    .plugin(myPluginInstance)              //set the plugin instance
-    .open(myPlayer);                       //opens the GUI for the player provided
+    .preventClose()                           //prevents the inventory from being closed
+    .text("What is the meaning of life?")     //sets the text the GUI should start with
+    .item(new ItemStack(Material.GOLD_BLOCK)) //use a custom item for the first slot
+    .title("Enter your answer.")              //set the title of the GUI (only works in 1.14+)
+    .plugin(myPluginInstance)                 //set the plugin instance
+    .open(myPlayer);                          //opens the GUI for the player provided
 ```
 
 ### [Javadocs](http://docs.wesjd.net/AnvilGUI/)
