@@ -63,7 +63,8 @@ Takes a custom `ItemStack` to be placed in the input slot.
 ItemStack stack = new ItemStack(Material.GOLD_BLOCK);
 ItemMeta meta = stack.getItemMeta();                 
 meta.setLore(Arrays.asList("Hi there"));             
-stack.setItemMeta(meta); builder.item(stack);        
+stack.setItemMeta(meta); 
+builder.item(stack);        
 ```                                                  
 
 #### `title(String)`
