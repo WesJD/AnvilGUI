@@ -16,6 +16,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 
+import java.util.Optional;
+import java.util.Properties;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
@@ -51,7 +54,7 @@ public class AnvilGUI {
 	/**
 	 * An {@link Consumer} that is called when the anvil GUI is closed
 	 */
-	private final Consumer<Player> closeListener;
+	private final BiConsumer<Player, Properties> closeListener;
 	/**
 	 * An {@link BiFunction} that is called when the {@link Slot#OUTPUT} slot has been clicked
 	 */
@@ -116,7 +119,7 @@ public class AnvilGUI {
 			Player player,
 			String text,
 			boolean preventClose,
-			Consumer<Player> closeListener,
+			BiConsumer<Player, Properties> closeListener,
 			BiFunction<Player, String, Response> completeFunction
 	) {
 		this.plugin = plugin;
@@ -159,7 +162,7 @@ public class AnvilGUI {
 	/**
 	 * Closes the inventory if it's open.
 	 */
-	public void closeInventory() {
+	public void closeInventory(Optional<Properties> properties) {
 		if (!open) {
 			return;
 		}
@@ -173,7 +176,7 @@ public class AnvilGUI {
 		HandlerList.unregisterAll(listener);
 
 		if(closeListener != null) {
-			closeListener.accept(player);
+			closeListener.accept(player, properties.orElse(new Properties()));
 		}
 	}
 
@@ -206,7 +209,7 @@ public class AnvilGUI {
 						clicked.setItemMeta(meta);
 						inventory.setItem(Slot.INPUT_LEFT, clicked);
 					} else {
-						closeInventory();
+						closeInventory(response.getProperties());
 					}
 				}
 			}
@@ -215,7 +218,7 @@ public class AnvilGUI {
 		@EventHandler
 		public void onInventoryClose(InventoryCloseEvent event) {
 			if (open && event.getInventory().equals(inventory)) {
-				closeInventory();
+				closeInventory(Optional.empty());
 				if(preventClose) {
 					Bukkit.getScheduler().runTask(plugin, AnvilGUI.this::openInventory);
 				}
@@ -232,7 +235,7 @@ public class AnvilGUI {
 		/**
 		 * An {@link Consumer} that is called when the anvil GUI is closed
 		 */
-		private Consumer<Player> closeListener;
+		private BiConsumer<Player, Properties> closeListener;
 		/**
 		 * A state that decides where the anvil GUI is able to be closed by the user
 		 */
@@ -266,6 +269,12 @@ public class AnvilGUI {
 		 * @throws IllegalArgumentException when the closeListener is null
 		 */
 		public Builder onClose(Consumer<Player> closeListener) {
+			Validate.notNull(closeListener, "closeListener cannot be null");
+			this.closeListener = (closer, properties) -> closeListener.accept(closer);
+			return this;
+		}
+
+		public Builder onClose(BiConsumer<Player, Properties> closeListener) {
 			Validate.notNull(closeListener, "closeListener cannot be null");
 			this.closeListener = closeListener;
 			return this;
@@ -332,12 +341,19 @@ public class AnvilGUI {
 		 */
 		private final String text;
 
+		private final Properties properties;
+
 		/**
 		 * Creates a response to the user's input
 		 * @param text The text that is to be displayed to the user, which can be null to close the inventory
 		 */
-		private Response(String text) {
+		public Response(String text) {
+			this(text, null);
+		}
+
+		public Response(String text, Properties properties) {
 			this.text = text;
+			this.properties = properties;
 		}
 
 		/**
@@ -348,12 +364,20 @@ public class AnvilGUI {
 			return text;
 		}
 
+		public Optional<Properties> getProperties() {
+			return Optional.ofNullable(properties);
+		}
+
 		/**
 		 * Returns an {@link Response} object for when the anvil GUI is to close
 		 * @return An {@link Response} object for when the anvil GUI is to close
 		 */
 		public static Response close() {
 			return new Response(null);
+		}
+
+		public static Response closeWithFallback(Properties properties) {
+			return new Response(null, properties);
 		}
 
 		/**
