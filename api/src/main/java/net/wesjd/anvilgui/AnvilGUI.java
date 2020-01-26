@@ -41,7 +41,7 @@ public class AnvilGUI {
 	 */
 	private final Player player;
 	/**
-	 * The text that will be displayed to the user
+	 * The title of the anvil inventory
 	 */
 	private String textGuiTitle;
 	/**
@@ -49,7 +49,7 @@ public class AnvilGUI {
 	 */
 	private String itemText;
 	/**
-	 * The text that will be displayed to the user
+	 * The material of the input slot item
 	 */
 	private Material itemMaterial;
 	/**
@@ -348,7 +348,7 @@ public class AnvilGUI {
 		 * @throws IllegalArgumentException if the material is null
 		 */
 		public Builder itemMaterial(Material material) {
-			Validate.notNull(material, "ItemText cannot be null");
+			Validate.notNull(material, "material cannot be null");
 			this.itemMaterial = material;
 			return this;
 		}
