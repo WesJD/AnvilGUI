@@ -43,7 +43,7 @@ public class AnvilGUI {
 	/**
 	 * The text that will be displayed to the user
 	 */
-	private String textGuiTitle = "";
+	private String textGuiTitle;
 	/**
 	 * The text that will be displayed to the user
 	 */
@@ -99,7 +99,7 @@ public class AnvilGUI {
 	 */
 	@Deprecated
 	public AnvilGUI(Plugin plugin, Player holder, String insert, BiFunction<Player, String, String> biFunction) {
-		this(plugin, holder, insert, "Repair & Name", Material.PAPER, false, null, (player, text) -> {
+		this(plugin, holder, "Repair & Name", insert, Material.PAPER, false, null, (player, text) -> {
 			String response = biFunction.apply(player, text);
 			if(response != null) {
 				return Response.text(response);
@@ -146,8 +146,8 @@ public class AnvilGUI {
 	 * Opens the anvil GUI
 	 */
 	private void openInventory() {
-		final ItemStack paper = new ItemStack(itemMaterial);
-		final ItemMeta paperMeta = paper.getItemMeta();
+		ItemStack paper = new ItemStack(itemMaterial);
+		ItemMeta paperMeta = paper.getItemMeta();
 		paperMeta.setDisplayName(itemText);
 		paper.setItemMeta(paperMeta);
 		this.insert = paper;
@@ -262,11 +262,11 @@ public class AnvilGUI {
 		/**
 		 * The text that will be displayed to the user
 		 */
-		private String text = "";
+		private String guiTitle = "Repair & Name";
 		/**
 		 * The starting text on the item
 		 */
-		private String itemText = "Repair & Name";
+		private String itemText = "";
 		/**
 		 * The material of the item in the anvilGui
 		 */
@@ -325,7 +325,7 @@ public class AnvilGUI {
 		 */
 		public Builder text(String text) {
 			Validate.notNull(text, "Text cannot be null");
-			this.text = itemText;
+			this.itemText = text;
 			return this;
 		}
 
@@ -335,9 +335,9 @@ public class AnvilGUI {
 		 * @return The {@link Builder} instance
 		 * @throws IllegalArgumentException if the guiTitle is null
 		 */
-		public Builder guiTitke(String guiTitle) {
+		public Builder guiTitle(String guiTitle) {
 			Validate.notNull(guiTitle, "ItemText cannot be null");
-			this.itemText = guiTitle;
+			this.guiTitle = guiTitle;
 			return this;
 		}
 
@@ -363,7 +363,7 @@ public class AnvilGUI {
 			Validate.notNull(plugin, "Plugin cannot be null");
 			Validate.notNull(completeFunction, "Complete function cannot be null");
 			Validate.notNull(player, "Player cannot be null");
-			return new AnvilGUI(plugin, player, text, itemText, itemMaterial, preventClose, closeListener, completeFunction);
+			return new AnvilGUI(plugin, player, guiTitle, itemText, itemMaterial, preventClose, closeListener, completeFunction);
 		}
 
 	}
