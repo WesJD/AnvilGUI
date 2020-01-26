@@ -10,11 +10,11 @@ import org.bukkit.entity.Player;
 
 public class AnvilContainer1_14_4_R1 extends ContainerAnvil {
 
-    public AnvilContainer1_14_4_R1(Player player, int containerId) {
+    public AnvilContainer1_14_4_R1(Player player, int containerId, String guiTitle) {
         super(containerId, ((CraftPlayer) player).getHandle().inventory,
                 ContainerAccess.at(((CraftWorld) player.getWorld()).getHandle(), new BlockPosition(0, 0, 0)));
         this.checkReachable = false;
-        setTitle(new ChatMessage("Repair & Name"));
+        setTitle(new ChatMessage(guiTitle));
     }
 
     @Override

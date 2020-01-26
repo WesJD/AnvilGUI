@@ -28,7 +28,7 @@ public class Wrapper1_13_R2 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
-    public void sendPacketOpenWindow(Player player, int containerId) {
+    public void sendPacketOpenWindow(Player player, int containerId, String guiTitle) {
         toNMS(player).playerConnection.sendPacket(new PacketPlayOutOpenWindow(containerId, "minecraft:anvil", new ChatMessage(Blocks.ANVIL.a() + ".name")));
     }
 
@@ -84,7 +84,7 @@ public class Wrapper1_13_R2 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
-    public Object newContainerAnvil(Player player) {
+    public Object newContainerAnvil(Player player, String guiTitle) {
         return new Wrapper1_13_R2.AnvilContainer(toNMS(player));
     }
 

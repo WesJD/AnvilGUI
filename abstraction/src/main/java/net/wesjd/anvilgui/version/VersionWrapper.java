@@ -25,11 +25,12 @@ public interface VersionWrapper {
     void handleInventoryCloseEvent(Player player);
 
     /**
-     * Sends PacketPlayOutOpenWindow to the player with the container id
+     * Sends PacketPlayOutOpenWindow to the player with the container id and window title
      * @param player The player to send the packet to
      * @param containerId The container id to open
+     * @param inventoryTitle The title of the inventory to be opened (only works in Minecraft 1.14 and above)
      */
-    void sendPacketOpenWindow(Player player, int containerId);
+    void sendPacketOpenWindow(Player player, int containerId, String inventoryTitle);
 
     /**
      * Sends PacketPlayOutCloseWindow to the player with the contaienr id
@@ -75,8 +76,9 @@ public interface VersionWrapper {
     /**
      * Creates a new ContainerAnvil
      * @param player The player to get the container of
+     * @param title The title of the anvil inventory
      * @return The Container instance
      */
-    Object newContainerAnvil(Player player);
+    Object newContainerAnvil(Player player, String title);
 
 }

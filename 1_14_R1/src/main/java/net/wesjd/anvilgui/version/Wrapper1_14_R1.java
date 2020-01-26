@@ -41,8 +41,8 @@ public class Wrapper1_14_R1 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
-    public void sendPacketOpenWindow(Player player, int containerId) {
-        toNMS(player).playerConnection.sendPacket(new PacketPlayOutOpenWindow(containerId, Containers.ANVIL, new ChatMessage("Repair & Name")));
+    public void sendPacketOpenWindow(Player player, int containerId, String guiTitle) {
+        toNMS(player).playerConnection.sendPacket(new PacketPlayOutOpenWindow(containerId, Containers.ANVIL, new ChatMessage(guiTitle)));
     }
 
     /**
@@ -97,11 +97,11 @@ public class Wrapper1_14_R1 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
-    public Object newContainerAnvil(Player player) {
+    public Object newContainerAnvil(Player player, String guiTitle) {
         if (IS_ONE_FOURTEEN) {
-            return new AnvilContainer1_14_4_R1(player, getRealNextContainerId(player));
+            return new AnvilContainer1_14_4_R1(player, getRealNextContainerId(player), guiTitle);
         } else {
-            return new Wrapper1_14_R1.AnvilContainer(player);
+            return new Wrapper1_14_R1.AnvilContainer(player, guiTitle);
         }
     }
 
@@ -120,11 +120,11 @@ public class Wrapper1_14_R1 implements VersionWrapper {
      */
     private class AnvilContainer extends ContainerAnvil {
 
-        public AnvilContainer(Player player) {
+        public AnvilContainer(Player player, String guiTitle) {
             super(getRealNextContainerId(player), ((CraftPlayer) player).getHandle().inventory,
                     ContainerAccess.at(((CraftWorld) player.getWorld()).getHandle(), new BlockPosition(0, 0, 0)));
             this.checkReachable = false;
-            setTitle(new ChatMessage("Repair & Name"));
+            setTitle(new ChatMessage(guiTitle));
         }
 
         @Override
