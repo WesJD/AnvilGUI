@@ -112,6 +112,7 @@ public class AnvilGUI {
 	 * @param preventClose Whether to prevent the inventory from closing
 	 * @param closeListener A {@link Consumer} when the inventory closes
 	 * @param completeFunction A {@link BiFunction} that is called when the player clicks the {@link Slot#OUTPUT} slot
+	 * @throws IllegalStateException If both itemText and insert are supplied
 	 */
 	private AnvilGUI(
 			Plugin plugin,
@@ -356,6 +357,7 @@ public class AnvilGUI {
 		 * @param player The {@link Player} the anvil GUI should open for
 		 * @return The {@link AnvilGUI} instance from this builder
 		 * @throws IllegalArgumentException when the onComplete function, plugin, or player is null
+		 * @throws IllegalStateException If both text and item are supplied
 		 */
 		public AnvilGUI open(Player player) {
 			Validate.notNull(plugin, "Plugin cannot be null");
