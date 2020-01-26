@@ -43,7 +43,7 @@ public class AnvilGUI {
 	/**
 	 * The title of the anvil inventory
 	 */
-	private String textGuiTitle;
+	private String inventoryTitle;
 	/**
 	 * The ItemStack that is in the {@link Slot#INPUT_LEFT} slot.
 	 */
@@ -125,7 +125,7 @@ public class AnvilGUI {
 	) {
 		this.plugin = plugin;
 		this.player = player;
-		this.textGuiTitle = inventoryTitle;
+		this.inventoryTitle = inventoryTitle;
 		this.insert = insert;
 		this.preventClose = preventClose;
 		this.closeListener = closeListener;
@@ -155,13 +155,13 @@ public class AnvilGUI {
 
 		Bukkit.getPluginManager().registerEvents(listener, plugin);
 
-		final Object container = WRAPPER.newContainerAnvil(player, textGuiTitle);
+		final Object container = WRAPPER.newContainerAnvil(player, inventoryTitle);
 
 		inventory = WRAPPER.toBukkitInventory(container);
 		inventory.setItem(Slot.INPUT_LEFT, this.insert);
 
 		containerId = WRAPPER.getNextContainerId(player, container);
-		WRAPPER.sendPacketOpenWindow(player, containerId, textGuiTitle);
+		WRAPPER.sendPacketOpenWindow(player, containerId, inventoryTitle);
 		WRAPPER.setActiveContainer(player, container);
 		WRAPPER.setActiveContainerId(container, containerId);
 		WRAPPER.addActiveContainerSlotListener(container, player);
@@ -260,7 +260,7 @@ public class AnvilGUI {
 		/**
 		 * The text that will be displayed to the user
 		 */
-		private String guiTitle = "Repair & Name";
+		private String title = "Repair & Name";
 		/**
 		 * The starting text on the item
 		 */
@@ -329,13 +329,13 @@ public class AnvilGUI {
 
 		/**
 		 * Sets the AnvilGUI title that is to be displayed to the user
-		 * @param guiTitle The guiTitle that is to be displayed to the user
+		 * @param title The title that is to be displayed to the user
 		 * @return The {@link Builder} instance
-		 * @throws IllegalArgumentException if the guiTitle is null
+		 * @throws IllegalArgumentException if the title is null
 		 */
-		public Builder guiTitle(String guiTitle) {
-			Validate.notNull(guiTitle, "ItemText cannot be null");
-			this.guiTitle = guiTitle;
+		public Builder title(String title) {
+			Validate.notNull(title, "title cannot be null");
+			this.title = title;
 			return this;
 		}
 
@@ -361,7 +361,7 @@ public class AnvilGUI {
 			Validate.notNull(plugin, "Plugin cannot be null");
 			Validate.notNull(completeFunction, "Complete function cannot be null");
 			Validate.notNull(player, "Player cannot be null");
-			return new AnvilGUI(plugin, player, guiTitle, itemText, item, preventClose, closeListener, completeFunction);
+			return new AnvilGUI(plugin, player, title, itemText, item, preventClose, closeListener, completeFunction);
 		}
 
 	}
