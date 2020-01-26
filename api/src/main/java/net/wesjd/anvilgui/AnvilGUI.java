@@ -45,13 +45,9 @@ public class AnvilGUI {
 	 */
 	private String textGuiTitle;
 	/**
-	 * The text that will be displayed to the user
+	 * The ItemStack that is in the {@link Slot#INPUT_LEFT} slot.
 	 */
-	private String itemText;
-	/**
-	 * The material of the input slot item
-	 */
-	private Material itemMaterial;
+	private ItemStack insert;
 	/**
 	 * A state that decides where the anvil GUI is able to be closed by the user
 	 */
@@ -65,10 +61,6 @@ public class AnvilGUI {
 	 */
 	private final BiFunction<Player, String, Response> completeFunction;
 
-	/**
-	 * The ItemStack that is in the {@link Slot#INPUT_LEFT} slot.
-	 */
-	private ItemStack insert;
 	/**
 	 * The container id of the inventory, used for NMS methods
 	 */
@@ -99,7 +91,7 @@ public class AnvilGUI {
 	 */
 	@Deprecated
 	public AnvilGUI(Plugin plugin, Player holder, String insert, BiFunction<Player, String, String> biFunction) {
-		this(plugin, holder, "Repair & Name", insert, Material.PAPER, false, null, (player, text) -> {
+		this(plugin, holder, "Repair & Name", insert, null, false, null, (player, text) -> {
 			String response = biFunction.apply(player, text);
 			if(response != null) {
 				return Response.text(response);
@@ -114,9 +106,9 @@ public class AnvilGUI {
 	 *
 	 * @param plugin A {@link org.bukkit.plugin.java.JavaPlugin} instance
 	 * @param player The {@link Player} to open the inventory for
-	 * @param textGuiTitle What to have the text already set to
+	 * @param inventoryTitle What to have the text already set to
 	 * @param itemText The name of the item in the first slot of the anvilGui
-	 * @param itemMaterial The material of the item in the first slot of the anvilGUI
+	 * @param insert The material of the item in the first slot of the anvilGUI
 	 * @param preventClose Whether to prevent the inventory from closing
 	 * @param closeListener A {@link Consumer} when the inventory closes
 	 * @param completeFunction A {@link BiFunction} that is called when the player clicks the {@link Slot#OUTPUT} slot
@@ -124,21 +116,33 @@ public class AnvilGUI {
 	private AnvilGUI(
 			Plugin plugin,
 			Player player,
-			String textGuiTitle,
+			String inventoryTitle,
 			String itemText,
-			Material itemMaterial,
+			ItemStack insert,
 			boolean preventClose,
 			Consumer<Player> closeListener,
 			BiFunction<Player, String, Response> completeFunction
 	) {
 		this.plugin = plugin;
 		this.player = player;
-		this.textGuiTitle = textGuiTitle;
-		this.itemText = itemText;
-		this.itemMaterial = itemMaterial;
+		this.textGuiTitle = inventoryTitle;
+		this.insert = insert;
 		this.preventClose = preventClose;
 		this.closeListener = closeListener;
 		this.completeFunction = completeFunction;
+
+		if(itemText != null) {
+			if(insert != null) {
+				ItemStack paper = new ItemStack(Material.PAPER);
+				ItemMeta paperMeta = paper.getItemMeta();
+				paperMeta.setDisplayName(itemText);
+				paper.setItemMeta(paperMeta);
+				this.insert = paper;
+			} else {
+				throw new IllegalStateException("Both itemText and an ItemStack cannot be supplied.");
+			}
+		}
+
 		openInventory();
 	}
 
@@ -146,12 +150,6 @@ public class AnvilGUI {
 	 * Opens the anvil GUI
 	 */
 	private void openInventory() {
-		ItemStack paper = new ItemStack(itemMaterial);
-		ItemMeta paperMeta = paper.getItemMeta();
-		paperMeta.setDisplayName(itemText);
-		paper.setItemMeta(paperMeta);
-		this.insert = paper;
-
 		WRAPPER.handleInventoryCloseEvent(player);
 		WRAPPER.setActiveContainerDefault(player);
 
@@ -268,9 +266,9 @@ public class AnvilGUI {
 		 */
 		private String itemText = "";
 		/**
-		 * The material of the item in the anvilGui
+		 * An {@link ItemStack} to be put in the input slot
 		 */
-		private Material itemMaterial = Material.PAPER;
+		private ItemStack item;
 
 		/**
 		 * Prevents the closing of the anvil GUI by the user
@@ -342,14 +340,14 @@ public class AnvilGUI {
 		}
 
 		/**
-		 * Sets the material of the item in the first slot of the anvil
-		 * @param material The material of the item in the first slot of the anvil
+		 * Sets the {@link ItemStack} to be put in the first slot
+		 * @param item The {@link ItemStack} to be put in the first slot
 		 * @return The {@link Builder} instance
-		 * @throws IllegalArgumentException if the material is null
+		 * @throws IllegalArgumentException if the {@link ItemStack} is null
 		 */
-		public Builder itemMaterial(Material material) {
-			Validate.notNull(material, "material cannot be null");
-			this.itemMaterial = material;
+		public Builder item(ItemStack item) {
+			Validate.notNull(item, "item cannot be null");
+			this.item = item;
 			return this;
 		}
 
@@ -363,7 +361,7 @@ public class AnvilGUI {
 			Validate.notNull(plugin, "Plugin cannot be null");
 			Validate.notNull(completeFunction, "Complete function cannot be null");
 			Validate.notNull(player, "Player cannot be null");
-			return new AnvilGUI(plugin, player, guiTitle, itemText, itemMaterial, preventClose, closeListener, completeFunction);
+			return new AnvilGUI(plugin, player, guiTitle, itemText, item, preventClose, closeListener, completeFunction);
 		}
 
 	}
