@@ -7,10 +7,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
 /**
- * {@link VersionWrapper} implemented for NMS version 1_8_R1
+ * {@link VersionWrapper} implemented for NMS version 1_7_R4
  *
- * @author Wesley Smith
- * @since 1.0
+ * @author Hasan Demirtaş
+ * @since 1.3.0
  */
 public class Wrapper1_7_R4 implements VersionWrapper {
 
