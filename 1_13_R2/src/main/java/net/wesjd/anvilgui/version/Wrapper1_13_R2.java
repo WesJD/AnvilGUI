@@ -6,6 +6,12 @@ import org.bukkit.craftbukkit.v1_13_R2.event.CraftEventFactory;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
+/**
+ * {@link VersionWrapper} implemented for NMS version 1_13_R2
+ *
+ * @author Wesley Smith
+ * @since 1.2.1
+ */
 public class Wrapper1_13_R2 implements VersionWrapper {
 
     /**
