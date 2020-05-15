@@ -13,7 +13,7 @@ on the issues tab.
 ## How to use
 
 AnvilGUI requires the usage of Maven or a Maven compatible build system. 
-You can find the repository and dependency information [here](https://jitpack.io/#WesJD/AnvilGUI).
+You can find the repository and dependency information [here](https://jitpack.io/#WesJD/AnvilGUI/master-SNAPSHOT).
 
 ### In your plugin
 
