@@ -190,10 +190,13 @@ public class AnvilGUI {
 	}
 
 	/**
-	 * Force close the inventory
+	 * Closes the inventory if it's open.
+	 * @param force whether it'll force the inventory to be fully closed
 	 */
-	public void forceCloseInventory() {
-		preventClose = false;
+	public void closeInventory(boolean force) {
+		if (force) {
+			preventClose = false;
+		}
 		closeInventory();
 	}
 
