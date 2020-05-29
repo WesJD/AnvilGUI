@@ -53,7 +53,7 @@ public class AnvilGUI {
 	/**
 	 * A state that decides where the anvil GUI is able to be closed by the user
 	 */
-	private final boolean preventClose;
+	private boolean preventClose;
 	/**
 	 * An {@link Consumer} that is called when the anvil GUI is closed
 	 */
@@ -187,6 +187,14 @@ public class AnvilGUI {
 		if(closeListener != null) {
 			closeListener.accept(player);
 		}
+	}
+
+	/**
+	 * Force close the inventory
+	 */
+	public void forceCloseInventory() {
+		preventClose = false;
+		closeInventory();
 	}
 
 	/**
