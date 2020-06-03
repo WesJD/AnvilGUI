@@ -449,10 +449,10 @@ public final class AnvilGUI {
             }
             event.setCancelled(true);
             final Player clicker = (Player) event.getWhoClicked();
-            if (event.getRawSlot() != AnvilGUI.Slot.OUTPUT.getSlot()) {
+            if (event.getRawSlot() != AnvilGUI.Slot.OUTPUT) {
                 return;
             }
-            final ItemStack clicked = AnvilGUI.this.inventory.getItem(AnvilGUI.Slot.OUTPUT.getSlot());
+            final ItemStack clicked = AnvilGUI.this.inventory.getItem(AnvilGUI.Slot.OUTPUT);
             if (clicked == null || clicked.getType() == Material.AIR) {
                 return;
             }
@@ -465,7 +465,7 @@ public final class AnvilGUI {
             final ItemMeta meta = clicked.getItemMeta();
             meta.setDisplayName(response.getText());
             clicked.setItemMeta(meta);
-            AnvilGUI.this.inventory.setItem(AnvilGUI.Slot.INPUT_LEFT.getSlot(), clicked);
+            AnvilGUI.this.inventory.setItem(AnvilGUI.Slot.INPUT_LEFT, clicked);
         }
 
         @EventHandler
@@ -473,8 +473,8 @@ public final class AnvilGUI {
             if (!event.getInventory().equals(AnvilGUI.this.inventory)) {
                 return;
             }
-            for (final AnvilGUI.Slot slot : AnvilGUI.Slot.values()) {
-                if (event.getRawSlots().contains(slot.getSlot())) {
+            for (final int slot : AnvilGUI.Slot.values()) {
+                if (event.getRawSlots().contains(slot)) {
                     event.setCancelled(true);
                     break;
                 }
