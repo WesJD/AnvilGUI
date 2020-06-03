@@ -208,31 +208,34 @@ public final class AnvilGUI {
     /**
      * Class wrapping the magic constants of slot numbers in an anvil GUI
      */
-    public enum Slot {
+    public static final class Slot {
 
         /**
          * The slot on the far left, where the first input is inserted. An {@link ItemStack} is always inserted
          * here to be renamed
          */
-        INPUT_LEFT(0),
+        public static final int INPUT_LEFT = 0;
+
         /**
          * Not used, but in a real anvil you are able to put the second item you want to combine here
          */
-        INPUT_RIGHT(1),
+        public static final int INPUT_RIGHT = 1;
+
         /**
          * The output slot, where an item is put when two items are combined from {@link #INPUT_LEFT} and
          * {@link #INPUT_RIGHT} or {@link #INPUT_LEFT} is renamed
          */
-        OUTPUT(2);
+        public static final int OUTPUT = 2;
 
-        private final int slot;
+        private static final int[] values = {AnvilGUI.Slot.INPUT_LEFT, AnvilGUI.Slot.INPUT_RIGHT, AnvilGUI.Slot.OUTPUT};
 
-        Slot(final int slot) {
-            this.slot = slot;
-        }
-
-        public int getSlot() {
-            return this.slot;
+        /**
+         * Get all anvil slot values
+         *
+         * @return The array containing all possible anvil slots
+         */
+        public static int[] values() {
+            return AnvilGUI.Slot.values.clone();
         }
 
     }
