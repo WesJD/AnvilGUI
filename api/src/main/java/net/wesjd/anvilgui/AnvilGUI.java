@@ -195,7 +195,7 @@ public final class AnvilGUI {
         final Object container = AnvilGUI.WRAPPER.newContainerAnvil(this.player, this.inventoryTitle);
 
         this.inventory = AnvilGUI.WRAPPER.toBukkitInventory(container);
-        this.inventory.setItem(AnvilGUI.Slot.INPUT_LEFT.getSlot(), this.insert);
+        this.inventory.setItem(AnvilGUI.Slot.INPUT_LEFT, this.insert);
 
         this.containerId = AnvilGUI.WRAPPER.getNextContainerId(this.player, container);
         AnvilGUI.WRAPPER.sendPacketOpenWindow(this.player, this.containerId, this.inventoryTitle);
