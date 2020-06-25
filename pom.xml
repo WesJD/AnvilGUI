@@ -26,6 +26,7 @@
         <module>1_14_R1</module>
         <module>1_14_4_R1</module>
         <module>1_15_R1</module>
+        <module>1_16_R1</module>
     </modules>
 
     <repositories>
