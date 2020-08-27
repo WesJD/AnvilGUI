@@ -1,7 +1,7 @@
 package net.wesjd.anvilgui.version;
 
 import net.minecraft.server.v1_14_R1.*;
-import net.wesjd.version.special.AnvilContainer1_14_4_R1;
+import net.wesjd.anvilgui.version.special.AnvilContainer1_14_4_R1;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
