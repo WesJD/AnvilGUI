@@ -1,9 +1,6 @@
 package net.wesjd.anvilgui.version.special;
 
-import net.minecraft.server.v1_14_R1.BlockPosition;
-import net.minecraft.server.v1_14_R1.ChatMessage;
-import net.minecraft.server.v1_14_R1.ContainerAccess;
-import net.minecraft.server.v1_14_R1.ContainerAnvil;
+import net.minecraft.server.v1_14_R1.*;
 import org.bukkit.craftbukkit.v1_14_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -22,6 +19,12 @@ public class AnvilContainer1_14_4_R1 extends ContainerAnvil {
         super.e();
         this.levelCost.set(0);
     }
+
+    @Override
+    public void b(EntityHuman entityhuman) {}
+
+    @Override
+    protected void a(EntityHuman entityhuman, World world, IInventory iinventory) {}
 
     public int getContainerId() {
         return windowId;
