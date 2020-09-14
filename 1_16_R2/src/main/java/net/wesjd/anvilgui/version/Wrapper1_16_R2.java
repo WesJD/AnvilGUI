@@ -120,6 +120,12 @@ public class Wrapper1_16_R2 implements VersionWrapper {
             this.levelCost.set(0);
         }
 
+        @Override
+        public void b(EntityHuman entityhuman) {}
+
+        @Override
+        protected void a(EntityHuman entityhuman, World world, IInventory iinventory) {}
+
         public int getContainerId() {
             return windowId;
         }
