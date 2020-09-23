@@ -32,6 +32,7 @@
         <module>1_15_R1</module>
         <module>1_16_R1</module>
         <module>1_16_R2</module>
+        <module>1_16_R3</module>
     </modules>
 
     <repositories>
