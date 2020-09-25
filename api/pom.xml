@@ -15,7 +15,7 @@
     <dependencies>
         <dependency>
             <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
+            <artifactId>spigot</artifactId>
             <version>1.8-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
@@ -114,11 +114,6 @@
         <dependency>
             <groupId>net.wesjd</groupId>
             <artifactId>anvilgui-1_16_R2</artifactId>
-            <version>1.3.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>net.wesjd</groupId>
-            <artifactId>anvilgui-1_16_R3</artifactId>
             <version>1.3.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
