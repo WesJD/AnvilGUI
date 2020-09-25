@@ -1,0 +1,4 @@
+language: java
+install: true
+script:
+  - mvn clean install -B -ntp
