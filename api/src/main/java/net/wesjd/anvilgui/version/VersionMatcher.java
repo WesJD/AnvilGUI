@@ -35,8 +35,7 @@ public class VersionMatcher {
 			Wrapper1_14_R1.class,
 			Wrapper1_15_R1.class,
 			Wrapper1_16_R1.class,
-			Wrapper1_16_R2.class,
-			Wrapper1_16_R3.class
+			Wrapper1_16_R2.class
 	);
 
 	/**
