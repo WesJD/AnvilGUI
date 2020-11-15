@@ -49,7 +49,11 @@ public class AnvilGUI {
 	/**
 	 * The ItemStack that is in the {@link Slot#INPUT_LEFT} slot.
 	 */
-	private ItemStack insert;
+	private ItemStack input_left;
+	/**
+	 * The ItemStack that is in the {@link Slot#INPUT_RIGHT} slot.
+	 */
+	private ItemStack input_right;
 	/**
 	 * A state that decides where the anvil GUI is able to be closed by the user
 	 */
@@ -62,6 +66,15 @@ public class AnvilGUI {
 	 * An {@link BiFunction} that is called when the {@link Slot#OUTPUT} slot has been clicked
 	 */
 	private final BiFunction<Player, String, Response> completeFunction;
+
+	/**
+	 * An {@link Consumer} that is called when the {@link Slot#INPUT_LEFT} slot has been clicked
+	 */
+	private final Consumer<Player> inputLeftClickListener;
+	/**
+	 * An {@link Consumer} that is called when the {@link Slot#INPUT_RIGHT} slot has been clicked
+	 */
+	private final Consumer<Player> inputRightClickListener;
 
 	/**
 	 * The container id of the inventory, used for NMS methods
@@ -86,14 +99,14 @@ public class AnvilGUI {
 	 *
 	 * @param plugin     A {@link org.bukkit.plugin.java.JavaPlugin} instance
 	 * @param holder     The {@link Player} to open the inventory for
-	 * @param insert     What to have the text already set to
+	 * @param input_left     What to have the text already set to
 	 * @param biFunction A {@link BiFunction} that is called when the player clicks the {@link Slot#OUTPUT} slot
 	 * @throws NullPointerException If the server version isn't supported
 	 * @deprecated As of version 1.2.3, use {@link AnvilGUI.Builder}
 	 */
 	@Deprecated
 	public AnvilGUI(Plugin plugin, Player holder, String insert, BiFunction<Player, String, String> biFunction) {
-		this(plugin, holder, "Repair & Name", insert, null, false, null, (player, text) -> {
+		this(plugin, holder, "Repair & Name", insert, null, null, false, null, null, null, (player, text) -> {
 			String response = biFunction.apply(player, text);
 			if(response != null) {
 				return Response.text(response);
@@ -110,7 +123,7 @@ public class AnvilGUI {
 	 * @param player The {@link Player} to open the inventory for
 	 * @param inventoryTitle What to have the text already set to
 	 * @param itemText The name of the item in the first slot of the anvilGui
-	 * @param insert The material of the item in the first slot of the anvilGUI
+	 * @param input_left The material of the item in the first slot of the anvilGUI
 	 * @param preventClose Whether to prevent the inventory from closing
 	 * @param closeListener A {@link Consumer} when the inventory closes
 	 * @param completeFunction A {@link BiFunction} that is called when the player clicks the {@link Slot#OUTPUT} slot
@@ -120,27 +133,33 @@ public class AnvilGUI {
 			Player player,
 			String inventoryTitle,
 			String itemText,
-			ItemStack insert,
+			ItemStack input_left,
+			ItemStack input_right,
 			boolean preventClose,
 			Consumer<Player> closeListener,
+			Consumer<Player> inputLeftClickListener,
+			Consumer<Player> inputRightClickListener,
 			BiFunction<Player, String, Response> completeFunction
 	) {
 		this.plugin = plugin;
 		this.player = player;
 		this.inventoryTitle = inventoryTitle;
-		this.insert = insert;
+		this.input_left = input_left;
+		this.input_right = input_right;
 		this.preventClose = preventClose;
 		this.closeListener = closeListener;
+		this.inputLeftClickListener = inputLeftClickListener;
+		this.inputRightClickListener = inputRightClickListener;
 		this.completeFunction = completeFunction;
 
 		if(itemText != null) {
-			if(insert == null) {
-				this.insert = new ItemStack(Material.PAPER);
+			if(input_left == null) {
+				this.input_left = new ItemStack(Material.PAPER);
 			}
 
-			ItemMeta paperMeta = this.insert.getItemMeta();
+			ItemMeta paperMeta = this.input_left.getItemMeta();
 			paperMeta.setDisplayName(itemText);
-			this.insert.setItemMeta(paperMeta);
+			this.input_left.setItemMeta(paperMeta);
 		}
 
 		openInventory();
@@ -158,7 +177,10 @@ public class AnvilGUI {
 		final Object container = WRAPPER.newContainerAnvil(player, inventoryTitle);
 
 		inventory = WRAPPER.toBukkitInventory(container);
-		inventory.setItem(Slot.INPUT_LEFT, this.insert);
+		inventory.setItem(Slot.INPUT_LEFT, this.input_left);
+		if(this.input_right!=null) {
+			inventory.setItem(Slot.INPUT_RIGHT, this.input_right);
+		}
 
 		containerId = WRAPPER.getNextContainerId(player, container);
 		WRAPPER.sendPacketOpenWindow(player, containerId, inventoryTitle);
@@ -226,6 +248,14 @@ public class AnvilGUI {
 					} else {
 						closeInventory();
 					}
+				}else if(event.getRawSlot() == Slot.INPUT_LEFT) {
+					if(inputLeftClickListener!=null) {
+						inputLeftClickListener.accept(player);
+					}
+				}else if(event.getRawSlot() == Slot.INPUT_RIGHT) {
+					if(inputRightClickListener!=null) {
+						inputRightClickListener.accept(player);
+					}
 				}
 			}
 		}
@@ -268,6 +298,14 @@ public class AnvilGUI {
 		 */
 		private boolean preventClose = false;
 		/**
+		 * An {@link Consumer} that is called when the {@link Slot#INPUT_LEFT} slot has been clicked
+		 */
+		private Consumer<Player> inputLeftClickListener;
+		/**
+		 * An {@link Consumer} that is called when the {@link Slot#INPUT_RIGHT} slot has been clicked
+		 */
+		private Consumer<Player> inputRightClickListener;
+		/**
 		 * An {@link BiFunction} that is called when the anvil output slot has been clicked
 		 */
 		private BiFunction<Player, String, Response> completeFunction;
@@ -284,9 +322,13 @@ public class AnvilGUI {
 		 */
 		private String itemText = "";
 		/**
-		 * An {@link ItemStack} to be put in the input slot
+		 * An {@link ItemStack} to be put in the left input slot
 		 */
-		private ItemStack item;
+		private ItemStack item_left;
+		/**
+		 * An {@link ItemStack} to be put in the right input slot
+		 */
+		private ItemStack item_right;
 
 		/**
 		 * Prevents the closing of the anvil GUI by the user
@@ -306,6 +348,25 @@ public class AnvilGUI {
 		public Builder onClose(Consumer<Player> closeListener) {
 			Validate.notNull(closeListener, "closeListener cannot be null");
 			this.closeListener = closeListener;
+			return this;
+		}
+		
+		/**
+		 * Listens for when the first input slot is clicked
+		 * @param inputLeftClickListener An {@link Consumer} that is called when the first input slot is clicked
+		 * @return The {@link Builder} instance
+		 */
+		public Builder onLeftInputClick(Consumer<Player> inputLeftClickListener) {
+			this.inputLeftClickListener = inputLeftClickListener;
+			return this;
+		}
+		/**
+		 * Listens for when the second input slot is clicked
+		 * @param inputRightClickListener An {@link Consumer} that is called when the second input slot is clicked
+		 * @return The {@link Builder} instance
+		 */
+		public Builder onRightInputClick(Consumer<Player> inputRightClickListener) {
+			this.inputRightClickListener = inputRightClickListener;
 			return this;
 		}
 
@@ -365,7 +426,17 @@ public class AnvilGUI {
 		 */
 		public Builder item(ItemStack item) {
 			Validate.notNull(item, "item cannot be null");
-			this.item = item;
+			this.item_left = item;
+			return this;
+		}
+		
+		/**
+		 * Sets the {@link ItemStack} to be put in the second slot
+		 * @param item The {@link ItemStack} to be put in the second slot
+		 * @return The {@link Builder} instance
+		 */
+		public Builder item_right(ItemStack item) {
+			this.item_right = item;
 			return this;
 		}
 
@@ -379,7 +450,7 @@ public class AnvilGUI {
 			Validate.notNull(plugin, "Plugin cannot be null");
 			Validate.notNull(completeFunction, "Complete function cannot be null");
 			Validate.notNull(player, "Player cannot be null");
-			return new AnvilGUI(plugin, player, title, itemText, item, preventClose, closeListener, completeFunction);
+			return new AnvilGUI(plugin, player, title, itemText, item_left, item_right, preventClose, closeListener, inputLeftClickListener, inputRightClickListener, completeFunction);
 		}
 
 	}
