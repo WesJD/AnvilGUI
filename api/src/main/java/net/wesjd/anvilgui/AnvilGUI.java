@@ -49,11 +49,11 @@ public class AnvilGUI {
 	/**
 	 * The ItemStack that is in the {@link Slot#INPUT_LEFT} slot.
 	 */
-	private ItemStack input_left;
+	private ItemStack inputLeft;
 	/**
 	 * The ItemStack that is in the {@link Slot#INPUT_RIGHT} slot.
 	 */
-	private ItemStack input_right;
+	private ItemStack inputRight;
 	/**
 	 * A state that decides where the anvil GUI is able to be closed by the user
 	 */
@@ -99,7 +99,7 @@ public class AnvilGUI {
 	 *
 	 * @param plugin     A {@link org.bukkit.plugin.java.JavaPlugin} instance
 	 * @param holder     The {@link Player} to open the inventory for
-	 * @param input_left     What to have the text already set to
+	 * @param inputLeft     What to have the text already set to
 	 * @param biFunction A {@link BiFunction} that is called when the player clicks the {@link Slot#OUTPUT} slot
 	 * @throws NullPointerException If the server version isn't supported
 	 * @deprecated As of version 1.2.3, use {@link AnvilGUI.Builder}
@@ -123,7 +123,7 @@ public class AnvilGUI {
 	 * @param player The {@link Player} to open the inventory for
 	 * @param inventoryTitle What to have the text already set to
 	 * @param itemText The name of the item in the first slot of the anvilGui
-	 * @param input_left The material of the item in the first slot of the anvilGUI
+	 * @param inputLeft The material of the item in the first slot of the anvilGUI
 	 * @param preventClose Whether to prevent the inventory from closing
 	 * @param closeListener A {@link Consumer} when the inventory closes
 	 * @param completeFunction A {@link BiFunction} that is called when the player clicks the {@link Slot#OUTPUT} slot
@@ -144,8 +144,8 @@ public class AnvilGUI {
 		this.plugin = plugin;
 		this.player = player;
 		this.inventoryTitle = inventoryTitle;
-		this.input_left = input_left;
-		this.input_right = input_right;
+		this.inputLeft = input_left;
+		this.inputRight = input_right;
 		this.preventClose = preventClose;
 		this.closeListener = closeListener;
 		this.inputLeftClickListener = inputLeftClickListener;
@@ -154,12 +154,12 @@ public class AnvilGUI {
 
 		if(itemText != null) {
 			if(input_left == null) {
-				this.input_left = new ItemStack(Material.PAPER);
+				this.inputLeft = new ItemStack(Material.PAPER);
 			}
 
-			ItemMeta paperMeta = this.input_left.getItemMeta();
+			ItemMeta paperMeta = this.inputLeft.getItemMeta();
 			paperMeta.setDisplayName(itemText);
-			this.input_left.setItemMeta(paperMeta);
+			this.inputLeft.setItemMeta(paperMeta);
 		}
 
 		openInventory();
@@ -177,9 +177,9 @@ public class AnvilGUI {
 		final Object container = WRAPPER.newContainerAnvil(player, inventoryTitle);
 
 		inventory = WRAPPER.toBukkitInventory(container);
-		inventory.setItem(Slot.INPUT_LEFT, this.input_left);
-		if(this.input_right!=null) {
-			inventory.setItem(Slot.INPUT_RIGHT, this.input_right);
+		inventory.setItem(Slot.INPUT_LEFT, this.inputLeft);
+		if(this.inputRight!=null) {
+			inventory.setItem(Slot.INPUT_RIGHT, this.inputRight);
 		}
 
 		containerId = WRAPPER.getNextContainerId(player, container);
@@ -324,11 +324,11 @@ public class AnvilGUI {
 		/**
 		 * An {@link ItemStack} to be put in the left input slot
 		 */
-		private ItemStack item_left;
+		private ItemStack itemLeft;
 		/**
 		 * An {@link ItemStack} to be put in the right input slot
 		 */
-		private ItemStack item_right;
+		private ItemStack itemRight;
 
 		/**
 		 * Prevents the closing of the anvil GUI by the user
@@ -423,20 +423,30 @@ public class AnvilGUI {
 		 * @param item The {@link ItemStack} to be put in the first slot
 		 * @return The {@link Builder} instance
 		 * @throws IllegalArgumentException if the {@link ItemStack} is null
+		 * @deprecated As of version 1.3.1, use {@link AnvilGUI.Builder.itemLeft}
 		 */
+		@Deprecated
 		public Builder item(ItemStack item) {
+			return itemLeft(item);
+		}
+		/**
+		 * Sets the {@link ItemStack} to be put in the first slot
+		 * @param item The {@link ItemStack} to be put in the first slot
+		 * @return The {@link Builder} instance
+		 * @throws IllegalArgumentException if the {@link ItemStack} is null
+		 */
+		public Builder itemLeft(ItemStack item) {
 			Validate.notNull(item, "item cannot be null");
-			this.item_left = item;
+			this.itemLeft = item;
 			return this;
 		}
-		
 		/**
 		 * Sets the {@link ItemStack} to be put in the second slot
 		 * @param item The {@link ItemStack} to be put in the second slot
 		 * @return The {@link Builder} instance
 		 */
-		public Builder item_right(ItemStack item) {
-			this.item_right = item;
+		public Builder itemRight(ItemStack item) {
+			this.itemRight = item;
 			return this;
 		}
 
@@ -450,7 +460,7 @@ public class AnvilGUI {
 			Validate.notNull(plugin, "Plugin cannot be null");
 			Validate.notNull(completeFunction, "Complete function cannot be null");
 			Validate.notNull(player, "Player cannot be null");
-			return new AnvilGUI(plugin, player, title, itemText, item_left, item_right, preventClose, closeListener, inputLeftClickListener, inputRightClickListener, completeFunction);
+			return new AnvilGUI(plugin, player, title, itemText, itemLeft, itemRight, preventClose, closeListener, inputLeftClickListener, inputRightClickListener, completeFunction);
 		}
 
 	}
