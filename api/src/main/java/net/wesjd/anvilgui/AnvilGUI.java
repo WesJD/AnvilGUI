@@ -133,8 +133,8 @@ public class AnvilGUI {
 			Player player,
 			String inventoryTitle,
 			String itemText,
-			ItemStack input_left,
-			ItemStack input_right,
+			ItemStack inputLeft,
+			ItemStack inputRight,
 			boolean preventClose,
 			Consumer<Player> closeListener,
 			Consumer<Player> inputLeftClickListener,
@@ -144,8 +144,8 @@ public class AnvilGUI {
 		this.plugin = plugin;
 		this.player = player;
 		this.inventoryTitle = inventoryTitle;
-		this.inputLeft = input_left;
-		this.inputRight = input_right;
+		this.inputLeft = inputLeft;
+		this.inputRight = inputRight;
 		this.preventClose = preventClose;
 		this.closeListener = closeListener;
 		this.inputLeftClickListener = inputLeftClickListener;
@@ -153,7 +153,7 @@ public class AnvilGUI {
 		this.completeFunction = completeFunction;
 
 		if(itemText != null) {
-			if(input_left == null) {
+			if(inputLeft == null) {
 				this.inputLeft = new ItemStack(Material.PAPER);
 			}
 
