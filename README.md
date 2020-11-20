@@ -1,4 +1,4 @@
-# AnvilGUI
+# AnvilGUI [![Build Status](https://ci.codemc.io/job/WesJD/job/AnvilGUI/badge/icon)](https://ci.codemc.io/job/WesJD/job/AnvilGUI/)
 Easily use anvil guis to get a user's input.
 
 This project was made since there is no way to prompt users with an anvil input with the Spigot / Bukkit API. It requires interaction with NMS and that is a pain in plugins where users have different versions of the server running.
@@ -7,13 +7,26 @@ This project was made since there is no way to prompt users with an anvil input 
 Java 8 and Bukkit / Spigot. Most server versions in the [Spigot Repository](https://hub.spigotmc.org/nexus/) are supported.
 
 ### My version isn't supported
-If you are a developer, submit a pull request adding a wrapper class for your version. Otherwise, please create an issue
+If you are a developer, submit a pull request adding a wrapper module for your version. Otherwise, please create an issue
 on the issues tab. 
 
-## How to use
+## Usage
+
+### As a dependency
 
 AnvilGUI requires the usage of Maven or a Maven compatible build system. 
-You can find the repository and dependency information [here](https://jitpack.io/#WesJD/AnvilGUI/master-SNAPSHOT).
+```xml
+<dependency>
+    <groupId>net.wesjd</groupId>
+    <artifactId>anvilgui</artifactId>
+    <version>1.3.0-SNAPSHOT</version>
+</dependency>
+
+<repository>
+    <id>codemc-snapshots</id>
+    <url>https://repo.codemc.io/repository/maven-snapshots/</url>
+</repository>
+```
 
 ### In your plugin
 
