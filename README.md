@@ -70,15 +70,41 @@ Takes a `String` that contains what the initial text in the renaming field shoul
 builder.text("What is the meaning of life?");     
 ```  
 
-#### `item(ItemStack)`
-Takes a custom `ItemStack` to be placed in the input slot.
+#### `itemLeft(ItemStack)`
+Takes a custom `ItemStack` to be placed in the left input slot.
 ```java                                              
-ItemStack stack = new ItemStack(Material.GOLD_BLOCK);
+ItemStack stack = new ItemStack(Material.IRON_SWORD);
 ItemMeta meta = stack.getItemMeta();                 
-meta.setLore(Arrays.asList("Hi there"));             
+meta.setLore(Arrays.asList("Sharp iron sword"));             
 stack.setItemMeta(meta); 
-builder.item(stack);        
-```                                                  
+builder.itemLeft(stack);        
+```         
+
+#### `onLeftInputClick(Consumer<Player>)`
+Takes a `Consumer<Player>` to be executed when the item in the left input slot is clicked.
+```java                                              
+builder.onLeftInputClick(player->{
+    player.sendMessage("You clicked the left input slot!");
+});        
+```      
+
+#### `itemRight(ItemStack)`
+Takes a custom `ItemStack` to be placed in the right input slot.
+```java                                              
+ItemStack stack = new ItemStack(Material.IRON_INGOT);
+ItemMeta meta = stack.getItemMeta();                 
+meta.setLore(Arrays.asList("A piece of metal"));             
+stack.setItemMeta(meta); 
+builder.itemRight(stack);        
+```         
+
+#### `onRightInputClick(Consumer<Player>)`
+Takes a `Consumer<Player>` to be executed when the item in the right input slot is clicked.
+```java                                              
+builder.onRightInputClick(player->{
+    player.sendMessage("You clicked the right input slot!");
+});        
+```
 
 #### `title(String)`
 Takes a `String` that will be used as the inventory title. Only displayed in Minecraft 1.14 and above.
@@ -115,7 +141,10 @@ new AnvilGUI.Builder()
     })
     .preventClose()                           //prevents the inventory from being closed
     .text("What is the meaning of life?")     //sets the text the GUI should start with
-    .item(new ItemStack(Material.GOLD_BLOCK)) //use a custom item for the first slot
+    .itemLeft(new ItemStack(Material.IRON_SWORD))   //use a custom item for the first slot
+    .itemRight(new ItemStack(Material.IRON_INGOT))  //use a custom item for the second slot
+    .onLeftInputClick(p->p.sendMessage("sword"))    //called when the left input slot is clicked
+    .onRightInputClick(p->p.sendMessage("ingot"))   //called when the right input slot is clicked
     .title("Enter your answer.")              //set the title of the GUI (only works in 1.14+)
     .plugin(myPluginInstance)                 //set the plugin instance
     .open(myPlayer);                          //opens the GUI for the player provided
