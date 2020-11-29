@@ -99,7 +99,7 @@ public class AnvilGUI {
      *
      * @param plugin     A {@link org.bukkit.plugin.java.JavaPlugin} instance
      * @param holder     The {@link Player} to open the inventory for
-     * @param inputLeft  What to have the text already set to
+     * @param insert  What to have the text already set to
      * @param biFunction A {@link BiFunction} that is called when the player clicks the {@link Slot#OUTPUT} slot
      * @throws NullPointerException If the server version isn't supported
      * @deprecated As of version 1.2.3, use {@link AnvilGUI.Builder}
