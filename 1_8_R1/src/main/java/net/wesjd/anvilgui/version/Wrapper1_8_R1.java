@@ -8,6 +8,7 @@ import org.bukkit.inventory.Inventory;
 
 /**
  * {@link VersionWrapper} implemented for NMS version 1_8_R1
+ *
  * @author Wesley Smith
  * @since 1.0
  */
@@ -95,6 +96,7 @@ public class Wrapper1_8_R1 implements VersionWrapper {
 
     /**
      * Turns a {@link Player} into an NMS one
+     *
      * @param player The player to be converted
      * @return the NMS EntityPlayer
      */
@@ -117,7 +119,8 @@ public class Wrapper1_8_R1 implements VersionWrapper {
         }
 
         @Override
-        public void b(EntityHuman entityhuman) {}
+        public void b(EntityHuman entityhuman) {
+        }
 
     }
 

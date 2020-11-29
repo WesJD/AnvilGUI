@@ -53,7 +53,8 @@
                         <outputDirectory>${project.basedir}/javadocs</outputDirectory>
                         <reportOutputDirectory>${project.basedir}/javadocs</reportOutputDirectory>
                         <destDir>${project.basedir}/javadocs</destDir>
-                        <failOnError>false</failOnError> <!-- if any fix is possible around @deprecated, please let me know -->
+                        <failOnError>false
+                        </failOnError> <!-- if any fix is possible around @deprecated, please let me know -->
                     </configuration>
                 </plugin>
             </plugins>
@@ -76,7 +77,8 @@
                     <outputDirectory>${project.basedir}/javadocs</outputDirectory>
                     <reportOutputDirectory>${project.basedir}/javadocs</reportOutputDirectory>
                     <destDir>${project.basedir}/javadocs</destDir>
-                    <failOnError>false</failOnError> <!-- if any fix is possible around @deprecated, please let me know -->
+                    <failOnError>false
+                    </failOnError> <!-- if any fix is possible around @deprecated, please let me know -->
                 </configuration>
             </plugin>
         </plugins>

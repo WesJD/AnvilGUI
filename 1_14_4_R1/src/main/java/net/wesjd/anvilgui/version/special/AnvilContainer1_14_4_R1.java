@@ -21,10 +21,12 @@ public class AnvilContainer1_14_4_R1 extends ContainerAnvil {
     }
 
     @Override
-    public void b(EntityHuman entityhuman) {}
+    public void b(EntityHuman entityhuman) {
+    }
 
     @Override
-    protected void a(EntityHuman entityhuman, World world, IInventory iinventory) {}
+    protected void a(EntityHuman entityhuman, World world, IInventory iinventory) {
+    }
 
     public int getContainerId() {
         return windowId;

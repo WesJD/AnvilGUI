@@ -22,7 +22,7 @@ public class Wrapper1_14_R1 implements VersionWrapper {
      */
     @Override
     public int getNextContainerId(Player player, Object container) {
-        if(IS_ONE_FOURTEEN) {
+        if (IS_ONE_FOURTEEN) {
             return ((AnvilContainer1_14_4_R1) container).getContainerId();
         } else {
             return ((AnvilContainer) container).getContainerId();
@@ -134,10 +134,12 @@ public class Wrapper1_14_R1 implements VersionWrapper {
         }
 
         @Override
-        public void b(EntityHuman entityhuman) {}
+        public void b(EntityHuman entityhuman) {
+        }
 
         @Override
-        protected void a(EntityHuman entityhuman, World world, IInventory iinventory) {}
+        protected void a(EntityHuman entityhuman, World world, IInventory iinventory) {
+        }
 
         public int getContainerId() {
             return windowId;

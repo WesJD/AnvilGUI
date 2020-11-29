@@ -121,10 +121,12 @@ public class Wrapper1_15_R1 implements VersionWrapper {
         }
 
         @Override
-        public void b(EntityHuman entityhuman) {}
+        public void b(EntityHuman entityhuman) {
+        }
 
         @Override
-        protected void a(EntityHuman entityhuman, World world, IInventory iinventory) {}
+        protected void a(EntityHuman entityhuman, World world, IInventory iinventory) {
+        }
 
         public int getContainerId() {
             return windowId;
