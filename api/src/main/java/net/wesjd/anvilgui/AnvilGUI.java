@@ -318,7 +318,7 @@ public class AnvilGUI {
         /**
          * The starting text on the item
          */
-        private String itemText = "";
+        private String itemText;
         /**
          * An {@link ItemStack} to be put in the left input slot
          */
