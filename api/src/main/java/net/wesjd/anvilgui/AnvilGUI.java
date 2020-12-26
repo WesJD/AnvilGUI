@@ -232,6 +232,7 @@ public class AnvilGUI {
 					(event.getRawSlot() < 3 || event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY))
             ) {
                 event.setCancelled(true);
+
                 final Player clicker = (Player) event.getWhoClicked();
                 if (event.getRawSlot() == Slot.OUTPUT) {
                     final ItemStack clicked = inventory.getItem(Slot.OUTPUT);
@@ -245,6 +246,11 @@ public class AnvilGUI {
                         inventory.setItem(Slot.INPUT_LEFT, clicked);
                     } else {
                         closeInventory();
+
+                        final Inventory openingNext = response.getInventory();
+                        if(openingNext != null) {
+                            Bukkit.getScheduler().runTask(plugin, () -> player.openInventory(openingNext));
+                        }
                     }
                 } else if (event.getRawSlot() == Slot.INPUT_LEFT) {
                     if (inputLeftClickListener != null) {
@@ -487,14 +493,19 @@ public class AnvilGUI {
          * The text that is to be displayed to the user
          */
         private final String text;
+        /**
+         * The inventory that is to be opened a tick later
+         */
+        private final Inventory inventory;
 
         /**
          * Creates a response to the user's input
          *
          * @param text The text that is to be displayed to the user, which can be null to close the inventory
          */
-        private Response(String text) {
+        private Response(String text, Inventory inventory) {
             this.text = text;
+            this.inventory = inventory;
         }
 
         /**
@@ -507,12 +518,21 @@ public class AnvilGUI {
         }
 
         /**
+         * Gets the inventory that is to be opened a tick later
+         *
+         * @return The inventory that is to be opened a tick later
+         */
+        public Inventory getInventory() {
+            return inventory;
+        }
+
+        /**
          * Returns an {@link Response} object for when the anvil GUI is to close
          *
          * @return An {@link Response} object for when the anvil GUI is to close
          */
         public static Response close() {
-            return new Response(null);
+            return new Response(null, null);
         }
 
         /**
@@ -522,7 +542,20 @@ public class AnvilGUI {
          * @return An {@link Response} object for when the anvil GUI is to display text to the user
          */
         public static Response text(String text) {
-            return new Response(text);
+            return new Response(text, null);
+        }
+
+        /**
+         * Returns an {@link Response} object for when the anvil GUI is to open another inventory.
+         * This response exists as the programmer would otherwise need to open an inventory a tick
+         * later in the click listener. This response cleans up and standardizes that code.
+         *
+         * @param inventory The {@link Inventory} instance to open
+         * @return An {@link Response} object for when the anvil GUI is to open another inventory
+         */
+        public static Response openInventory(Inventory inventory) {
+            Validate.notNull(inventory, "Inventory to open cannot be null");
+            return new Response(null, inventory);
         }
 
     }
