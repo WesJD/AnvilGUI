@@ -44,8 +44,9 @@ builder.onClose(player -> {
 #### `onComplete(BiFunction<Player, String, AnvilGUI.Response>)`  
 Takes a `BiFunction<Player, String, AnvilGUI.Response>` argument. The BiFunction is called when a player clicks the output slot. 
 The supplied string is what the player has inputted in the renaming field of the anvil gui. You must return an AnvilGUI.Response,
-which can either be `close()` or `text(String)`. Returning `close()` will close the inventory; returning `text(String)` will keep
-the inventory open and put the supplied String in the renaming field.           
+which can either be `close()`, `text(String)`, or `openInventory(Inventory)`. Returning `close()` will close the inventory; returning 
+`text(String)` will keep the inventory open and put the supplied String in the renaming field; returning `openInventory(Inventory)`
+will open the provided inventory, which is useful for when a user has finished their input in GUI menus.
 ```java                                                
 builder.onComplete((player, text) -> {                 
     if(text.equalsIgnoreCase("you")) {                 
