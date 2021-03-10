@@ -247,12 +247,17 @@ public class AnvilGUI {
                     final ItemStack clicked = inventory.getItem(Slot.OUTPUT);
                     if (clicked == null || clicked.getType() == Material.AIR) return;
 
-                    final Response response = completeFunction.apply(clicker, clicked.hasItemMeta() ? clicked.getItemMeta().getDisplayName() : "");
+                    final Response response = completeFunction.apply(
+                            clicker,
+                            clicked.hasItemMeta() ? clicked.getItemMeta().getDisplayName() : ""
+                    );
                     if (response.getText() != null) {
                         final ItemMeta meta = clicked.getItemMeta();
                         meta.setDisplayName(response.getText());
                         clicked.setItemMeta(meta);
                         inventory.setItem(Slot.INPUT_LEFT, clicked);
+                    } else if (response.getInventoryToOpen() != null) {
+                        clicker.openInventory(response.getInventoryToOpen());
                     } else {
                         closeInventory();
                     }
@@ -497,14 +502,16 @@ public class AnvilGUI {
          * The text that is to be displayed to the user
          */
         private final String text;
+        private final Inventory openInventory;
 
         /**
          * Creates a response to the user's input
          *
          * @param text The text that is to be displayed to the user, which can be null to close the inventory
          */
-        private Response(String text) {
+        private Response(String text, Inventory openInventory) {
             this.text = text;
+            this.openInventory = openInventory;
         }
 
         /**
@@ -517,12 +524,21 @@ public class AnvilGUI {
         }
 
         /**
+         * Gets the inventory that should be opened
+         *
+         * @return The inventory that should be opened
+         */
+        public Inventory getInventoryToOpen() {
+            return openInventory;
+        }
+
+        /**
          * Returns an {@link Response} object for when the anvil GUI is to close
          *
          * @return An {@link Response} object for when the anvil GUI is to close
          */
         public static Response close() {
-            return new Response(null);
+            return new Response(null, null);
         }
 
         /**
@@ -532,7 +548,17 @@ public class AnvilGUI {
          * @return An {@link Response} object for when the anvil GUI is to display text to the user
          */
         public static Response text(String text) {
-            return new Response(text);
+            return new Response(text, null);
+        }
+
+        /**
+         * Returns an {@link Response} object for when the GUI should open the provided inventory
+         *
+         * @param inventory The inventory to open
+         * @return The {@link Response} to return
+         */
+        public static Response openInventory(Inventory inventory) {
+            return new Response(null, inventory);
         }
 
     }
