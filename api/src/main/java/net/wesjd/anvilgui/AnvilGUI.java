@@ -194,15 +194,25 @@ public class AnvilGUI {
      * Closes the inventory if it's open.
      */
     public void closeInventory() {
+        closeInventory(true);
+    }
+
+    /**
+     * Closes the inventory if it's open, only sending the close inventory packets if the arg is true
+     * @param sendClosePacket Whether to send the close inventory event, packet, etc
+     */
+    private void closeInventory(boolean sendClosePacket) {
         if (!open) {
             return;
         }
 
         open = false;
 
-        WRAPPER.handleInventoryCloseEvent(player);
-        WRAPPER.setActiveContainerDefault(player);
-        WRAPPER.sendPacketCloseWindow(player, containerId);
+        if (sendClosePacket) {
+            WRAPPER.handleInventoryCloseEvent(player);
+            WRAPPER.setActiveContainerDefault(player);
+            WRAPPER.sendPacketCloseWindow(player, containerId);
+        }
 
         HandlerList.unregisterAll(listener);
 
@@ -273,7 +283,7 @@ public class AnvilGUI {
         @EventHandler
         public void onInventoryClose(InventoryCloseEvent event) {
             if (open && event.getInventory().equals(inventory)) {
-                closeInventory();
+                closeInventory(false);
                 if (preventClose) {
                     Bukkit.getScheduler().runTask(plugin, AnvilGUI.this::openInventory);
                 }
