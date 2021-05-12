@@ -129,10 +129,10 @@ builder.open(player);
 ### A full example combining all methods
 ```java
 new AnvilGUI.Builder()
-    .onClose(player -> {                                        //called when the inventory is closing
+    .onClose(player -> {                                               //called when the inventory is closing
         player.sendMessage("You closed the inventory.");
     })
-    .onComplete((player, text) -> {                             //called when the inventory output slot is clicked
+    .onComplete((player, text) -> {                                    //called when the inventory output slot is clicked
         if(text.equalsIgnoreCase("you")) {
             player.sendMessage("You have magical powers!");
             return AnvilGUI.Response.close();
@@ -140,15 +140,15 @@ new AnvilGUI.Builder()
             return AnvilGUI.Response.text("Incorrect.");
         }
     })
-    .preventClose()                                             //prevents the inventory from being closed
-    .text("What is the meaning of life?")                       //sets the text the GUI should start with
-    .itemLeft(new ItemStack(Material.IRON_SWORD))               //use a custom item for the first slot
-    .itemRight(new ItemStack(Material.IRON_INGOT))              //use a custom item for the second slot
-    .onLeftInputClick(player -> player.sendMessage("sword"))    //called when the left input slot is clicked
-    .onRightInputClick(player -> player.sendMessage("ingot"))   //called when the right input slot is clicked
-    .title("Enter your answer.")                                //set the title of the GUI (only works in 1.14+)
-    .plugin(myPluginInstance)                                   //set the plugin instance
-    .open(myPlayer);                                            //opens the GUI for the player provided
+    .preventClose()                                                    //prevents the inventory from being closed
+    .text("What is the meaning of life?")                              //sets the text the GUI should start with
+    .itemLeft(new ItemStack(Material.IRON_SWORD))                      //use a custom item for the first slot
+    .itemRight(new ItemStack(Material.IRON_SWORD))                     //use a custom item for the second slot
+    .onLeftInputClick(player -> player.sendMessage("first sword"))     //called when the left input slot is clicked
+    .onRightInputClick(player -> player.sendMessage("second sword"))   //called when the right input slot is clicked
+    .title("Enter your answer.")                                       //set the title of the GUI (only works in 1.14+)
+    .plugin(myPluginInstance)                                          //set the plugin instance
+    .open(myPlayer);                                                   //opens the GUI for the player provided
 ```
                                                                                                                                                                                                                                                                               
 
