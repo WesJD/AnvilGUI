@@ -208,13 +208,13 @@ public class AnvilGUI {
 
         open = false;
 
+        HandlerList.unregisterAll(listener);
+
         if (sendClosePacket) {
             WRAPPER.handleInventoryCloseEvent(player);
             WRAPPER.setActiveContainerDefault(player);
             WRAPPER.sendPacketCloseWindow(player, containerId);
         }
-
-        HandlerList.unregisterAll(listener);
 
         if (closeListener != null) {
             closeListener.accept(player);
