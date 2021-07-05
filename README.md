@@ -21,7 +21,7 @@ AnvilGUI requires the usage of Maven or a Maven compatible build system.
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-shade-plugin</artifactId>
-            <version>${maven-shade.version}</version>
+            <version>3.2.4</version>
             <executions>
                 <execution>
                     <phase>package</phase>
