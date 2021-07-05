@@ -153,7 +153,7 @@ new AnvilGUI.Builder()
                                                                                                                                                                                                                                                                               
 
 ## Compilation
-Build with `mvn clean install`.
+Build with `mvn clean install` using Java 16.
 
 ## License
 This project is licensed under the [MIT License](LICENSE).
