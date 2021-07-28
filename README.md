@@ -28,6 +28,36 @@ AnvilGUI requires the usage of Maven or a Maven compatible build system.
 </repository>
 ```
 
+It is best to be a good citizen and relocate the dependency to within your namespace in order 
+to prevent conflicts with other plugins. Here is an example of how to relocate the dependency:
+```xml
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>${shade.version}</version>
+            <executions>
+                <execution>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>shade</goal>
+                    </goals>
+                    <configuration>
+                        <relocations>
+                            <relocation>
+                                <pattern>net.wesjd.anvilgui</pattern>
+                                <shadedPattern>[YOUR_PLUGIN_PACKAGE].anvilgui</shadedPattern> <!-- Replace [YOUR_PLUGIN_PACKAGE] with your namespace -->
+                            </relocation>
+                        </relocations>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+</build>
+```
+
 ### In your plugin
 
 The `AnvilGUI.Builder` class is how you build an AnvilGUI. 
