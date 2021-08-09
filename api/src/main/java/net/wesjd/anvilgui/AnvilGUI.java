@@ -206,8 +206,6 @@ public class AnvilGUI {
             return;
         }
 
-        open = false;
-
         HandlerList.unregisterAll(listener);
 
         if (sendClosePacket) {
