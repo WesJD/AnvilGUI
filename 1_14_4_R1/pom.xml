@@ -7,7 +7,7 @@
     <parent>
         <artifactId>anvilgui-parent</artifactId>
         <groupId>net.wesjd</groupId>
-        <version>1.5.2-SNAPSHOT</version>
+        <version>1.5.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>anvilgui-1_14_4_R1</artifactId>
