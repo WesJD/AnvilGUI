@@ -2,9 +2,6 @@ package net.wesjd.anvilgui.version;
 
 import org.bukkit.Bukkit;
 
-import java.util.Arrays;
-import java.util.List;
-
 /**
  * Matches the server's NMS version to its {@link VersionWrapper}
  *
@@ -14,23 +11,19 @@ import java.util.List;
 public class VersionMatcher {
 
     /**
-     * The server's version
-     */
-    private final String serverVersion = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3].substring(1);
-
-    /**
      * Matches the server version to it's {@link VersionWrapper}
      *
      * @return The {@link VersionWrapper} for this server
-     * @throws RuntimeException If AnvilGUI doesn't support this server version
+     * @throws IllegalStateException If the version wrapper failed to be instantiated or is unable to be found
      */
     public VersionWrapper match() {
+        final String serverVersion = Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3].substring(1);
         try {
-            return (VersionWrapper) Class.forName(this.getClass().getPackage().getName() + ".Wrapper" + serverVersion).newInstance();
-        } catch (IllegalAccessException | InstantiationException ex) {
-            throw new RuntimeException(ex);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException("Your server version isn't supported in AnvilGUI!");
+            return (VersionWrapper) Class.forName(getClass().getPackage().getName() + ".Wrapper" + serverVersion).newInstance();
+        } catch (IllegalAccessException | InstantiationException exception) {
+            throw new IllegalStateException("Failed to instantiate version wrapper for version " + serverVersion, exception);
+        } catch (ClassNotFoundException exception) {
+            throw new IllegalStateException("AnvilGUI does not support server version \"" + serverVersion + "\"", exception);
         }
     }
 
