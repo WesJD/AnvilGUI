@@ -50,6 +50,7 @@ to prevent conflicts with other plugins. Here is an example of how to relocate t
                                 <shadedPattern>[YOUR_PLUGIN_PACKAGE].anvilgui</shadedPattern> <!-- Replace [YOUR_PLUGIN_PACKAGE] with your namespace -->
                             </relocation>
                         </relocations>
+                        <minimizeJar>false</minimizeJar> <!-- Ensure not set to true -->
                     </configuration>
                 </execution>
             </executions>
@@ -57,6 +58,8 @@ to prevent conflicts with other plugins. Here is an example of how to relocate t
     </plugins>
 </build>
 ```
+Please note: A lot of tutorials advise you set `<minimizeJar>` to true, but this will break version matching in the library.
+If set to true, the different `VersionWrapper`s won't be shaded into the final artifact and no Minecraft version will be compatible.
 
 ### In your plugin
 
