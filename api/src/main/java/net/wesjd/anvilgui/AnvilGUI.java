@@ -17,6 +17,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -32,12 +33,12 @@ public class AnvilGUI {
     /**
      * The local {@link VersionWrapper} object for the server's version
      */
-    private static VersionWrapper WRAPPER = new VersionMatcher().match();
+    private static final VersionWrapper WRAPPER = new VersionMatcher().match();
 
     /**
      * The {@link Plugin} that this anvil GUI is associated with
      */
-    private final Plugin plugin;
+    private static final Plugin PLUGIN = JavaPlugin.getProvidingPlugin(AnvilGUI.class);
     /**
      * The player who has the GUI open
      */
@@ -141,7 +142,6 @@ public class AnvilGUI {
             Consumer<Player> inputRightClickListener,
             BiFunction<Player, String, Response> completeFunction
     ) {
-        this.plugin = plugin;
         this.player = player;
         this.inventoryTitle = inventoryTitle;
         this.inputLeft = inputLeft;
@@ -172,7 +172,7 @@ public class AnvilGUI {
         WRAPPER.handleInventoryCloseEvent(player);
         WRAPPER.setActiveContainerDefault(player);
 
-        Bukkit.getPluginManager().registerEvents(listener, plugin);
+        Bukkit.getPluginManager().registerEvents(listener, PLUGIN);
 
         final Object container = WRAPPER.newContainerAnvil(player, inventoryTitle);
 
@@ -290,7 +290,7 @@ public class AnvilGUI {
             if (open && event.getInventory().equals(inventory)) {
                 closeInventory(false);
                 if (preventClose) {
-                    Bukkit.getScheduler().runTask(plugin, AnvilGUI.this::openInventory);
+                    Bukkit.getScheduler().runTask(PLUGIN, AnvilGUI.this::openInventory);
                 }
             }
         }
@@ -398,19 +398,6 @@ public class AnvilGUI {
         public Builder onComplete(BiFunction<Player, String, Response> completeFunction) {
             Validate.notNull(completeFunction, "Complete function cannot be null");
             this.completeFunction = completeFunction;
-            return this;
-        }
-
-        /**
-         * Sets the plugin for the {@link AnvilGUI}
-         *
-         * @param plugin The {@link Plugin} this anvil GUI is associated with
-         * @return The {@link Builder} instance
-         * @throws IllegalArgumentException if the plugin is null
-         */
-        public Builder plugin(Plugin plugin) {
-            Validate.notNull(plugin, "Plugin cannot be null");
-            this.plugin = plugin;
             return this;
         }
 
