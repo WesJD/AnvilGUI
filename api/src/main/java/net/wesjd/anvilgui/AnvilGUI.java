@@ -323,10 +323,6 @@ public class AnvilGUI {
          */
         private BiFunction<Player, String, Response> completeFunction;
         /**
-         * The {@link Plugin} that this anvil GUI is associated with
-         */
-        private Plugin plugin;
-        /**
          * The text that will be displayed to the user
          */
         private String title = "Repair & Name";
@@ -472,10 +468,9 @@ public class AnvilGUI {
          * @throws IllegalArgumentException when the onComplete function, plugin, or player is null
          */
         public AnvilGUI open(Player player) {
-            Validate.notNull(plugin, "Plugin cannot be null");
             Validate.notNull(completeFunction, "Complete function cannot be null");
             Validate.notNull(player, "Player cannot be null");
-            return new AnvilGUI(plugin, player, title, itemText, itemLeft, itemRight, preventClose, closeListener, inputLeftClickListener, inputRightClickListener, completeFunction);
+            return new AnvilGUI(PLUGIN, player, title, itemText, itemLeft, itemRight, preventClose, closeListener, inputLeftClickListener, inputRightClickListener, completeFunction);
         }
 
     }

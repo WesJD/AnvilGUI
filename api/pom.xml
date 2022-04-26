@@ -173,4 +173,11 @@
             </plugin>
         </plugins>
     </build>
+
+    <distributionManagement>
+        <repository>
+            <id>repo-eternalcode</id>
+            <url>https://repo.eternalcode.pl/releases</url>
+        </repository>
+    </distributionManagement>
 </project>

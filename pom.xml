@@ -42,7 +42,7 @@
     <repositories>
         <repository>
             <id>nms-repo</id>
-            <url>https://repo.codemc.org/repository/nms/</url>
+            <url>https://repo.eternalcode.pl/releases/</url>
         </repository>
     </repositories>
 
@@ -82,13 +82,9 @@
 
     <distributionManagement>
         <repository>
-            <id>codemc-releases</id>
-            <url>https://repo.codemc.io/repository/maven-releases/</url>
+            <id>repo-eternalcode</id>
+            <url>https://repo.eternalcode.pl/releases/</url>
         </repository>
-        <snapshotRepository>
-            <id>codemc-snapshots</id>
-            <url>https://repo.codemc.io/repository/maven-snapshots/</url>
-        </snapshotRepository>
     </distributionManagement>
 
 </project>
