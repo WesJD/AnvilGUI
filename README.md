@@ -185,8 +185,13 @@ new AnvilGUI.Builder()
 ```
                                                                                                                                                                                                                                                                               
 
-## Compilation
-Build with `mvn clean install` using Java 16.
+## Development 
+We use Maven to handle our dependencies. Run `mvn clean install` using Java 17 to build the project.
+
+### Spotless
+The project utilizes the [Spotless Maven Plugin](https://github.com/diffplug/spotless/tree/main/plugin-maven) to
+enforce style guidelines. You will not be able to build the project if your code does not meet the guidelines.
+To fix all code formatting issues, simply run `mvn spotless:apply`.
 
 ## License
 This project is licensed under the [MIT License](LICENSE).
