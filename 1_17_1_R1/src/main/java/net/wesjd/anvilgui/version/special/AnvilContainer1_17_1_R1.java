@@ -1,5 +1,6 @@
 package net.wesjd.anvilgui.version.special;
 
+
 import net.minecraft.core.BlockPosition;
 import net.minecraft.network.chat.ChatMessage;
 import net.minecraft.world.IInventory;
@@ -11,9 +12,11 @@ import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 public class AnvilContainer1_17_1_R1 extends ContainerAnvil {
-    public AnvilContainer1_17_1_R1(Player player, int containerId ,String guiTitle) {
-        super(containerId, ((CraftPlayer)player).getHandle().getInventory(),
-                ContainerAccess.at(((CraftWorld)player.getWorld()).getHandle(), new BlockPosition(0, 0, 0)));
+    public AnvilContainer1_17_1_R1(Player player, int containerId, String guiTitle) {
+        super(
+                containerId,
+                ((CraftPlayer) player).getHandle().getInventory(),
+                ContainerAccess.at(((CraftWorld) player.getWorld()).getHandle(), new BlockPosition(0, 0, 0)));
         this.checkReachable = false;
         setTitle(new ChatMessage(guiTitle));
     }

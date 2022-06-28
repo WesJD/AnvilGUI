@@ -1,5 +1,6 @@
 package net.wesjd.anvilgui.version;
 
+
 import net.minecraft.server.v1_14_R1.*;
 import net.wesjd.anvilgui.version.special.AnvilContainer1_14_4_R1;
 import org.bukkit.Bukkit;
@@ -42,7 +43,9 @@ public class Wrapper1_14_R1 implements VersionWrapper {
      */
     @Override
     public void sendPacketOpenWindow(Player player, int containerId, String guiTitle) {
-        toNMS(player).playerConnection.sendPacket(new PacketPlayOutOpenWindow(containerId, Containers.ANVIL, new ChatMessage(guiTitle)));
+        toNMS(player)
+                .playerConnection
+                .sendPacket(new PacketPlayOutOpenWindow(containerId, Containers.ANVIL, new ChatMessage(guiTitle)));
     }
 
     /**
@@ -74,7 +77,7 @@ public class Wrapper1_14_R1 implements VersionWrapper {
      */
     @Override
     public void setActiveContainerId(Object container, int containerId) {
-        //noop
+        // noop
     }
 
     /**
@@ -121,7 +124,9 @@ public class Wrapper1_14_R1 implements VersionWrapper {
     private class AnvilContainer extends ContainerAnvil {
 
         public AnvilContainer(Player player, String guiTitle) {
-            super(getRealNextContainerId(player), ((CraftPlayer) player).getHandle().inventory,
+            super(
+                    getRealNextContainerId(player),
+                    ((CraftPlayer) player).getHandle().inventory,
                     ContainerAccess.at(((CraftWorld) player.getWorld()).getHandle(), new BlockPosition(0, 0, 0)));
             this.checkReachable = false;
             setTitle(new ChatMessage(guiTitle));
@@ -134,17 +139,13 @@ public class Wrapper1_14_R1 implements VersionWrapper {
         }
 
         @Override
-        public void b(EntityHuman entityhuman) {
-        }
+        public void b(EntityHuman entityhuman) {}
 
         @Override
-        protected void a(EntityHuman entityhuman, World world, IInventory iinventory) {
-        }
+        protected void a(EntityHuman entityhuman, World world, IInventory iinventory) {}
 
         public int getContainerId() {
             return windowId;
         }
-
     }
-
 }

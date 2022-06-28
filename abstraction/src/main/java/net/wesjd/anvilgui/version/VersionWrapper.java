@@ -1,5 +1,6 @@
 package net.wesjd.anvilgui.version;
 
+
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
@@ -91,5 +92,4 @@ public interface VersionWrapper {
      * @return The Container instance
      */
     Object newContainerAnvil(Player player, String title);
-
 }

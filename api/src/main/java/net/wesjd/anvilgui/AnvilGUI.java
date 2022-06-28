@@ -1,5 +1,8 @@
 package net.wesjd.anvilgui;
 
+
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import net.wesjd.anvilgui.version.VersionMatcher;
 import net.wesjd.anvilgui.version.VersionWrapper;
 import org.apache.commons.lang.Validate;
@@ -17,9 +20,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
-
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
 
 /**
  * An anvil gui, used for gathering a user's input
@@ -139,8 +139,7 @@ public class AnvilGUI {
             Consumer<Player> closeListener,
             Consumer<Player> inputLeftClickListener,
             Consumer<Player> inputRightClickListener,
-            BiFunction<Player, String, Response> completeFunction
-    ) {
+            BiFunction<Player, String, Response> completeFunction) {
         this.plugin = plugin;
         this.player = player;
         this.inventoryTitle = inventoryTitle;
@@ -237,10 +236,8 @@ public class AnvilGUI {
 
         @EventHandler
         public void onInventoryClick(InventoryClickEvent event) {
-            if (
-                    event.getInventory().equals(inventory) &&
-					(event.getRawSlot() < 3 || event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY))
-            ) {
+            if (event.getInventory().equals(inventory)
+                    && (event.getRawSlot() < 3 || event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY))) {
                 event.setCancelled(true);
                 final Player clicker = (Player) event.getWhoClicked();
                 if (event.getRawSlot() == Slot.OUTPUT) {
@@ -249,8 +246,7 @@ public class AnvilGUI {
 
                     final Response response = completeFunction.apply(
                             clicker,
-                            clicked.hasItemMeta() ? clicked.getItemMeta().getDisplayName() : ""
-                    );
+                            clicked.hasItemMeta() ? clicked.getItemMeta().getDisplayName() : "");
                     if (response.getText() != null) {
                         final ItemMeta meta = clicked.getItemMeta();
                         meta.setDisplayName(response.getText());
@@ -294,7 +290,6 @@ public class AnvilGUI {
                 }
             }
         }
-
     }
 
     /**
@@ -488,9 +483,19 @@ public class AnvilGUI {
             Validate.notNull(plugin, "Plugin cannot be null");
             Validate.notNull(completeFunction, "Complete function cannot be null");
             Validate.notNull(player, "Player cannot be null");
-            return new AnvilGUI(plugin, player, title, itemText, itemLeft, itemRight, preventClose, closeListener, inputLeftClickListener, inputRightClickListener, completeFunction);
+            return new AnvilGUI(
+                    plugin,
+                    player,
+                    title,
+                    itemText,
+                    itemLeft,
+                    itemRight,
+                    preventClose,
+                    closeListener,
+                    inputLeftClickListener,
+                    inputRightClickListener,
+                    completeFunction);
         }
-
     }
 
     /**
@@ -502,6 +507,7 @@ public class AnvilGUI {
          * The text that is to be displayed to the user
          */
         private final String text;
+
         private final Inventory openInventory;
 
         /**
@@ -560,7 +566,6 @@ public class AnvilGUI {
         public static Response openInventory(Inventory inventory) {
             return new Response(null, inventory);
         }
-
     }
 
     /**
@@ -568,7 +573,7 @@ public class AnvilGUI {
      */
     public static class Slot {
 
-        private static final int[] values = new int[]{Slot.INPUT_LEFT, Slot.INPUT_RIGHT, Slot.OUTPUT};
+        private static final int[] values = new int[] {Slot.INPUT_LEFT, Slot.INPUT_RIGHT, Slot.OUTPUT};
 
         /**
          * The slot on the far left, where the first input is inserted. An {@link ItemStack} is always inserted
@@ -594,5 +599,4 @@ public class AnvilGUI {
             return values;
         }
     }
-
 }

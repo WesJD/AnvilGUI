@@ -1,5 +1,6 @@
 package net.wesjd.anvilgui.version;
 
+
 import net.minecraft.server.v1_7_R4.*;
 import org.bukkit.craftbukkit.v1_7_R4.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_7_R4.event.CraftEventFactory;
@@ -35,7 +36,9 @@ public class Wrapper1_7_R4 implements VersionWrapper {
      */
     @Override
     public void sendPacketOpenWindow(final Player player, final int containerId, final String guiTitle) {
-        this.toNMS(player).playerConnection.sendPacket(new PacketPlayOutOpenWindow(containerId, 8, "Repairing", 9, true));
+        this.toNMS(player)
+                .playerConnection
+                .sendPacket(new PacketPlayOutOpenWindow(containerId, 8, "Repairing", 9, true));
     }
 
     /**
@@ -119,9 +122,6 @@ public class Wrapper1_7_R4 implements VersionWrapper {
         }
 
         @Override
-        public void b(EntityHuman entityhuman) {
-        }
-
+        public void b(EntityHuman entityhuman) {}
     }
-
 }

@@ -1,5 +1,6 @@
 package net.wesjd.anvilgui.version;
 
+
 import net.minecraft.core.BlockPosition;
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.network.protocol.game.PacketPlayOutCloseWindow;
@@ -63,9 +64,7 @@ public final class Wrapper1_19_R1 implements VersionWrapper {
     }
 
     @Override
-    public void setActiveContainerId(Object container, int containerId) {
-
-    }
+    public void setActiveContainerId(Object container, int containerId) {}
 
     @Override
     public void addActiveContainerSlotListener(Object container, Player player) {
@@ -85,7 +84,9 @@ public final class Wrapper1_19_R1 implements VersionWrapper {
     private static class AnvilContainer extends ContainerAnvil {
         public AnvilContainer(Player player, int containerId, String guiTitle) {
 
-            super(containerId, ((CraftPlayer) player).getHandle().fB(),
+            super(
+                    containerId,
+                    ((CraftPlayer) player).getHandle().fB(),
                     ContainerAccess.a(((CraftWorld) player.getWorld()).getHandle(), new BlockPosition(0, 0, 0)));
             this.checkReachable = false;
             setTitle(IChatBaseComponent.a(guiTitle));
