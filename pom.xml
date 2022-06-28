@@ -48,6 +48,9 @@
     </repositories>
 
     <build>
+        <!-- Considering this project is purely used as a library, it makes sense for the default goal
+         to install -->
+        <defaultGoal>clean install</defaultGoal>
         <plugins>
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
