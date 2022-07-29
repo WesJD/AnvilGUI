@@ -1,8 +1,6 @@
 package net.wesjd.anvilgui.version;
 
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import net.minecraft.core.BlockPosition;
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.network.protocol.game.PacketPlayOutCloseWindow;
@@ -14,6 +12,8 @@ import net.minecraft.world.inventory.Container;
 import net.minecraft.world.inventory.ContainerAccess;
 import net.minecraft.world.inventory.ContainerAnvil;
 import net.minecraft.world.inventory.Containers;
+import net.wesjd.anvilgui.version.special.AnvilContainer1_19_1_R1;
+import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_19_R1.event.CraftEventFactory;
@@ -21,6 +21,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
 public final class Wrapper1_19_R1 implements VersionWrapper {
+    private final boolean IS_ONE_NINETEEN_ONE = Bukkit.getBukkitVersion().contains("1.19.1");
+
     private int getRealNextContainerId(Player player) {
         return toNMS(player).nextContainerCounter();
     }
@@ -37,6 +39,9 @@ public final class Wrapper1_19_R1 implements VersionWrapper {
 
     @Override
     public int getNextContainerId(Player player, Object container) {
+        if (IS_ONE_NINETEEN_ONE) {
+            return ((AnvilContainer1_19_1_R1) container).getContainerId();
+        }
         return ((AnvilContainer) container).getContainerId();
     }
 
@@ -80,6 +85,9 @@ public final class Wrapper1_19_R1 implements VersionWrapper {
 
     @Override
     public Object newContainerAnvil(Player player, String title) {
+        if (IS_ONE_NINETEEN_ONE) {
+            return new AnvilContainer1_19_1_R1(player, getRealNextContainerId(player), title);
+        }
         return new AnvilContainer(player, getRealNextContainerId(player), title);
     }
 
@@ -87,26 +95,10 @@ public final class Wrapper1_19_R1 implements VersionWrapper {
         public AnvilContainer(Player player, int containerId, String guiTitle) {
             super(
                     containerId,
-                    getPlayerInventory(((CraftPlayer) player).getHandle()),
+                    ((CraftPlayer) player).getHandle().fB(),
                     ContainerAccess.a(((CraftWorld) player.getWorld()).getHandle(), new BlockPosition(0, 0, 0)));
             this.checkReachable = false;
             setTitle(IChatBaseComponent.a(guiTitle));
-        }
-
-        private static net.minecraft.world.entity.player.PlayerInventory getPlayerInventory(EntityPlayer player) {
-            // In 1.19.1 the fB method was renamed to fA. We use reflection to determine which one to call.
-            try {
-                Method fA = EntityPlayer.class.getMethod("fA"); // 1.19.1
-                Method fB = EntityPlayer.class.getMethod("fB"); // 1.19
-                if (fA.getReturnType().equals(net.minecraft.world.entity.player.PlayerInventory.class)) {
-                    return (net.minecraft.world.entity.player.PlayerInventory) fA.invoke(player);
-                } else if (fB.getReturnType().equals(net.minecraft.world.entity.player.PlayerInventory.class)) {
-                    return (net.minecraft.world.entity.player.PlayerInventory) fB.invoke(player);
-                }
-            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
-                throw new RuntimeException("Failed to determine inventory method on EntityPlayer");
-            }
-            return null;
         }
 
         @Override
