@@ -1,6 +1,8 @@
 package net.wesjd.anvilgui.version;
 
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import net.minecraft.core.BlockPosition;
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.network.protocol.game.PacketPlayOutCloseWindow;
@@ -83,13 +85,28 @@ public final class Wrapper1_19_R1 implements VersionWrapper {
 
     private static class AnvilContainer extends ContainerAnvil {
         public AnvilContainer(Player player, int containerId, String guiTitle) {
-
             super(
                     containerId,
-                    ((CraftPlayer) player).getHandle().fB(),
+                    getPlayerInventory(((CraftPlayer) player).getHandle()),
                     ContainerAccess.a(((CraftWorld) player.getWorld()).getHandle(), new BlockPosition(0, 0, 0)));
             this.checkReachable = false;
             setTitle(IChatBaseComponent.a(guiTitle));
+        }
+
+        private static net.minecraft.world.entity.player.PlayerInventory getPlayerInventory(EntityPlayer player) {
+            // In 1.19.1 the fB method was renamed to fA. We use reflection to determine which one to call.
+            try {
+                Method fA = EntityPlayer.class.getMethod("fA"); // 1.19.1
+                Method fB = EntityPlayer.class.getMethod("fB"); // 1.19
+                if (fA.getReturnType().equals(net.minecraft.world.entity.player.PlayerInventory.class)) {
+                    return (net.minecraft.world.entity.player.PlayerInventory) fA.invoke(player);
+                } else if (fB.getReturnType().equals(net.minecraft.world.entity.player.PlayerInventory.class)) {
+                    return (net.minecraft.world.entity.player.PlayerInventory) fB.invoke(player);
+                }
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
+                throw new RuntimeException("Failed to determine inventory method on EntityPlayer");
+            }
+            return null;
         }
 
         @Override
