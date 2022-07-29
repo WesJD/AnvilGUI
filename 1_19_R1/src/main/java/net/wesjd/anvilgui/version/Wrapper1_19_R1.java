@@ -12,6 +12,8 @@ import net.minecraft.world.inventory.Container;
 import net.minecraft.world.inventory.ContainerAccess;
 import net.minecraft.world.inventory.ContainerAnvil;
 import net.minecraft.world.inventory.Containers;
+import net.wesjd.anvilgui.version.special.AnvilContainer1_19_1_R1;
+import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_19_R1.event.CraftEventFactory;
@@ -19,6 +21,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
 public final class Wrapper1_19_R1 implements VersionWrapper {
+    private final boolean IS_ONE_NINETEEN_ONE = Bukkit.getBukkitVersion().contains("1.19.1");
+
     private int getRealNextContainerId(Player player) {
         return toNMS(player).nextContainerCounter();
     }
@@ -35,6 +39,9 @@ public final class Wrapper1_19_R1 implements VersionWrapper {
 
     @Override
     public int getNextContainerId(Player player, Object container) {
+        if (IS_ONE_NINETEEN_ONE) {
+            return ((AnvilContainer1_19_1_R1) container).getContainerId();
+        }
         return ((AnvilContainer) container).getContainerId();
     }
 
@@ -78,12 +85,14 @@ public final class Wrapper1_19_R1 implements VersionWrapper {
 
     @Override
     public Object newContainerAnvil(Player player, String title) {
+        if (IS_ONE_NINETEEN_ONE) {
+            return new AnvilContainer1_19_1_R1(player, getRealNextContainerId(player), title);
+        }
         return new AnvilContainer(player, getRealNextContainerId(player), title);
     }
 
     private static class AnvilContainer extends ContainerAnvil {
         public AnvilContainer(Player player, int containerId, String guiTitle) {
-
             super(
                     containerId,
                     ((CraftPlayer) player).getHandle().fB(),

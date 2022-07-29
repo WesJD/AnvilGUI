@@ -10,19 +10,13 @@
         <version>1.5.3-SNAPSHOT</version>
     </parent>
 
-    <artifactId>anvilgui-1_19_R1</artifactId>
+    <artifactId>anvilgui-1_19_1_R1</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot</artifactId>
-            <version>1.19-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.wesjd</groupId>
-            <artifactId>anvilgui-1_19_1_R1</artifactId>
-            <version>${project.parent.version}</version>
+            <version>1.19.1-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
