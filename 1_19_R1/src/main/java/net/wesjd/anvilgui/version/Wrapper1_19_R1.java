@@ -21,7 +21,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
 public final class Wrapper1_19_R1 implements VersionWrapper {
-    private final boolean IS_ONE_NINETEEN_ONE = Bukkit.getBukkitVersion().contains("1.19.1");
+    private final boolean IS_ONE_NINETEEN_ONE = Bukkit.getBukkitVersion().contains("1.19.1") || Bukkit.getBukkitVersion().contains("1.19.2");
 
     private int getRealNextContainerId(Player player) {
         return toNMS(player).nextContainerCounter();
