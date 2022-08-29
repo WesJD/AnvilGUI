@@ -69,7 +69,7 @@ The following methods allow you to modify various parts of the displayed GUI. Ja
 #### `onClose(Consumer<Player>)` 
 Takes a `Consumer<Player>` argument that is called when a player closes the anvil gui.
 ```java                                             
-builder.onClose(player -> {                         
+builder.onClose(player => {                         
     player.sendMessage("You closed the inventory.");
 });                                                 
 ``` 
@@ -81,7 +81,7 @@ which can either be `close()`, `text(String)`, or `openInventory(Inventory)`. Re
 `text(String)` will keep the inventory open and put the supplied String in the renaming field; returning `openInventory(Inventory)`
 will open the provided inventory, which is useful for when a user has finished their input in GUI menus.
 ```java                                                
-builder.onComplete((player, text) -> {                 
+builder.onComplete((player, text) => {                 
     if(text.equalsIgnoreCase("you")) {                 
         player.sendMessage("You have magical powers!");
         return AnvilGUI.Response.close();              
@@ -117,7 +117,7 @@ builder.itemLeft(stack);
 #### `onLeftInputClick(Consumer<Player>)`
 Takes a `Consumer<Player>` to be executed when the item in the left input slot is clicked.
 ```java                                              
-builder.onLeftInputClick(player -> {
+builder.onLeftInputClick(player => {
     player.sendMessage("You clicked the left input slot!");
 });        
 ```      
@@ -135,7 +135,7 @@ builder.itemRight(stack);
 #### `onRightInputClick(Consumer<Player>)`
 Takes a `Consumer<Player>` to be executed when the item in the right input slot is clicked.
 ```java                                              
-builder.onRightInputClick(player -> {
+builder.onRightInputClick(player => {
     player.sendMessage("You clicked the right input slot!");
 });        
 ```
@@ -162,10 +162,10 @@ builder.open(player);
 ### A full example combining all methods
 ```java
 new AnvilGUI.Builder()
-    .onClose(player -> {                                               //called when the inventory is closing
+    .onClose(player => {                                               //called when the inventory is closing
         player.sendMessage("You closed the inventory.");
     })
-    .onComplete((player, text) -> {                                    //called when the inventory output slot is clicked
+    .onComplete((player, text) => {                                    //called when the inventory output slot is clicked
         if(text.equalsIgnoreCase("you")) {
             player.sendMessage("You have magical powers!");
             return AnvilGUI.Response.close();
