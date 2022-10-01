@@ -10,7 +10,6 @@ import net.wesjd.anvilgui.version.Wrapper1_7_R4;
 import net.wesjd.anvilgui.version.Wrapper1_8_R1;
 import net.wesjd.anvilgui.version.Wrapper1_8_R2;
 import net.wesjd.anvilgui.version.Wrapper1_8_R3;
-
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -246,31 +245,41 @@ public class AnvilGUI {
     public Inventory getInventory() {
         return inventory;
     }
-    
-	private void registerEvents() {
-		Bukkit.getPluginManager().registerEvents(listener, plugin);
 
-		// registering the AnvilPrepareEvent listener externally since this event is not
-		// available for MC 1.7 and 1.8.
-		if (!(WRAPPER.getClass() == Wrapper1_7_R4.class || WRAPPER.getClass() == Wrapper1_8_R1.class
-				|| WRAPPER.getClass() == Wrapper1_8_R2.class || WRAPPER.getClass() == Wrapper1_8_R3.class)) {
+    private void registerEvents() {
+        Bukkit.getPluginManager().registerEvents(listener, plugin);
 
-			Bukkit.getPluginManager().registerEvent(PrepareAnvilEvent.class, listener, EventPriority.NORMAL, new EventExecutor() {
-				@Override
-				public void execute(Listener listener, Event event) throws EventException {
-					PrepareAnvilEvent prepareEvent = (PrepareAnvilEvent) event;
+        // registering the AnvilPrepareEvent listener externally since this event is not
+        // available for MC 1.7 and 1.8.
+        if (!(WRAPPER.getClass() == Wrapper1_7_R4.class
+                || WRAPPER.getClass() == Wrapper1_8_R1.class
+                || WRAPPER.getClass() == Wrapper1_8_R2.class
+                || WRAPPER.getClass() == Wrapper1_8_R3.class)) {
 
-					if (prepareEvent.getInventory().equals(inventory)) {
-						Player player = (Player) prepareEvent.getView().getPlayer();
-						if (prepareListener != null) {
-							prepareListener.accept(player, prepareEvent.getInventory().getRenameText());
-						}
-					}
-				}
-			}, plugin);
-		}
-	}
+            Bukkit.getPluginManager()
+                    .registerEvent(
+                            PrepareAnvilEvent.class,
+                            listener,
+                            EventPriority.NORMAL,
+                            new EventExecutor() {
+                                @Override
+                                public void execute(Listener listener, Event event) throws EventException {
+                                    PrepareAnvilEvent prepareEvent = (PrepareAnvilEvent) event;
 
+                                    if (prepareEvent.getInventory().equals(inventory)) {
+                                        Player player =
+                                                (Player) prepareEvent.getView().getPlayer();
+                                        if (prepareListener != null) {
+                                            prepareListener.accept(
+                                                    player,
+                                                    prepareEvent.getInventory().getRenameText());
+                                        }
+                                    }
+                                }
+                            },
+                            plugin);
+        }
+    }
 
     /**
      * Simply holds the listeners for the GUI
@@ -429,16 +438,16 @@ public class AnvilGUI {
             this.inputRightClickListener = inputRightClickListener;
             return this;
         }
-        
+
         /**
          * Listens for changes in the input field of the anvil. Ineffective for MC versions 1.7.* and 1.8.*
-         * 
+         *
          * @param prepareListener An {@link BiConsumer} that is called when the string of the input field is changed
-         * @return The {@link Builder} instance 
+         * @return The {@link Builder} instance
          */
         public Builder onPrepare(BiConsumer<Player, String> prepareListener) {
-        	this.prepareListener = prepareListener;
-        	return this;
+            this.prepareListener = prepareListener;
+            return this;
         }
 
         /**
