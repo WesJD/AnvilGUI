@@ -1,24 +1,35 @@
 package net.wesjd.anvilgui;
 
 
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import net.wesjd.anvilgui.version.VersionMatcher;
 import net.wesjd.anvilgui.version.VersionWrapper;
+import net.wesjd.anvilgui.version.Wrapper1_7_R4;
+import net.wesjd.anvilgui.version.Wrapper1_8_R1;
+import net.wesjd.anvilgui.version.Wrapper1_8_R2;
+import net.wesjd.anvilgui.version.Wrapper1_8_R3;
+
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+import org.bukkit.event.EventException;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.EventExecutor;
 import org.bukkit.plugin.Plugin;
 
 /**
@@ -75,6 +86,10 @@ public class AnvilGUI {
      * An {@link Consumer} that is called when the {@link Slot#INPUT_RIGHT} slot has been clicked
      */
     private final Consumer<Player> inputRightClickListener;
+    /**
+     * An {@link BiConsumer} that is called when the string of the anvil input has been changed.
+     */
+    private final BiConsumer<Player, String> prepareListener;
 
     /**
      * The container id of the inventory, used for NMS methods
@@ -106,7 +121,7 @@ public class AnvilGUI {
      */
     @Deprecated
     public AnvilGUI(Plugin plugin, Player holder, String insert, BiFunction<Player, String, String> biFunction) {
-        this(plugin, holder, "Repair & Name", insert, null, null, false, null, null, null, (player, text) -> {
+        this(plugin, holder, "Repair & Name", insert, null, null, false, null, null, null, null, (player, text) -> {
             String response = biFunction.apply(player, text);
             if (response != null) {
                 return Response.text(response);
@@ -126,6 +141,7 @@ public class AnvilGUI {
      * @param inputLeft        The material of the item in the first slot of the anvilGUI
      * @param preventClose     Whether to prevent the inventory from closing
      * @param closeListener    A {@link Consumer} when the inventory closes
+     * @param prepareListener  A {@link BiConsumer} that is called when the player changes the text of the item name field
      * @param completeFunction A {@link BiFunction} that is called when the player clicks the {@link Slot#OUTPUT} slot
      */
     private AnvilGUI(
@@ -139,6 +155,7 @@ public class AnvilGUI {
             Consumer<Player> closeListener,
             Consumer<Player> inputLeftClickListener,
             Consumer<Player> inputRightClickListener,
+            BiConsumer<Player, String> prepareListener,
             BiFunction<Player, String, Response> completeFunction) {
         this.plugin = plugin;
         this.player = player;
@@ -149,6 +166,7 @@ public class AnvilGUI {
         this.closeListener = closeListener;
         this.inputLeftClickListener = inputLeftClickListener;
         this.inputRightClickListener = inputRightClickListener;
+        this.prepareListener = prepareListener;
         this.completeFunction = completeFunction;
 
         if (itemText != null) {
@@ -171,7 +189,7 @@ public class AnvilGUI {
         WRAPPER.handleInventoryCloseEvent(player);
         WRAPPER.setActiveContainerDefault(player);
 
-        Bukkit.getPluginManager().registerEvents(listener, plugin);
+        this.registerEvents();
 
         final Object container = WRAPPER.newContainerAnvil(player, inventoryTitle);
 
@@ -228,6 +246,31 @@ public class AnvilGUI {
     public Inventory getInventory() {
         return inventory;
     }
+    
+	private void registerEvents() {
+		Bukkit.getPluginManager().registerEvents(listener, plugin);
+
+		// registering the AnvilPrepareEvent listener externally since this event is not
+		// available for MC 1.7 and 1.8.
+		if (!(WRAPPER.getClass() == Wrapper1_7_R4.class || WRAPPER.getClass() == Wrapper1_8_R1.class
+				|| WRAPPER.getClass() == Wrapper1_8_R2.class || WRAPPER.getClass() == Wrapper1_8_R3.class)) {
+
+			Bukkit.getPluginManager().registerEvent(PrepareAnvilEvent.class, listener, EventPriority.NORMAL, new EventExecutor() {
+				@Override
+				public void execute(Listener listener, Event event) throws EventException {
+					PrepareAnvilEvent prepareEvent = (PrepareAnvilEvent) event;
+
+					if (prepareEvent.getInventory().equals(inventory)) {
+						Player player = (Player) prepareEvent.getView().getPlayer();
+						if (prepareListener != null) {
+							prepareListener.accept(player, prepareEvent.getInventory().getRenameText());
+						}
+					}
+				}
+			}, plugin);
+		}
+	}
+
 
     /**
      * Simply holds the listeners for the GUI
@@ -314,6 +357,10 @@ public class AnvilGUI {
          */
         private Consumer<Player> inputRightClickListener;
         /**
+         * An {@link BiConsumer} that is called when the string of the anvil input has been changed
+         */
+        private BiConsumer<Player, String> prepareListener;
+        /**
          * An {@link BiFunction} that is called when the anvil output slot has been clicked
          */
         private BiFunction<Player, String, Response> completeFunction;
@@ -381,6 +428,17 @@ public class AnvilGUI {
         public Builder onRightInputClick(Consumer<Player> inputRightClickListener) {
             this.inputRightClickListener = inputRightClickListener;
             return this;
+        }
+        
+        /**
+         * Listens for changes in the input field of the anvil. Ineffective for MC versions 1.7.* and 1.8.*
+         * 
+         * @param prepareListener An {@link BiConsumer} that is called when the string of the input field is changed
+         * @return The {@link Builder} instance 
+         */
+        public Builder onPrepare(BiConsumer<Player, String> prepareListener) {
+        	this.prepareListener = prepareListener;
+        	return this;
         }
 
         /**
@@ -494,6 +552,7 @@ public class AnvilGUI {
                     closeListener,
                     inputLeftClickListener,
                     inputRightClickListener,
+                    prepareListener,
                     completeFunction);
         }
     }
