@@ -89,7 +89,16 @@ builder.onComplete((player, text) -> {
         return AnvilGUI.Response.text("Incorrect.");   
     }                                                  
 });                                                    
-```                                                    
+```                           
+                         
+#### `onPrepare(BiConsumer<Player, String>)`
+Takes a `BiConsumer<Player, String>` argument that is called when a player changes the input field of the anvil, i.e. when typing or undoing characters.
+It uses the [PrepareAnvilEvent](https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/event/inventory/PrepareAnvilEvent.html), so it will only have an effect on MC versions >= 1.9.
+```java
+builder.onPrepare((player, text) -> {
+	player.sendMessage("Current input: " + text);
+});
+```
 
 #### `preventClose()` 
 Tells the AnvilGUI to prevent the user from pressing escape to close the inventory.
