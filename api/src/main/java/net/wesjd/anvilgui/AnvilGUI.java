@@ -1,6 +1,7 @@
 package net.wesjd.anvilgui;
 
 
+import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import net.wesjd.anvilgui.version.VersionMatcher;
@@ -35,6 +36,12 @@ public class AnvilGUI {
     private static VersionWrapper WRAPPER = new VersionMatcher().match();
 
     /**
+     * The variable containing an item with air. Used when the item would be null.
+     * To keep the heap clean, this object only gets iniziaised once
+     */
+    private static final ItemStack AIR = new ItemStack(Material.AIR);
+
+    /**
      * The {@link Plugin} that this anvil GUI is associated with
      */
     private final Plugin plugin;
@@ -58,14 +65,20 @@ public class AnvilGUI {
      * A state that decides where the anvil GUI is able to be closed by the user
      */
     private final boolean preventClose;
+
+    /**
+     * This boolean is used to determine if the event should be cancelled or not
+     */
+    private final boolean isInteractive;
+
     /**
      * An {@link Consumer} that is called when the anvil GUI is closed
      */
     private final Consumer<Player> closeListener;
     /**
-     * An {@link BiFunction} that is called when the {@link Slot#OUTPUT} slot has been clicked
+     * An {@link Function5} that is called when the {@link Slot#OUTPUT} slot has been clicked
      */
-    private final BiFunction<Player, String, Response> completeFunction;
+    private final Function5<Player, String, ItemStack, ItemStack, Response> completeFunction;
 
     /**
      * An {@link Consumer} that is called when the {@link Slot#INPUT_LEFT} slot has been clicked
@@ -80,6 +93,7 @@ public class AnvilGUI {
      * The container id of the inventory, used for NMS methods
      */
     private int containerId;
+
     /**
      * The inventory that is used on the Bukkit side of things
      */
@@ -106,7 +120,7 @@ public class AnvilGUI {
      */
     @Deprecated
     public AnvilGUI(Plugin plugin, Player holder, String insert, BiFunction<Player, String, String> biFunction) {
-        this(plugin, holder, "Repair & Name", insert, null, null, false, null, null, null, (player, text) -> {
+        this(plugin, holder, "Repair & Name", insert, null, null, false, false, null, null, null, (player, text) -> {
             String response = biFunction.apply(player, text);
             if (response != null) {
                 return Response.text(response);
@@ -136,10 +150,11 @@ public class AnvilGUI {
             ItemStack inputLeft,
             ItemStack inputRight,
             boolean preventClose,
+            boolean isInteractive,
             Consumer<Player> closeListener,
             Consumer<Player> inputLeftClickListener,
             Consumer<Player> inputRightClickListener,
-            BiFunction<Player, String, Response> completeFunction) {
+            Function5<Player, String, ItemStack, ItemStack, Response> completeFunction) {
         this.plugin = plugin;
         this.player = player;
         this.inventoryTitle = inventoryTitle;
@@ -150,6 +165,7 @@ public class AnvilGUI {
         this.inputLeftClickListener = inputLeftClickListener;
         this.inputRightClickListener = inputRightClickListener;
         this.completeFunction = completeFunction;
+        this.isInteractive = isInteractive;
 
         if (itemText != null) {
             if (inputLeft == null) {
@@ -238,15 +254,20 @@ public class AnvilGUI {
         public void onInventoryClick(InventoryClickEvent event) {
             if (event.getInventory().equals(inventory)
                     && (event.getRawSlot() < 3 || event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY))) {
-                event.setCancelled(true);
+                event.setCancelled(!isInteractive);
                 final Player clicker = (Player) event.getWhoClicked();
                 if (event.getRawSlot() == Slot.OUTPUT) {
                     final ItemStack clicked = inventory.getItem(Slot.OUTPUT);
                     if (clicked == null || clicked.getType() == Material.AIR) return;
 
+                    final ItemStack left = inventory.getItem(Slot.INPUT_LEFT);
+                    final ItemStack right = inventory.getItem(Slot.INPUT_RIGHT);
+
                     final Response response = completeFunction.apply(
                             clicker,
-                            clicked.hasItemMeta() ? clicked.getItemMeta().getDisplayName() : "");
+                            clicked.hasItemMeta() ? clicked.getItemMeta().getDisplayName() : "",
+                            left == null ? AIR : left,
+                            right == null ? AIR : right);
                     if (response.getText() != null) {
                         final ItemMeta meta = clicked.getItemMeta();
                         meta.setDisplayName(response.getText());
@@ -274,7 +295,7 @@ public class AnvilGUI {
             if (event.getInventory().equals(inventory)) {
                 for (int slot : Slot.values()) {
                     if (event.getRawSlots().contains(slot)) {
-                        event.setCancelled(true);
+                        event.setCancelled(!isInteractive);
                         break;
                     }
                 }
@@ -305,6 +326,13 @@ public class AnvilGUI {
          * A state that decides where the anvil GUI is able to be closed by the user
          */
         private boolean preventClose = false;
+
+        /**
+         * A state that decided if the anvil GUI should be modifiable by the user.
+         * When set to true, this would allow the user to take out items / put items into the container
+         */
+        private boolean isInteractive = false;
+
         /**
          * An {@link Consumer} that is called when the {@link Slot#INPUT_LEFT} slot has been clicked
          */
@@ -314,9 +342,9 @@ public class AnvilGUI {
          */
         private Consumer<Player> inputRightClickListener;
         /**
-         * An {@link BiFunction} that is called when the anvil output slot has been clicked
+         * An {@link Function5} that is called when the anvil output slot has been clicked
          */
-        private BiFunction<Player, String, Response> completeFunction;
+        private Function5<Player, String, ItemStack, ItemStack, Response> completeFunction;
         /**
          * The {@link Plugin} that this anvil GUI is associated with
          */
@@ -345,6 +373,18 @@ public class AnvilGUI {
          */
         public Builder preventClose() {
             preventClose = true;
+            return this;
+        }
+
+        /**
+         * Allow the user to modify the anvil GUi content
+         * When set to true, this would allow the user to take out items / put items into the container
+         *
+         * @param isInteractive If the container should allow user inputs / outputs
+         * @return The {@link Builder} instance
+         */
+        public Builder interactable(boolean isInteractive) {
+            this.isInteractive = isInteractive;
             return this;
         }
 
@@ -391,6 +431,19 @@ public class AnvilGUI {
          * @throws IllegalArgumentException when the completeFunction is null
          */
         public Builder onComplete(BiFunction<Player, String, Response> completeFunction) {
+            Validate.notNull(completeFunction, "Complete function cannot be null");
+            this.completeFunction = (player, text, left, right) -> completeFunction.apply(player, text);
+            return this;
+        }
+
+        /**
+         * Handles the inventory output slot when it is clicked
+         *
+         * @param completeFunction An {@link Function5} that is called when the user clicks the output slot
+         * @return The {@link Builder} instance
+         * @throws IllegalArgumentException when the completeFunction is null
+         */
+        public Builder onComplete(Function5<Player, String, ItemStack, ItemStack, Response> completeFunction) {
             Validate.notNull(completeFunction, "Complete function cannot be null");
             this.completeFunction = completeFunction;
             return this;
@@ -491,6 +544,7 @@ public class AnvilGUI {
                     itemLeft,
                     itemRight,
                     preventClose,
+                    isInteractive,
                     closeListener,
                     inputLeftClickListener,
                     inputRightClickListener,

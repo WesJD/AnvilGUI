@@ -89,14 +89,37 @@ builder.onComplete((player, text) -> {
         return AnvilGUI.Response.text("Incorrect.");   
     }                                                  
 });                                                    
-```                                                    
+```
+
+#### `onComplete(Function5<Player, String, ItemStack, ItemStack, AnvilGUI.Response>)`
+Takes a `Function5<Player, String, ItemStack, ItemStack, AnvilGUI.Response>` as argument. The Function5 is called when a player clicks the output slot.
+The supplied string is what the player has inputted in the renmaing field of the anvil gui. The first itemstack is the left item in the combine slot. 
+The second itemstack is the right item in the combine slot. You must return an AnvilGUI.Response,
+which can either be `close()`, `text(String)`, or `openInventory(Inventory)`. Returning `close()` will close the inventory; returning 
+`text(String)` will keep the inventory open and put the supplied String in the renaming field; returning `openInventory(Inventory)`
+will open the provided inventory, which is useful for when a user has finished their input in GUI menus.
+Useful for situations when dealing with an interactive anvil gui.
+```java
+builder.onComplete((player, text, left, right) -> {
+    player.sendMessage("Left is a item with the Type of " + left.getType());
+    return AnvilGUI.Response.close();
+});
+```
+
+#### `interactable(boolean)`
+This allows or denies users to take / input items in th anvil slots.
+Useful when you try to make a inputting system using an anvil gui.
+Defaults to `false` thus blocking any attempts to insert items or remove them
+```java
+builder.interactable(true);
+```
 
 #### `preventClose()` 
 Tells the AnvilGUI to prevent the user from pressing escape to close the inventory.
 Useful for situations like password input to play.                                      
 ```java                     
 builder.preventClose();     
-```                         
+```                     
      
 #### `text(String)`
 Takes a `String` that contains what the initial text in the renaming field should be set to.
@@ -174,6 +197,7 @@ new AnvilGUI.Builder()
         }
     })
     .preventClose()                                                    //prevents the inventory from being closed
+    .interactable(false)                                               // Deny player insertion or removal from the left or right slot
     .text("What is the meaning of life?")                              //sets the text the GUI should start with
     .itemLeft(new ItemStack(Material.IRON_SWORD))                      //use a custom item for the first slot
     .itemRight(new ItemStack(Material.IRON_SWORD))                     //use a custom item for the second slot
