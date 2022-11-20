@@ -120,14 +120,26 @@ public class AnvilGUI {
      */
     @Deprecated
     public AnvilGUI(Plugin plugin, Player holder, String insert, BiFunction<Player, String, String> biFunction) {
-        this(plugin, holder, "Repair & Name", insert, null, null, false, false, null, null, null, (player, text, left, right) -> {
-            String response = biFunction.apply(player, text);
-            if (response != null) {
-                return Response.text(response);
-            } else {
-                return Response.close();
-            }
-        });
+        this(
+                plugin,
+                holder,
+                "Repair & Name",
+                insert,
+                null,
+                null,
+                false,
+                false,
+                null,
+                null,
+                null,
+                (player, text, left, right) -> {
+                    String response = biFunction.apply(player, text);
+                    if (response != null) {
+                        return Response.text(response);
+                    } else {
+                        return Response.close();
+                    }
+                });
     }
 
     /**
