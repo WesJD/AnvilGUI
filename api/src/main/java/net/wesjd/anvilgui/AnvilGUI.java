@@ -7,8 +7,10 @@ import java.util.function.Consumer;
 import net.wesjd.anvilgui.version.VersionMatcher;
 import net.wesjd.anvilgui.version.VersionWrapper;
 import org.apache.commons.lang.Validate;
+import org.apache.logging.log4j.core.appender.AppenderLoggingException;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
@@ -306,11 +308,32 @@ public class AnvilGUI {
         public void onInventoryClose(InventoryCloseEvent event) {
             if (open && event.getInventory().equals(inventory)) {
                 closeInventory(false);
+                if (isInteractive) {
+                    giveItem(event.getPlayer(), inventory.getItem(Slot.INPUT_LEFT));
+                    giveItem(event.getPlayer(), inventory.getItem(Slot.INPUT_RIGHT));
+                }
                 if (preventClose) {
                     Bukkit.getScheduler().runTask(plugin, AnvilGUI.this::openInventory);
                 }
             }
         }
+    }
+
+    /**
+     * Gives the player the item. If the player has no inventory space left,
+     * it will get dropped in-front of him
+     *
+     * @param player The player that should receive the itemstack
+     * @param stack The itemstack the player should receive
+     *
+     * @throws IllegalArgumentException Gets thrown when the player is null
+     */
+    private void giveItem(HumanEntity player, ItemStack stack) {
+        Validate.notNull(player, "player can't be null");
+        if (stack == null || stack.getType() == Material.AIR) return;
+
+        player.getInventory().addItem(stack)
+                .forEach((key, value) -> player.getWorld().dropItem(player.getLocation(), value));
     }
 
     /**
