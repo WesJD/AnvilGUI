@@ -1,5 +1,6 @@
 package net.wesjd.anvilgui;
 
+
 import java.util.function.Function;
 
 /**

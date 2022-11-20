@@ -1,13 +1,11 @@
 package net.wesjd.anvilgui;
 
 
-import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import net.wesjd.anvilgui.version.VersionMatcher;
 import net.wesjd.anvilgui.version.VersionWrapper;
 import org.apache.commons.lang.Validate;
-import org.apache.logging.log4j.core.appender.AppenderLoggingException;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
@@ -122,7 +120,7 @@ public class AnvilGUI {
      */
     @Deprecated
     public AnvilGUI(Plugin plugin, Player holder, String insert, BiFunction<Player, String, String> biFunction) {
-        this(plugin, holder, "Repair & Name", insert, null, null, false, false, null, null, null, (player, text) -> {
+        this(plugin, holder, "Repair & Name", insert, null, null, false, false, null, null, null, (player, text, left, right) -> {
             String response = biFunction.apply(player, text);
             if (response != null) {
                 return Response.text(response);
@@ -332,8 +330,8 @@ public class AnvilGUI {
         Validate.notNull(player, "player can't be null");
         if (stack == null || stack.getType() == Material.AIR) return;
 
-        player.getInventory().addItem(stack)
-                .forEach((key, value) -> player.getWorld().dropItem(player.getLocation(), value));
+        player.getInventory().addItem(stack).forEach((key, value) -> player.getWorld()
+                .dropItem(player.getLocation(), value));
     }
 
     /**
