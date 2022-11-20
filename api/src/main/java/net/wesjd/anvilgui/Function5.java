@@ -20,7 +20,7 @@ import java.util.function.Function;
  * @since 1.5.3-SNAPSHOT
  */
 @FunctionalInterface
-interface Function5<T, U, V, W, R> {
+public interface Function5<T, U, V, W, R> {
 
     /**
      * Applies this function to the given arguments.
