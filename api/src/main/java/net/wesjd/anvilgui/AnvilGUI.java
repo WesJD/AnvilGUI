@@ -3,6 +3,7 @@ package net.wesjd.anvilgui;
 
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import net.wesjd.anvilgui.version.VersionMatcher;
 import net.wesjd.anvilgui.version.VersionWrapper;
 import org.apache.commons.lang.Validate;
@@ -33,7 +34,7 @@ public class AnvilGUI {
     /**
      * The local {@link VersionWrapper} object for the server's version
      */
-    private static VersionWrapper WRAPPER = new VersionMatcher().match();
+    private static final VersionWrapper WRAPPER = new VersionMatcher().match();
 
     /**
      * The variable containing an item with air. Used when the item would be null.
@@ -52,7 +53,7 @@ public class AnvilGUI {
     /**
      * The title of the anvil inventory
      */
-    private String inventoryTitle;
+    private final String inventoryTitle;
     /**
      * The ItemStack that is in the {@link Slot#INPUT_LEFT} slot.
      */
@@ -60,9 +61,9 @@ public class AnvilGUI {
     /**
      * The ItemStack that is in the {@link Slot#INPUT_RIGHT} slot.
      */
-    private ItemStack inputRight;
+    private final ItemStack inputRight;
     /**
-     * A state that decides where the anvil GUI is able to be closed by the user
+     * A state that decides where the anvil GUI is able to get closed by the user
      */
     private final boolean preventClose;
 
@@ -76,9 +77,9 @@ public class AnvilGUI {
      */
     private final Consumer<Player> closeListener;
     /**
-     * An {@link Function5} that is called when the {@link Slot#OUTPUT} slot has been clicked
+     * An {@link Function} that is called when the {@link Slot#OUTPUT} slot has been clicked
      */
-    private final Function5<Player, String, ItemStack, ItemStack, Response> completeFunction;
+    private final Function<Completion, Response> completeFunction;
 
     /**
      * An {@link Consumer} that is called when the {@link Slot#INPUT_LEFT} slot has been clicked
@@ -113,33 +114,21 @@ public class AnvilGUI {
      *
      * @param plugin     A {@link org.bukkit.plugin.java.JavaPlugin} instance
      * @param holder     The {@link Player} to open the inventory for
-     * @param insert  What to have the text already set to
+     * @param insert     What to have the text already set to
      * @param biFunction A {@link BiFunction} that is called when the player clicks the {@link Slot#OUTPUT} slot
      * @throws NullPointerException If the server version isn't supported
      * @deprecated As of version 1.2.3, use {@link AnvilGUI.Builder}
      */
     @Deprecated
     public AnvilGUI(Plugin plugin, Player holder, String insert, BiFunction<Player, String, String> biFunction) {
-        this(
-                plugin,
-                holder,
-                "Repair & Name",
-                insert,
-                null,
-                null,
-                false,
-                false,
-                null,
-                null,
-                null,
-                (player, text, left, right) -> {
-                    String response = biFunction.apply(player, text);
-                    if (response != null) {
-                        return Response.text(response);
-                    } else {
-                        return Response.close();
-                    }
-                });
+        this(plugin, holder, "Repair & Name", insert, null, null, false, false, null, null, null, completion -> {
+            String response = biFunction.apply(completion.player, completion.text);
+            if (response != null) {
+                return Response.text(response);
+            } else {
+                return Response.close();
+            }
+        });
     }
 
     /**
@@ -166,7 +155,7 @@ public class AnvilGUI {
             Consumer<Player> closeListener,
             Consumer<Player> inputLeftClickListener,
             Consumer<Player> inputRightClickListener,
-            Function5<Player, String, ItemStack, ItemStack, Response> completeFunction) {
+            Function<Completion, Response> completeFunction) {
         this.plugin = plugin;
         this.player = player;
         this.inventoryTitle = inventoryTitle;
@@ -226,6 +215,7 @@ public class AnvilGUI {
 
     /**
      * Closes the inventory if it's open, only sending the close inventory packets if the arg is true
+     *
      * @param sendClosePacket Whether to send the close inventory event, packet, etc
      */
     private void closeInventory(boolean sendClosePacket) {
@@ -272,14 +262,13 @@ public class AnvilGUI {
                     final ItemStack clicked = inventory.getItem(Slot.OUTPUT);
                     if (clicked == null || clicked.getType() == Material.AIR) return;
 
-                    final ItemStack left = inventory.getItem(Slot.INPUT_LEFT);
-                    final ItemStack right = inventory.getItem(Slot.INPUT_RIGHT);
+                    final Response response = completeFunction.apply(new Completion(
+                            notNull(inventory.getItem(Slot.INPUT_LEFT)),
+                            notNull(inventory.getItem(Slot.INPUT_RIGHT)),
+                            notNull(inventory.getItem(Slot.OUTPUT)),
+                            player,
+                            clicked.hasItemMeta() ? clicked.getItemMeta().getDisplayName() : ""));
 
-                    final Response response = completeFunction.apply(
-                            clicker,
-                            clicked.hasItemMeta() ? clicked.getItemMeta().getDisplayName() : "",
-                            left == null ? AIR : left,
-                            right == null ? AIR : right);
                     if (response.getText() != null) {
                         final ItemMeta meta = clicked.getItemMeta();
                         meta.setDisplayName(response.getText());
@@ -334,8 +323,7 @@ public class AnvilGUI {
      * it will get dropped in-front of him
      *
      * @param player The player that should receive the itemstack
-     * @param stack The itemstack the player should receive
-     *
+     * @param stack  The itemstack the player should receive
      * @throws IllegalArgumentException Gets thrown when the player is null
      */
     private void giveItem(HumanEntity player, ItemStack stack) {
@@ -344,6 +332,16 @@ public class AnvilGUI {
 
         player.getInventory().addItem(stack).forEach((key, value) -> player.getWorld()
                 .dropItem(player.getLocation(), value));
+    }
+
+    /**
+     * If the given ItemStack is null, return an air ItemStack, otherwise return the given ItemStack
+     *
+     * @param stack The ItemStack to check
+     * @return air or the given ItemStack
+     */
+    private ItemStack notNull(ItemStack stack) {
+        return stack == null ? AIR : stack;
     }
 
     /**
@@ -375,9 +373,9 @@ public class AnvilGUI {
          */
         private Consumer<Player> inputRightClickListener;
         /**
-         * An {@link Function5} that is called when the anvil output slot has been clicked
+         * An {@link Function} that is called when the anvil output slot has been clicked
          */
-        private Function5<Player, String, ItemStack, ItemStack, Response> completeFunction;
+        private Function<Completion, Response> completeFunction;
         /**
          * The {@link Plugin} that this anvil GUI is associated with
          */
@@ -416,7 +414,7 @@ public class AnvilGUI {
          * @param isInteractive If the container should allow user inputs / outputs
          * @return The {@link Builder} instance
          */
-        public Builder interactable(boolean isInteractive) {
+        public Builder canBeInteractedWith(boolean isInteractive) {
             this.isInteractive = isInteractive;
             return this;
         }
@@ -465,18 +463,18 @@ public class AnvilGUI {
          */
         public Builder onComplete(BiFunction<Player, String, Response> completeFunction) {
             Validate.notNull(completeFunction, "Complete function cannot be null");
-            this.completeFunction = (player, text, left, right) -> completeFunction.apply(player, text);
+            this.completeFunction = completion -> completeFunction.apply(completion.player, completion.text);
             return this;
         }
 
         /**
          * Handles the inventory output slot when it is clicked
          *
-         * @param completeFunction An {@link Function5} that is called when the user clicks the output slot
+         * @param completeFunction An {@link Function} that is called when the user clicks the output slot
          * @return The {@link Builder} instance
          * @throws IllegalArgumentException when the completeFunction is null
          */
-        public Builder onComplete(Function5<Player, String, ItemStack, ItemStack, Response> completeFunction) {
+        public Builder onComplete(Function<Completion, Response> completeFunction) {
             Validate.notNull(completeFunction, "Complete function cannot be null");
             this.completeFunction = completeFunction;
             return this;
@@ -684,6 +682,89 @@ public class AnvilGUI {
          */
         public static int[] values() {
             return values;
+        }
+    }
+
+    /**
+     * Class wrapping the values you receive from the onComplete event
+     */
+    public static final class Completion {
+
+        /**
+         * The {@link ItemStack} in the anvilGui slots
+         */
+        private final ItemStack leftItem, rightItem, outputItem;
+
+        /**
+         * The {@link Player} that clicked the output slot
+         */
+        private final Player player;
+
+        /**
+         * The text the player typed into the field
+         */
+        private final String text;
+
+        /**
+         * The event parameter constructor
+         * @param leftItem The left item in the combine slot of the anvilGUI
+         * @param rightItem The right item in the combine slot of the anvilGUI
+         * @param outputItem The item that would have been outputted, when the items would have been combined
+         * @param player The player that clicked the output slot
+         * @param text The text the player typed into the rename text field
+         */
+        public Completion(ItemStack leftItem, ItemStack rightItem, ItemStack outputItem, Player player, String text) {
+            this.leftItem = leftItem;
+            this.rightItem = rightItem;
+            this.outputItem = outputItem;
+            this.player = player;
+            this.text = text;
+        }
+
+        /**
+         * It returns the item in the left combine slot of the gui
+         *
+         * @return The leftItem
+         */
+        public ItemStack getLeftItem() {
+            return leftItem;
+        }
+
+        /**
+         * It returns the item in the right combine slot of the gui
+         *
+         * @return The rightItem
+         */
+        public ItemStack getRightItem() {
+            return rightItem;
+        }
+
+        /**
+         * It returns the output item that would have been the result
+         * by combining the left and right one
+         *
+         * @return The outputItem
+         */
+        public ItemStack getOutputItem() {
+            return outputItem;
+        }
+
+        /**
+         * It returns the player that clicked onto the output slot
+         *
+         * @return The player
+         */
+        public Player getPlayer() {
+            return player;
+        }
+
+        /**
+         * It returns the text the player typed into the rename field
+         *
+         * @return The text of the rename field
+         */
+        public String getText() {
+            return text;
         }
     }
 }
