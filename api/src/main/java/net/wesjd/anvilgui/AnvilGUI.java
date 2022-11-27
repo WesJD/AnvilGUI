@@ -1,6 +1,9 @@
 package net.wesjd.anvilgui;
 
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -67,9 +70,11 @@ public class AnvilGUI {
     private final boolean preventClose;
 
     /**
-     * This boolean is used to determine if the event should be cancelled or not
+     * A set of slot numbers that are permitted to be interacted with by the user. An interactable
+     * slot is one that is able to be minipulated by the player, i.e. clicking and picking up an item,
+     * placing in a new one, etc.
      */
-    private final boolean isInteractive;
+    private final Set<Integer> interactableSlots;
 
     /**
      * An {@link Consumer} that is called when the anvil GUI is closed
@@ -120,14 +125,26 @@ public class AnvilGUI {
      */
     @Deprecated
     public AnvilGUI(Plugin plugin, Player holder, String insert, BiFunction<Player, String, String> biFunction) {
-        this(plugin, holder, "Repair & Name", insert, null, null, false, false, null, null, null, completion -> {
-            String response = biFunction.apply(completion.player, completion.text);
-            if (response != null) {
-                return Response.text(response);
-            } else {
-                return Response.close();
-            }
-        });
+        this(
+                plugin,
+                holder,
+                "Repair & Name",
+                insert,
+                null,
+                null,
+                false,
+                Collections.emptySet(),
+                null,
+                null,
+                null,
+                completion -> {
+                    String response = biFunction.apply(completion.player, completion.text);
+                    if (response != null) {
+                        return Response.text(response);
+                    } else {
+                        return Response.close();
+                    }
+                });
     }
 
     /**
@@ -150,7 +167,7 @@ public class AnvilGUI {
             ItemStack inputLeft,
             ItemStack inputRight,
             boolean preventClose,
-            boolean isInteractive,
+            Set<Integer> interactableSlots,
             Consumer<Player> closeListener,
             Consumer<Player> inputLeftClickListener,
             Consumer<Player> inputRightClickListener,
@@ -161,11 +178,11 @@ public class AnvilGUI {
         this.inputLeft = inputLeft;
         this.inputRight = inputRight;
         this.preventClose = preventClose;
+        this.interactableSlots = Collections.unmodifiableSet(interactableSlots);
         this.closeListener = closeListener;
         this.inputLeftClickListener = inputLeftClickListener;
         this.inputRightClickListener = inputRightClickListener;
         this.completeFunction = completeFunction;
-        this.isInteractive = isInteractive;
 
         if (itemText != null) {
             if (inputLeft == null) {
@@ -255,7 +272,9 @@ public class AnvilGUI {
         public void onInventoryClick(InventoryClickEvent event) {
             if (event.getInventory().equals(inventory)
                     && (event.getRawSlot() < 3 || event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY))) {
-                event.setCancelled(!isInteractive);
+                final int slot = event.getRawSlot();
+                event.setCancelled(!interactableSlots.contains(slot));
+
                 final Player clicker = (Player) event.getWhoClicked();
                 if (event.getRawSlot() == Slot.OUTPUT) {
                     final ItemStack clicked = inventory.getItem(Slot.OUTPUT);
@@ -295,7 +314,7 @@ public class AnvilGUI {
             if (event.getInventory().equals(inventory)) {
                 for (int slot : Slot.values()) {
                     if (event.getRawSlots().contains(slot)) {
-                        event.setCancelled(!isInteractive);
+                        event.setCancelled(!interactableSlots.contains(slot));
                         break;
                     }
                 }
@@ -338,10 +357,9 @@ public class AnvilGUI {
         private boolean preventClose = false;
 
         /**
-         * A state that decided if the anvil GUI should be modifiable by the user.
-         * When set to true, this would allow the user to take out items / put items into the container
+         * A set of integers containing the slot numbers that should be modifiable by the user.
          */
-        private boolean isInteractive = false;
+        private Set<Integer> interactableSlots = Collections.emptySet();
 
         /**
          * An {@link Consumer} that is called when the {@link Slot#INPUT_LEFT} slot has been clicked
@@ -387,14 +405,18 @@ public class AnvilGUI {
         }
 
         /**
-         * Allow the user to modify the anvil GUi content
-         * When set to true, this would allow the user to take out items / put items into the container
+         * Permit the user to modify (take items in and out) the slot numbers provided.
          *
-         * @param isInteractive If the container should allow user inputs / outputs
+         * @param slots A varags param for the slot numbers. You can avoid relying on magic constants by using
+         *              the {@link AnvilGUI.Slot} class.
          * @return The {@link Builder} instance
          */
-        public Builder canBeInteractedWith(boolean isInteractive) {
-            this.isInteractive = isInteractive;
+        public Builder interactableSlots(int... slots) {
+            final Set<Integer> newValue = new HashSet<>();
+            for (int slot : slots) {
+                newValue.add(slot);
+            }
+            interactableSlots = newValue;
             return this;
         }
 
@@ -554,7 +576,7 @@ public class AnvilGUI {
                     itemLeft,
                     itemRight,
                     preventClose,
-                    isInteractive,
+                    interactableSlots,
                     closeListener,
                     inputLeftClickListener,
                     inputRightClickListener,
