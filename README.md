@@ -105,12 +105,10 @@ builder.onComplete(completion -> {
 });
 ```
 
-#### `canBeInteractedWith(boolean)`
-This allows or denies users to take / input items in th anvil slots.
-Useful when you try to make a inputting system using an anvil gui.
-Defaults to `false` thus blocking any attempts to insert items or remove them
+#### `interactableSlots(int... slots)`
+This allows or denies users to take / input items in the anvil slots that are provided. This feature is useful when you try to make a inputting system using an anvil gui.
 ```java
-builder.canBeInteractedWith(true);
+builder.canBeInteractedWith(Slot.INPUT_LEFT, Slot.INPUT_RIGHT);
 ```
 
 #### `preventClose()` 
@@ -196,7 +194,7 @@ new AnvilGUI.Builder()
         }
     })
     .preventClose()                                                    //prevents the inventory from being closed
-    .canBeInteractedWith(false)                                               // Deny player insertion or removal from the left or right slot
+    .interactableSlots(Slot.INPUT_RIGHT)                               //allow player to take out and replace the right input item
     .text("What is the meaning of life?")                              //sets the text the GUI should start with
     .itemLeft(new ItemStack(Material.IRON_SWORD))                      //use a custom item for the first slot
     .itemRight(new ItemStack(Material.IRON_SWORD))                     //use a custom item for the second slot
