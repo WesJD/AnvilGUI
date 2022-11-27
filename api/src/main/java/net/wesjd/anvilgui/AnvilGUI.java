@@ -57,13 +57,9 @@ public class AnvilGUI {
      */
     private final String inventoryTitle;
     /**
-     * The ItemStack that is in the {@link Slot#INPUT_LEFT} slot.
+     * The initial contents of the inventory
      */
-    private ItemStack inputLeft;
-    /**
-     * The ItemStack that is in the {@link Slot#INPUT_RIGHT} slot.
-     */
-    private final ItemStack inputRight;
+    private final ItemStack[] initialContents;
     /**
      * A state that decides where the anvil GUI is able to get closed by the user
      */
@@ -119,7 +115,7 @@ public class AnvilGUI {
      * @param plugin           A {@link org.bukkit.plugin.java.JavaPlugin} instance
      * @param player           The {@link Player} to open the inventory for
      * @param inventoryTitle   What to have the text already set to
-     * @param inputLeft        The material of the item in the first slot of the anvilGUI
+     * @param initialContents  The initial contents of the inventory
      * @param preventClose     Whether to prevent the inventory from closing
      * @param closeListener    A {@link Consumer} when the inventory closes
      * @param completeFunction A {@link BiFunction} that is called when the player clicks the {@link Slot#OUTPUT} slot
@@ -128,8 +124,7 @@ public class AnvilGUI {
             Plugin plugin,
             Player player,
             String inventoryTitle,
-            ItemStack inputLeft,
-            ItemStack inputRight,
+            ItemStack[] initialContents,
             boolean preventClose,
             Set<Integer> interactableSlots,
             Consumer<Player> closeListener,
@@ -139,8 +134,7 @@ public class AnvilGUI {
         this.plugin = plugin;
         this.player = player;
         this.inventoryTitle = inventoryTitle;
-        this.inputLeft = inputLeft;
-        this.inputRight = inputRight;
+        this.initialContents = initialContents;
         this.preventClose = preventClose;
         this.interactableSlots = Collections.unmodifiableSet(interactableSlots);
         this.closeListener = closeListener;
@@ -163,10 +157,7 @@ public class AnvilGUI {
         final Object container = WRAPPER.newContainerAnvil(player, inventoryTitle);
 
         inventory = WRAPPER.toBukkitInventory(container);
-        inventory.setItem(Slot.INPUT_LEFT, this.inputLeft);
-        if (this.inputRight != null) {
-            inventory.setItem(Slot.INPUT_RIGHT, this.inputRight);
-        }
+        inventory.setContents(initialContents);
 
         containerId = WRAPPER.getNextContainerId(player, container);
         WRAPPER.sendPacketOpenWindow(player, containerId, inventoryTitle);
@@ -537,8 +528,7 @@ public class AnvilGUI {
                     plugin,
                     player,
                     title,
-                    itemLeft,
-                    itemRight,
+                    new ItemStack[] {itemLeft, itemRight},
                     preventClose,
                     interactableSlots,
                     closeListener,
