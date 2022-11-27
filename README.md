@@ -50,7 +50,15 @@ to prevent conflicts with other plugins. Here is an example of how to relocate t
                                 <shadedPattern>[YOUR_PLUGIN_PACKAGE].anvilgui</shadedPattern> <!-- Replace [YOUR_PLUGIN_PACKAGE] with your namespace -->
                             </relocation>
                         </relocations>
-                        <minimizeJar>false</minimizeJar> <!-- Ensure not set to true -->
+                        <filters>
+                            <filter>
+                                <artifact>*:*</artifact>
+                                <excludeDefaults>false</excludeDefaults>
+                                <includes>
+                                    <include>[YOUR_PLUGIN_PACKAGE].anvilgui</include>
+                                </includes>
+                            </filter>
+                        </filters> 
                     </configuration>
                 </execution>
             </executions>
@@ -58,8 +66,8 @@ to prevent conflicts with other plugins. Here is an example of how to relocate t
     </plugins>
 </build>
 ```
-Please note: A lot of tutorials advise you set `<minimizeJar>` to true, but this will break version matching in the library.
-If set to true, the different `VersionWrapper`s won't be shaded into the final artifact and no Minecraft version will be compatible.
+Note: In order to solve `<minimizeJar>` removing AnvilGUI `VerionWrapper`s from the final jar and making the library unusable,
+ensure that your `<filters>` section contains the example `<filter>` as seen above.
 
 ### In your plugin
 
