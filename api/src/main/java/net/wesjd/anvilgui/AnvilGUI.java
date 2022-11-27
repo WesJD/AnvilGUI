@@ -157,13 +157,20 @@ public class AnvilGUI {
         final Object container = WRAPPER.newContainerAnvil(player, inventoryTitle);
 
         inventory = WRAPPER.toBukkitInventory(container);
-        inventory.setContents(initialContents);
+        // We need to use setItem instead of setContents because a Minecraft ContainerAnvil
+        // contains two separate inventories: the result inventory and the ingredients inventory.
+        // The setContents method only updates the ingredients inventory unfortunately,
+        // but setItem handles the index going into the result inventory.
+        for (int i = 0; i < initialContents.length; i++) {
+            inventory.setItem(i, initialContents[i]);
+        }
 
         containerId = WRAPPER.getNextContainerId(player, container);
         WRAPPER.sendPacketOpenWindow(player, containerId, inventoryTitle);
         WRAPPER.setActiveContainer(player, container);
         WRAPPER.setActiveContainerId(container, containerId);
         WRAPPER.addActiveContainerSlotListener(container, player);
+
         open = true;
     }
 
@@ -338,6 +345,10 @@ public class AnvilGUI {
          * An {@link ItemStack} to be put in the right input slot
          */
         private ItemStack itemRight;
+        /**
+         * An {@link ItemStack} to be placed in the output slot
+         */
+        private ItemStack itemOutput;
 
         /**
          * Prevents the closing of the anvil GUI by the user
@@ -503,6 +514,17 @@ public class AnvilGUI {
         }
 
         /**
+         * Sets the {@link ItemStack} to be put in the output slot
+         *
+         * @param item The {@link ItemStack} to be put in the output slot
+         * @return The {@link Builder} instance
+         */
+        public Builder itemOutput(ItemStack item) {
+            this.itemOutput = item;
+            return this;
+        }
+
+        /**
          * Creates the anvil GUI and opens it for the player
          *
          * @param player The {@link Player} the anvil GUI should open for
@@ -528,7 +550,7 @@ public class AnvilGUI {
                     plugin,
                     player,
                     title,
-                    new ItemStack[] {itemLeft, itemRight},
+                    new ItemStack[] {itemLeft, itemRight, itemOutput},
                     preventClose,
                     interactableSlots,
                     closeListener,
