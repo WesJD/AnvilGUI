@@ -116,44 +116,9 @@ public class AnvilGUI {
     /**
      * Create an AnvilGUI and open it for the player.
      *
-     * @param plugin     A {@link org.bukkit.plugin.java.JavaPlugin} instance
-     * @param holder     The {@link Player} to open the inventory for
-     * @param insert     What to have the text already set to
-     * @param biFunction A {@link BiFunction} that is called when the player clicks the {@link Slot#OUTPUT} slot
-     * @throws NullPointerException If the server version isn't supported
-     * @deprecated As of version 1.2.3, use {@link AnvilGUI.Builder}
-     */
-    @Deprecated
-    public AnvilGUI(Plugin plugin, Player holder, String insert, BiFunction<Player, String, String> biFunction) {
-        this(
-                plugin,
-                holder,
-                "Repair & Name",
-                insert,
-                null,
-                null,
-                false,
-                Collections.emptySet(),
-                null,
-                null,
-                null,
-                completion -> {
-                    String response = biFunction.apply(completion.player, completion.text);
-                    if (response != null) {
-                        return Response.text(response);
-                    } else {
-                        return Response.close();
-                    }
-                });
-    }
-
-    /**
-     * Create an AnvilGUI and open it for the player.
-     *
      * @param plugin           A {@link org.bukkit.plugin.java.JavaPlugin} instance
      * @param player           The {@link Player} to open the inventory for
      * @param inventoryTitle   What to have the text already set to
-     * @param itemText         The name of the item in the first slot of the anvilGui
      * @param inputLeft        The material of the item in the first slot of the anvilGUI
      * @param preventClose     Whether to prevent the inventory from closing
      * @param closeListener    A {@link Consumer} when the inventory closes
@@ -163,7 +128,6 @@ public class AnvilGUI {
             Plugin plugin,
             Player player,
             String inventoryTitle,
-            String itemText,
             ItemStack inputLeft,
             ItemStack inputRight,
             boolean preventClose,
@@ -183,16 +147,6 @@ public class AnvilGUI {
         this.inputLeftClickListener = inputLeftClickListener;
         this.inputRightClickListener = inputRightClickListener;
         this.completeFunction = completeFunction;
-
-        if (itemText != null) {
-            if (inputLeft == null) {
-                this.inputLeft = new ItemStack(Material.PAPER);
-            }
-
-            ItemMeta paperMeta = this.inputLeft.getItemMeta();
-            paperMeta.setDisplayName(itemText);
-            this.inputLeft.setItemMeta(paperMeta);
-        }
 
         openInventory();
     }
@@ -568,11 +522,21 @@ public class AnvilGUI {
             Validate.notNull(plugin, "Plugin cannot be null");
             Validate.notNull(completeFunction, "Complete function cannot be null");
             Validate.notNull(player, "Player cannot be null");
+
+            if (itemText != null) {
+                if (itemLeft == null) {
+                    itemLeft = new ItemStack(Material.PAPER);
+                }
+
+                ItemMeta paperMeta = itemLeft.getItemMeta();
+                paperMeta.setDisplayName(itemText);
+                itemLeft.setItemMeta(paperMeta);
+            }
+
             return new AnvilGUI(
                     plugin,
                     player,
                     title,
-                    itemText,
                     itemLeft,
                     itemRight,
                     preventClose,
