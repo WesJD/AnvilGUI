@@ -219,14 +219,18 @@ public class AnvilGUI {
 
         @EventHandler
         public void onInventoryClick(InventoryClickEvent event) {
-            if (event.getInventory().equals(inventory)
-                    && event.getClickedInventory().equals(player.getInventory())
-                    && event.getClick().equals(ClickType.DOUBLE_CLICK)) {
-                event.setCancelled(true);
+            if (!event.getInventory().equals(inventory)) {
+                return;
             }
 
-            if (event.getInventory().equals(inventory)
-                    && (event.getRawSlot() < 3 || event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY))) {
+            // prevent players from merging items from the anvil inventory
+            if (event.getClickedInventory().equals(player.getInventory())
+                    && event.getClick().equals(ClickType.DOUBLE_CLICK)) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if (event.getRawSlot() < 3 || event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
                 final int slot = event.getRawSlot();
                 event.setCancelled(!interactableSlots.contains(slot));
 
