@@ -16,10 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryAction;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -222,8 +219,18 @@ public class AnvilGUI {
 
         @EventHandler
         public void onInventoryClick(InventoryClickEvent event) {
-            if (event.getInventory().equals(inventory)
-                    && (event.getRawSlot() < 3 || event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY))) {
+            if (!event.getInventory().equals(inventory)) {
+                return;
+            }
+
+            // prevent players from merging items from the anvil inventory
+            if (event.getClickedInventory().equals(player.getInventory())
+                    && event.getClick().equals(ClickType.DOUBLE_CLICK)) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if (event.getRawSlot() < 3 || event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
                 final int slot = event.getRawSlot();
                 event.setCancelled(!interactableSlots.contains(slot));
 
