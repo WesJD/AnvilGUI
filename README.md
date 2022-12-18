@@ -1,7 +1,9 @@
 # AnvilGUI [![Build Status](https://ci.codemc.io/job/WesJD/job/AnvilGUI/badge/icon)](https://ci.codemc.io/job/WesJD/job/AnvilGUI/)
-Easily use anvil guis to get a user's input.
-
-This project was made since there is no way to prompt users with an anvil input with the Spigot / Bukkit API. It requires interaction with NMS and that is a pain in plugins where users have different versions of the server running.
+AnvilGUI is a library to capture user input in Minecraft through an anvil inventory. Anvil inventories within the realm
+of the Minecraft / Bukkit / Spigot / Paper API are extremely finnicky and ultimately don't support the ability to use them fully for
+the task of user input. As a result, the only way to achieve user input with an anvil inventory requires interaction with obfuscated,
+decompiled code. AnvilGUI provides a straightforward, versatile, and easy-to-use solution without having your project
+depend on version specific code. 
 
 ## Requirements
 Java 8 and Bukkit / Spigot. Most server versions in the [Spigot Repository](https://hub.spigotmc.org/nexus/) are supported.
