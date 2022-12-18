@@ -430,7 +430,10 @@ public class AnvilGUI {
         /**
          * Handles the inventory output slot when it is clicked
          *
-         * @param completeFunction An {@link Function} that is called when the user clicks the output slot
+         * @param completeFunction An {@link Function} that is called when the user clicks the output slot. The
+         *                         {@link Completion} contains information about the current state of the anvil,
+         *                         and the response is a list of {@link ResponseAction} to execute in the order
+         *                         that they are supplied.
          * @return The {@link Builder} instance
          * @throws IllegalArgumentException when the completeFunction is null
          */

@@ -82,41 +82,31 @@ builder.onClose(player -> {
 });                                                 
 ``` 
 
-#### `onComplete(BiFunction<Player, String, AnvilGUI.Response>)`  
-Takes a `BiFunction<Player, String, AnvilGUI.Response>` argument. The BiFunction is called when a player clicks the output slot. 
-The supplied string is what the player has inputted in the renaming field of the anvil gui. You must return an AnvilGUI.Response,
-which can either be `close()`, `text(String)`, or `openInventory(Inventory)`. Returning `close()` will close the inventory; returning 
-`text(String)` will keep the inventory open and put the supplied String in the renaming field; returning `openInventory(Inventory)`
-will open the provided inventory, which is useful for when a user has finished their input in GUI menus.
+#### `onComplete(Function<AnvilGUI.Completion, AnvilGUI.Response>)`
+Takes a `Function<AnvilGUI.Completion, List<AnvilGUI.ResponseAction>>` as argument. The function is called when a player clicks the output slot.
+The supplied `Completion` contains the player who clicked, the inputted text, the left item, right item and the output. You must return a `List<AnvilGUI.ResponseAction>`,
+which could include:
+- Closing the inventory (`AnvilGUI.ResponseAction.close()`)
+- Replacing the input text (`AnvilGUI.ResponseAction.replaceInputText(String)`)
+- Opening another inventory (`AnvilGUI.ResponseAction.openInventory(Inventory)`)
+- Closing and then running generic code (`AnvilGUI.ResponseAction.closeThenRun(Runnable)`)
+
+The list of actions are ran in the order they are supplied.
 ```java                                                
-builder.onComplete((player, text) -> {                 
-    if(text.equalsIgnoreCase("you")) {                 
-        player.sendMessage("You have magical powers!");
-        return AnvilGUI.Response.close();              
+builder.onComplete((completion) -> {                 
+    if(completion.getText().equalsIgnoreCase("you")) {
+        completion.getPlayer().sendMessage("You have magical powers!");
+        return Arrays.asList(AnvilGUI.ResponseAction.close());              
     } else {                                           
-        return AnvilGUI.Response.text("Incorrect.");   
+        return Arrays.asList(AnvilGUI.ResponseAction.replaceInputText("Try again"));   
     }                                                  
 });                                                    
-```
-
-#### `onComplete(Function<AnvilGUI.Completion, AnvilGUI.Response>)`
-Takes a `Function<AnvilGUI.Completion, AnvilGUI.Response>` as argument. The completion is called when a player clicks the output slot.
-The supplied completion contains the player who clicked, the inputted text, the left item, right item and the output. You must return an AnvilGUI.Response,
-which can either be `close()`, `text(String)`, or `openInventory(Inventory)`. Returning `close()` will close the inventory; returning 
-`text(String)` will keep the inventory open and put the supplied String in the renaming field; returning `openInventory(Inventory)`
-will open the provided inventory, which is useful for when a user has finished their input in GUI menus.
-Useful for situations when dealing with an interactive anvil gui.
-```java
-builder.onComplete(completion -> {
-    player.sendMessage("Left is a item with the Type of " + completion.getLeft().getType());
-    return AnvilGUI.Response.close();
-});
 ```
 
 #### `interactableSlots(int... slots)`
 This allows or denies users to take / input items in the anvil slots that are provided. This feature is useful when you try to make a inputting system using an anvil gui.
 ```java
-builder.canBeInteractedWith(Slot.INPUT_LEFT, Slot.INPUT_RIGHT);
+builder.interactableSlots(Slot.INPUT_LEFT, Slot.INPUT_RIGHT);
 ```
 
 #### `preventClose()` 
@@ -193,12 +183,12 @@ new AnvilGUI.Builder()
     .onClose(player -> {                                               //called when the inventory is closing
         player.sendMessage("You closed the inventory.");
     })
-    .onComplete((player, text) -> {                                    //called when the inventory output slot is clicked
-        if(text.equalsIgnoreCase("you")) {
-            player.sendMessage("You have magical powers!");
-            return AnvilGUI.Response.close();
+    .onComplete((completion) -> {                                    //called when the inventory output slot is clicked
+        if(completion.getText().equalsIgnoreCase("you")) {
+            completion.getPlayer().sendMessage("You have magical powers!");
+            return Arrays.asList(AnvilGUI.ResponseAction.close());
         } else {
-            return AnvilGUI.Response.text("Incorrect.");
+            return Arrays.asList(AnvilGUI.ResponseAction.replaceInputText("Try again"));
         }
     })
     .preventClose()                                                    //prevents the inventory from being closed
