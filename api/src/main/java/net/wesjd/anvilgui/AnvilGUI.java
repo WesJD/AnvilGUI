@@ -1,9 +1,12 @@
 package net.wesjd.anvilgui;
 
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -76,7 +79,7 @@ public class AnvilGUI {
     /**
      * An {@link Function} that is called when the {@link Slot#OUTPUT} slot has been clicked
      */
-    private final Function<Completion, Response> completeFunction;
+    private final Function<Completion, List<ResponseAction>> completeFunction;
 
     /**
      * An {@link Consumer} that is called when the {@link Slot#INPUT_LEFT} slot has been clicked
@@ -127,7 +130,7 @@ public class AnvilGUI {
             Consumer<Player> closeListener,
             Consumer<Player> inputLeftClickListener,
             Consumer<Player> inputRightClickListener,
-            Function<Completion, Response> completeFunction) {
+            Function<Completion, List<ResponseAction>> completeFunction) {
         this.plugin = plugin;
         this.player = player;
         this.inventoryTitle = inventoryTitle;
@@ -223,9 +226,9 @@ public class AnvilGUI {
                 return;
             }
 
+            final Player clicker = (Player) event.getWhoClicked();
             // prevent players from merging items from the anvil inventory
-            if (event.getClickedInventory().equals(player.getInventory())
-                    && event.getClick().equals(ClickType.DOUBLE_CLICK)) {
+            if (event.getClickedInventory().equals(clicker) && event.getClick().equals(ClickType.DOUBLE_CLICK)) {
                 event.setCancelled(true);
                 return;
             }
@@ -234,27 +237,18 @@ public class AnvilGUI {
                 final int slot = event.getRawSlot();
                 event.setCancelled(!interactableSlots.contains(slot));
 
-                final Player clicker = (Player) event.getWhoClicked();
                 if (event.getRawSlot() == Slot.OUTPUT) {
                     final ItemStack clicked = inventory.getItem(Slot.OUTPUT);
                     if (clicked == null || clicked.getType() == Material.AIR) return;
 
-                    final Response response = completeFunction.apply(new Completion(
+                    final List<ResponseAction> actions = completeFunction.apply(new Completion(
                             notNull(inventory.getItem(Slot.INPUT_LEFT)),
                             notNull(inventory.getItem(Slot.INPUT_RIGHT)),
                             notNull(inventory.getItem(Slot.OUTPUT)),
                             player,
                             clicked.hasItemMeta() ? clicked.getItemMeta().getDisplayName() : ""));
-
-                    if (response.getText() != null) {
-                        final ItemMeta meta = clicked.getItemMeta();
-                        meta.setDisplayName(response.getText());
-                        clicked.setItemMeta(meta);
-                        inventory.setItem(Slot.INPUT_LEFT, clicked);
-                    } else if (response.getInventoryToOpen() != null) {
-                        clicker.openInventory(response.getInventoryToOpen());
-                    } else {
-                        closeInventory();
+                    for (final ResponseAction action : actions) {
+                        action.accept(AnvilGUI.this, clicker);
                     }
                 } else if (event.getRawSlot() == Slot.INPUT_LEFT) {
                     if (inputLeftClickListener != null) {
@@ -331,7 +325,7 @@ public class AnvilGUI {
         /**
          * An {@link Function} that is called when the anvil output slot has been clicked
          */
-        private Function<Completion, Response> completeFunction;
+        private Function<Completion, List<ResponseAction>> completeFunction;
         /**
          * The {@link Plugin} that this anvil GUI is associated with
          */
@@ -424,8 +418,10 @@ public class AnvilGUI {
          * @param completeFunction An {@link BiFunction} that is called when the user clicks the output slot
          * @return The {@link Builder} instance
          * @throws IllegalArgumentException when the completeFunction is null
+         * @deprecated Since 1.6.2, use {@link #onComplete(Function)}
          */
-        public Builder onComplete(BiFunction<Player, String, Response> completeFunction) {
+        @Deprecated
+        public Builder onComplete(BiFunction<Player, String, List<ResponseAction>> completeFunction) {
             Validate.notNull(completeFunction, "Complete function cannot be null");
             this.completeFunction = completion -> completeFunction.apply(completion.player, completion.text);
             return this;
@@ -434,11 +430,14 @@ public class AnvilGUI {
         /**
          * Handles the inventory output slot when it is clicked
          *
-         * @param completeFunction An {@link Function} that is called when the user clicks the output slot
+         * @param completeFunction An {@link Function} that is called when the user clicks the output slot. The
+         *                         {@link Completion} contains information about the current state of the anvil,
+         *                         and the response is a list of {@link ResponseAction} to execute in the order
+         *                         that they are supplied.
          * @return The {@link Builder} instance
          * @throws IllegalArgumentException when the completeFunction is null
          */
-        public Builder onComplete(Function<Completion, Response> completeFunction) {
+        public Builder onComplete(Function<Completion, List<ResponseAction>> completeFunction) {
             Validate.notNull(completeFunction, "Complete function cannot be null");
             this.completeFunction = completeFunction;
             return this;
@@ -567,73 +566,88 @@ public class AnvilGUI {
         }
     }
 
+    /** An action to run in response to a player clicking the output slot in the GUI. This interface is public
+     * and permits you, the developer, to add additional response features easily to your custom AnvilGUIs. */
+    public interface ResponseAction extends BiConsumer<AnvilGUI, Player> {
+
+        /**
+         * Replace the input text box value with the provided text value
+         * @param text The text to write in the input box
+         * @return The {@link ResponseAction} to achieve the text replacement
+         */
+        static ResponseAction replaceInputText(String text) {
+            return (anvilgui, player) -> {
+                final ItemStack outputSlotItem =
+                        anvilgui.getInventory().getItem(Slot.OUTPUT).clone();
+                final ItemMeta meta = outputSlotItem.getItemMeta();
+                meta.setDisplayName(text);
+                outputSlotItem.setItemMeta(meta);
+                anvilgui.getInventory().setItem(Slot.INPUT_LEFT, outputSlotItem);
+            };
+        }
+
+        /**
+         * Open another inventory
+         * @param otherInventory The inventory to open
+         * @return The {@link ResponseAction} to achieve the inventory open
+         */
+        static ResponseAction openInventory(Inventory otherInventory) {
+            return (anvigui, player) -> player.openInventory(otherInventory);
+        }
+
+        /**
+         * Close the AnvilGUI
+         * @return The {@link ResponseAction} to achieve closing the AnvilGUI
+         */
+        static ResponseAction close() {
+            return (anvilgui, player) -> anvilgui.closeInventory();
+        }
+
+        /**
+         * Run the provided runnable
+         * @param runnable The runnable to run
+         * @return The {@link ResponseAction} to achieve running the runnable
+         */
+        static ResponseAction run(Runnable runnable) {
+            return (anvilgui, player) -> runnable.run();
+        }
+    }
+
     /**
      * Represents a response when the player clicks the output item in the anvil GUI
+     * @deprecated Since 1.6.2, use {@link ResponseAction}
      */
+    @Deprecated
     public static class Response {
-
-        /**
-         * The text that is to be displayed to the user
-         */
-        private final String text;
-
-        private final Inventory openInventory;
-
-        /**
-         * Creates a response to the user's input
-         *
-         * @param text The text that is to be displayed to the user, which can be null to close the inventory
-         */
-        private Response(String text, Inventory openInventory) {
-            this.text = text;
-            this.openInventory = openInventory;
-        }
-
-        /**
-         * Gets the text that is to be displayed to the user
-         *
-         * @return The text that is to be displayed to the user
-         */
-        public String getText() {
-            return text;
-        }
-
-        /**
-         * Gets the inventory that should be opened
-         *
-         * @return The inventory that should be opened
-         */
-        public Inventory getInventoryToOpen() {
-            return openInventory;
-        }
-
         /**
          * Returns an {@link Response} object for when the anvil GUI is to close
-         *
-         * @return An {@link Response} object for when the anvil GUI is to close
+         * @return An {@link Response} object for when the anvil GUI is to display text to the user
+         * @deprecated Since 1.6.2, use {@link ResponseAction#close()}
          */
-        public static Response close() {
-            return new Response(null, null);
+        public static List<ResponseAction> close() {
+            return Arrays.asList(ResponseAction.close());
         }
 
         /**
          * Returns an {@link Response} object for when the anvil GUI is to display text to the user
          *
          * @param text The text that is to be displayed to the user
-         * @return An {@link Response} object for when the anvil GUI is to display text to the user
+         * @return A list containing the {@link ResponseAction} for legacy compat
+         * @deprecated Since 1.6.2, use {@link ResponseAction#replaceInputText(String)}
          */
-        public static Response text(String text) {
-            return new Response(text, null);
+        public static List<ResponseAction> text(String text) {
+            return Arrays.asList(ResponseAction.replaceInputText(text));
         }
 
         /**
          * Returns an {@link Response} object for when the GUI should open the provided inventory
          *
          * @param inventory The inventory to open
-         * @return The {@link Response} to return
+         * @return A list containing the {@link ResponseAction} for legacy compat
+         * @deprecated Since 1.6.2, use {@link ResponseAction#openInventory(Inventory)}
          */
-        public static Response openInventory(Inventory inventory) {
-            return new Response(null, inventory);
+        public static List<ResponseAction> openInventory(Inventory inventory) {
+            return Arrays.asList(ResponseAction.openInventory(inventory));
         }
     }
 
