@@ -1,6 +1,7 @@
 package net.wesjd.anvilgui;
 
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -620,34 +621,33 @@ public class AnvilGUI {
     public static class Response {
         /**
          * Returns an {@link Response} object for when the anvil GUI is to close
-         *
-         * @return An {@link Response} object for when the anvil GUI is to close
+         * @return An {@link Response} object for when the anvil GUI is to display text to the user
          * @deprecated Since 1.6.2, use {@link ResponseAction#close()}
          */
-        public static ResponseAction close() {
-            return ResponseAction.close();
+        public static List<ResponseAction> close() {
+            return Arrays.asList(ResponseAction.close());
         }
 
         /**
          * Returns an {@link Response} object for when the anvil GUI is to display text to the user
          *
          * @param text The text that is to be displayed to the user
-         * @return An {@link Response} object for when the anvil GUI is to display text to the user
+         * @return A list containing the {@link ResponseAction} for legacy compat
          * @deprecated Since 1.6.2, use {@link ResponseAction#replaceInputText(String)}
          */
-        public static ResponseAction text(String text) {
-            return ResponseAction.replaceInputText(text);
+        public static List<ResponseAction> text(String text) {
+            return Arrays.asList(ResponseAction.replaceInputText(text));
         }
 
         /**
          * Returns an {@link Response} object for when the GUI should open the provided inventory
          *
          * @param inventory The inventory to open
-         * @return The {@link Response} to return
+         * @return A list containing the {@link ResponseAction} for legacy compat
          * @deprecated Since 1.6.2, use {@link ResponseAction#openInventory(Inventory)}
          */
-        public static ResponseAction openInventory(Inventory inventory) {
-            return ResponseAction.openInventory(inventory);
+        public static List<ResponseAction> openInventory(Inventory inventory) {
+            return Arrays.asList(ResponseAction.openInventory(inventory));
         }
     }
 
