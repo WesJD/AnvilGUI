@@ -604,15 +604,12 @@ public class AnvilGUI {
         }
 
         /**
-         * Close the AnvilGUI, then run the provided runnable.
-         * @param runnable The runnable to run after the inventory closes
-         * @return The {@link ResponseAction} to achieve closing and then running the runnable
+         * Run the provided runnable
+         * @param runnable The runnable to run
+         * @return The {@link ResponseAction} to achieve running the runnable
          */
-        static ResponseAction closeThenRun(Runnable runnable) {
-            return (anvilgui, player) -> {
-                anvilgui.closeInventory();
-                runnable.run();
-            };
+        static ResponseAction run(Runnable runnable) {
+            return (anvilgui, player) -> runnable.run();
         }
     }
 
