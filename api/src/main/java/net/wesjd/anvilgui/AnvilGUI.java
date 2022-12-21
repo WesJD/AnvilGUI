@@ -228,7 +228,10 @@ public class AnvilGUI {
 
             final Player clicker = (Player) event.getWhoClicked();
             // prevent players from merging items from the anvil inventory
-            if (event.getClickedInventory().equals(clicker) && event.getClick().equals(ClickType.DOUBLE_CLICK)) {
+            final Inventory clickedInventory = event.getClickedInventory();
+            if (clickedInventory != null
+                    && clickedInventory.equals(clicker.getInventory())
+                    && event.getClick().equals(ClickType.DOUBLE_CLICK)) {
                 event.setCancelled(true);
                 return;
             }
