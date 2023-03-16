@@ -17,31 +17,8 @@
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot</artifactId>
             <version>1.19.4-R0.1-SNAPSHOT</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/19R3.jar</systemPath>
+            <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
-            <version>1.19.4-R0.1-SNAPSHOT</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/api.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>com.mojang</groupId>
-            <artifactId>brigadier</artifactId>
-            <version>1.0.18</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/brigadier.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>com.mojang</groupId>
-            <artifactId>datafixerupper</artifactId>
-            <version>6.0.6</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/datafixerupper.jar</systemPath>
-        </dependency>
-
         <dependency>
             <groupId>net.wesjd</groupId>
             <artifactId>anvilgui-abstraction</artifactId>
