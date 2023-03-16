@@ -545,11 +545,17 @@ public class AnvilGUI {
             Validate.notNull(completeFunction, "Complete function cannot be null");
             Validate.notNull(player, "Player cannot be null");
 
-            if (itemText != null) {
-                if (itemLeft == null) {
-                    itemLeft = new ItemStack(Material.PAPER);
-                }
+            /*
+            This should be done always, otherwise, if no item
+            and text specified, and preventClose, the inventory
+            will never be able to be closed
+             */
+            if (itemLeft == null) {
+                itemLeft = new ItemStack(Material.PAPER);
+                itemText = "";
+            }
 
+            if (itemText != null) {
                 ItemMeta paperMeta = itemLeft.getItemMeta();
                 paperMeta.setDisplayName(itemText);
                 itemLeft.setItemMeta(paperMeta);
