@@ -229,7 +229,8 @@ public class AnvilGUI {
             final int rawSlot = event.getRawSlot();
             if (rawSlot < 3 || event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
                 event.setCancelled(!interactableSlots.contains(rawSlot));
-                final List<ResponseAction> actions = clickHandler.apply(rawSlot, StateSnapshot.fromAnvilGUI(AnvilGUI.this));
+                final List<ResponseAction> actions =
+                        clickHandler.apply(rawSlot, StateSnapshot.fromAnvilGUI(AnvilGUI.this));
                 for (final ResponseAction action : actions) {
                     action.accept(AnvilGUI.this, clicker);
                 }
@@ -258,7 +259,6 @@ public class AnvilGUI {
             }
         }
     }
-
 
     /** A builder class for an {@link AnvilGUI} object */
     public static class Builder {
