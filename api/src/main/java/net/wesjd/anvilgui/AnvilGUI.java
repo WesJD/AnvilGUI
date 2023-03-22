@@ -110,7 +110,7 @@ public class AnvilGUI {
     private boolean open;
 
     /**
-     * Create an AnvilGUI and open it for the player.
+     * Create an AnvilGUI
      *
      * @param plugin           A {@link org.bukkit.plugin.java.JavaPlugin} instance
      * @param player           The {@link Player} to open the inventory for
@@ -141,8 +141,6 @@ public class AnvilGUI {
         this.inputLeftClickListener = inputLeftClickListener;
         this.inputRightClickListener = inputRightClickListener;
         this.completeFunction = completeFunction;
-
-        openInventory();
     }
 
     /**
@@ -555,7 +553,7 @@ public class AnvilGUI {
                 itemLeft.setItemMeta(paperMeta);
             }
 
-            return new AnvilGUI(
+            final AnvilGUI anvilGUI = new AnvilGUI(
                     plugin,
                     player,
                     title,
@@ -566,6 +564,8 @@ public class AnvilGUI {
                     inputLeftClickListener,
                     inputRightClickListener,
                     completeFunction);
+            anvilGUI.openInventory();
+            return anvilGUI;
         }
     }
 
