@@ -83,7 +83,7 @@ public class AnvilGUI {
 
     /** An {@link Consumer} that is called when the anvil GUI is close */
     private final Consumer<StateSnapshot> closeListener;
-    /** An {@link BiFunction} that is called when the {@link Slot#OUTPUT} slot has been clicked */
+    /** An {@link BiFunction} that is called when a slot is clicked */
     private final BiFunction<Integer, StateSnapshot, List<ResponseAction>> clickHandler;
 
     /**
