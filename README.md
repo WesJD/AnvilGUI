@@ -91,7 +91,7 @@ which could include:
 - Closing the inventory (`AnvilGUI.ResponseAction.close()`)
 - Replacing the input text (`AnvilGUI.ResponseAction.replaceInputText(String)`)
 - Opening another inventory (`AnvilGUI.ResponseAction.openInventory(Inventory)`)
-- Running generic code (`AnvilGUI.ResponseAction.close(Runnable)`)
+- Running generic code (`AnvilGUI.ResponseAction.run(Runnable)`)
 
 The list of actions are ran in the order they are supplied.
 ```java                                                
