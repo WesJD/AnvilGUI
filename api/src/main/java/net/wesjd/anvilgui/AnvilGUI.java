@@ -385,19 +385,6 @@ public class AnvilGUI {
          * @param item The {@link ItemStack} to be put in the first slot
          * @return The {@link Builder} instance
          * @throws IllegalArgumentException if the {@link ItemStack} is null
-         * @deprecated As of version 1.4.0, use {@link AnvilGUI.Builder#itemLeft}
-         */
-        @Deprecated
-        public Builder item(ItemStack item) {
-            return itemLeft(item);
-        }
-
-        /**
-         * Sets the {@link ItemStack} to be put in the first slot
-         *
-         * @param item The {@link ItemStack} to be put in the first slot
-         * @return The {@link Builder} instance
-         * @throws IllegalArgumentException if the {@link ItemStack} is null
          */
         public Builder itemLeft(ItemStack item) {
             Validate.notNull(item, "item cannot be null");
