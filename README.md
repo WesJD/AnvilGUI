@@ -187,7 +187,7 @@ new AnvilGUI.Builder()
         } else {
             return Arrays.asList(AnvilGUI.ResponseAction.replaceInputText("Try again"));
         }
-    });
+    })
     .preventClose()                                                    //prevents the inventory from being closed
     .interactableSlots(Slot.INPUT_RIGHT)                               //allow player to take out and replace the right input item
     .text("What is the meaning of life?")                              //sets the text the GUI should start with
