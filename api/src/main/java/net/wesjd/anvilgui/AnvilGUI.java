@@ -43,6 +43,15 @@ public class AnvilGUI {
      * To keep the heap clean, this object only gets iniziaised once
      */
     private static final ItemStack AIR = new ItemStack(Material.AIR);
+    /**
+     * If the given ItemStack is null, return an air ItemStack, otherwise return the given ItemStack
+     *
+     * @param stack The ItemStack to check
+     * @return air or the given ItemStack
+     */
+    private static ItemStack itemNotNull(ItemStack stack) {
+        return stack == null ? AIR : stack;
+    }
 
     /**
      * The {@link Plugin} that this anvil GUI is associated with
@@ -72,23 +81,10 @@ public class AnvilGUI {
      */
     private final Set<Integer> interactableSlots;
 
-    /**
-     * An {@link Consumer} that is called when the anvil GUI is closed
-     */
-    private final Consumer<Player> closeListener;
-    /**
-     * An {@link Function} that is called when the {@link Slot#OUTPUT} slot has been clicked
-     */
-    private final Function<Completion, List<ResponseAction>> completeFunction;
-
-    /**
-     * An {@link Consumer} that is called when the {@link Slot#INPUT_LEFT} slot has been clicked
-     */
-    private final Consumer<Player> inputLeftClickListener;
-    /**
-     * An {@link Consumer} that is called when the {@link Slot#INPUT_RIGHT} slot has been clicked
-     */
-    private final Consumer<Player> inputRightClickListener;
+    /** An {@link Consumer} that is called when the anvil GUI is close */
+    private final Consumer<StateSnapshot> closeListener;
+    /** An {@link BiFunction} that is called when the {@link Slot#OUTPUT} slot has been clicked */
+    private final BiFunction<Integer, StateSnapshot, List<ResponseAction>> clickHandler;
 
     /**
      * The container id of the inventory, used for NMS methods
@@ -118,7 +114,7 @@ public class AnvilGUI {
      * @param initialContents  The initial contents of the inventory
      * @param preventClose     Whether to prevent the inventory from closing
      * @param closeListener    A {@link Consumer} when the inventory closes
-     * @param completeFunction A {@link BiFunction} that is called when the player clicks the {@link Slot#OUTPUT} slot
+     * @param clickHandler     A {@link BiFunction} that is called when the player clicks a slot
      */
     private AnvilGUI(
             Plugin plugin,
@@ -127,10 +123,8 @@ public class AnvilGUI {
             ItemStack[] initialContents,
             boolean preventClose,
             Set<Integer> interactableSlots,
-            Consumer<Player> closeListener,
-            Consumer<Player> inputLeftClickListener,
-            Consumer<Player> inputRightClickListener,
-            Function<Completion, List<ResponseAction>> completeFunction) {
+            Consumer<StateSnapshot> closeListener,
+            BiFunction<Integer, StateSnapshot, List<ResponseAction>> clickHandler) {
         this.plugin = plugin;
         this.player = player;
         this.inventoryTitle = inventoryTitle;
@@ -138,9 +132,7 @@ public class AnvilGUI {
         this.preventClose = preventClose;
         this.interactableSlots = Collections.unmodifiableSet(interactableSlots);
         this.closeListener = closeListener;
-        this.inputLeftClickListener = inputLeftClickListener;
-        this.inputRightClickListener = inputRightClickListener;
-        this.completeFunction = completeFunction;
+        this.clickHandler = clickHandler;
     }
 
     /**
@@ -200,7 +192,7 @@ public class AnvilGUI {
         }
 
         if (closeListener != null) {
-            closeListener.accept(player);
+            closeListener.accept(StateSnapshot.fromAnvilGUI(this));
         }
     }
 
@@ -234,31 +226,12 @@ public class AnvilGUI {
                 return;
             }
 
-            if (event.getRawSlot() < 3 || event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
-                final int slot = event.getRawSlot();
-                event.setCancelled(!interactableSlots.contains(slot));
-
-                if (event.getRawSlot() == Slot.OUTPUT) {
-                    final ItemStack clicked = inventory.getItem(Slot.OUTPUT);
-                    if (clicked == null || clicked.getType() == Material.AIR) return;
-
-                    final List<ResponseAction> actions = completeFunction.apply(new Completion(
-                            notNull(inventory.getItem(Slot.INPUT_LEFT)),
-                            notNull(inventory.getItem(Slot.INPUT_RIGHT)),
-                            notNull(inventory.getItem(Slot.OUTPUT)),
-                            player,
-                            clicked.hasItemMeta() ? clicked.getItemMeta().getDisplayName() : ""));
-                    for (final ResponseAction action : actions) {
-                        action.accept(AnvilGUI.this, clicker);
-                    }
-                } else if (event.getRawSlot() == Slot.INPUT_LEFT) {
-                    if (inputLeftClickListener != null) {
-                        inputLeftClickListener.accept(player);
-                    }
-                } else if (event.getRawSlot() == Slot.INPUT_RIGHT) {
-                    if (inputRightClickListener != null) {
-                        inputRightClickListener.accept(player);
-                    }
+            final int rawSlot = event.getRawSlot();
+            if (rawSlot < 3 || event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
+                event.setCancelled(!interactableSlots.contains(rawSlot));
+                final List<ResponseAction> actions = clickHandler.apply(rawSlot, StateSnapshot.fromAnvilGUI(AnvilGUI.this));
+                for (final ResponseAction action : actions) {
+                    action.accept(AnvilGUI.this, clicker);
                 }
             }
         }
@@ -286,70 +259,29 @@ public class AnvilGUI {
         }
     }
 
-    /**
-     * If the given ItemStack is null, return an air ItemStack, otherwise return the given ItemStack
-     *
-     * @param stack The ItemStack to check
-     * @return air or the given ItemStack
-     */
-    private ItemStack notNull(ItemStack stack) {
-        return stack == null ? AIR : stack;
-    }
 
-    /**
-     * A builder class for an {@link AnvilGUI} object
-     */
+    /** A builder class for an {@link AnvilGUI} object */
     public static class Builder {
 
-        /**
-         * An {@link Consumer} that is called when the anvil GUI is closed
-         */
-        private Consumer<Player> closeListener;
-        /**
-         * A state that decides where the anvil GUI is able to be closed by the user
-         */
+        /** An {@link Consumer} that is called when the anvil GUI is close */
+        private Consumer<StateSnapshot> closeListener;
+        /** An {@link Function} that is called when a slot in the inventory has been clicked */
+        private BiFunction<Integer, StateSnapshot, List<ResponseAction>> clickHandler;
+        /** A state that decides where the anvil GUI is able to be closed by the user */
         private boolean preventClose = false;
-
-        /**
-         * A set of integers containing the slot numbers that should be modifiable by the user.
-         */
+        /** A set of integers containing the slot numbers that should be modifiable by the user. */
         private Set<Integer> interactableSlots = Collections.emptySet();
-
-        /**
-         * An {@link Consumer} that is called when the {@link Slot#INPUT_LEFT} slot has been clicked
-         */
-        private Consumer<Player> inputLeftClickListener;
-        /**
-         * An {@link Consumer} that is called when the {@link Slot#INPUT_RIGHT} slot has been clicked
-         */
-        private Consumer<Player> inputRightClickListener;
-        /**
-         * An {@link Function} that is called when the anvil output slot has been clicked
-         */
-        private Function<Completion, List<ResponseAction>> completeFunction;
-        /**
-         * The {@link Plugin} that this anvil GUI is associated with
-         */
+        /** The {@link Plugin} that this anvil GUI is associated with */
         private Plugin plugin;
-        /**
-         * The text that will be displayed to the user
-         */
+        /** The text that will be displayed to the user */
         private String title = "Repair & Name";
-        /**
-         * The starting text on the item
-         */
+        /** The starting text on the item */
         private String itemText;
-        /**
-         * An {@link ItemStack} to be put in the left input slot
-         */
+        /** An {@link ItemStack} to be put in the left input slot */
         private ItemStack itemLeft;
-        /**
-         * An {@link ItemStack} to be put in the right input slot
-         */
+        /** An {@link ItemStack} to be put in the right input slot */
         private ItemStack itemRight;
-        /**
-         * An {@link ItemStack} to be placed in the output slot
-         */
+        /** An {@link ItemStack} to be placed in the output slot */
         private ItemStack itemOutput;
 
         /**
@@ -385,62 +317,26 @@ public class AnvilGUI {
          * @return The {@link Builder} instance
          * @throws IllegalArgumentException when the closeListener is null
          */
-        public Builder onClose(Consumer<Player> closeListener) {
+        public Builder onClose(Consumer<StateSnapshot> closeListener) {
             Validate.notNull(closeListener, "closeListener cannot be null");
             this.closeListener = closeListener;
             return this;
         }
 
         /**
-         * Listens for when the first input slot is clicked
+         * Do an action when a slot is clicked in the inventory
          *
-         * @param inputLeftClickListener An {@link Consumer} that is called when the first input slot is clicked
+         * @param clickHandler An {@link BiFunction} that is called when the user clicks a slot. The
+         *                     {@link Integer} is the slot number corresponding to {@link Slot}, the
+         *                     {@link StateSnapshot} contains information about the current state of the anvil,
+         *                     and the response is a list of {@link ResponseAction} to execute in the order
+         *                     that they are supplied.
          * @return The {@link Builder} instance
+         * @throws IllegalArgumentException when the function supplied is null
          */
-        public Builder onLeftInputClick(Consumer<Player> inputLeftClickListener) {
-            this.inputLeftClickListener = inputLeftClickListener;
-            return this;
-        }
-
-        /**
-         * Listens for when the second input slot is clicked
-         *
-         * @param inputRightClickListener An {@link Consumer} that is called when the second input slot is clicked
-         * @return The {@link Builder} instance
-         */
-        public Builder onRightInputClick(Consumer<Player> inputRightClickListener) {
-            this.inputRightClickListener = inputRightClickListener;
-            return this;
-        }
-
-        /**
-         * Handles the inventory output slot when it is clicked
-         *
-         * @param completeFunction An {@link BiFunction} that is called when the user clicks the output slot
-         * @return The {@link Builder} instance
-         * @throws IllegalArgumentException when the completeFunction is null
-         * @deprecated Since 1.6.2, use {@link #onComplete(Function)}
-         */
-        @Deprecated
-        public Builder onComplete(BiFunction<Player, String, List<ResponseAction>> completeFunction) {
-            Validate.notNull(completeFunction, "Complete function cannot be null");
-            this.completeFunction = completion -> completeFunction.apply(completion.player, completion.text);
-            return this;
-        }
-
-        /**
-         * Handles the inventory output slot when it is clicked
-         *
-         * @param completeFunction An {@link Function} that is called when the user clicks the output slot. The
-         *                         {@link Completion} contains information about the current state of the anvil,
-         *                         and the response is a list of {@link ResponseAction} to execute in the order
-         *                         that they are supplied.
-         * @return The {@link Builder} instance
-         * @throws IllegalArgumentException when the completeFunction is null
-         */
-        public Builder onComplete(Function<Completion, List<ResponseAction>> completeFunction) {
-            Validate.notNull(completeFunction, "Complete function cannot be null");
-            this.completeFunction = completeFunction;
+        public Builder onClick(BiFunction<Integer, StateSnapshot, List<ResponseAction>> clickHandler) {
+            Validate.notNull(clickHandler, "click function cannot be null");
+            this.clickHandler = clickHandler;
             return this;
         }
 
@@ -540,7 +436,7 @@ public class AnvilGUI {
          */
         public AnvilGUI open(Player player) {
             Validate.notNull(plugin, "Plugin cannot be null");
-            Validate.notNull(completeFunction, "Complete function cannot be null");
+            Validate.notNull(clickHandler, "click handler cannot be null");
             Validate.notNull(player, "Player cannot be null");
 
             if (itemText != null) {
@@ -561,9 +457,7 @@ public class AnvilGUI {
                     preventClose,
                     interactableSlots,
                     closeListener,
-                    inputLeftClickListener,
-                    inputRightClickListener,
-                    completeFunction);
+                    clickHandler);
             anvilGUI.openInventory();
             return anvilGUI;
         }
@@ -686,10 +580,22 @@ public class AnvilGUI {
         }
     }
 
-    /**
-     * Class wrapping the values you receive from the onComplete event
-     */
-    public static final class Completion {
+    /** Represents a snapshot of the state of an AnvilGUI */
+    public static final class StateSnapshot {
+
+        /**
+         * Create an {@link StateSnapshot} from the current state of an {@link AnvilGUI}
+         * @param anvilGUI The instance to take the snapshot of
+         * @return The snapshot
+         */
+        private static StateSnapshot fromAnvilGUI(AnvilGUI anvilGUI) {
+            final Inventory inventory = anvilGUI.getInventory();
+            return new StateSnapshot(
+                    itemNotNull(inventory.getItem(Slot.INPUT_LEFT).clone()),
+                    itemNotNull(inventory.getItem(Slot.INPUT_RIGHT).clone()),
+                    itemNotNull(inventory.getItem(Slot.OUTPUT).clone()),
+                    anvilGUI.player);
+        }
 
         /**
          * The {@link ItemStack} in the anvilGui slots
@@ -702,24 +608,17 @@ public class AnvilGUI {
         private final Player player;
 
         /**
-         * The text the player typed into the field
-         */
-        private final String text;
-
-        /**
          * The event parameter constructor
          * @param leftItem The left item in the combine slot of the anvilGUI
          * @param rightItem The right item in the combine slot of the anvilGUI
          * @param outputItem The item that would have been outputted, when the items would have been combined
          * @param player The player that clicked the output slot
-         * @param text The text the player typed into the rename text field
          */
-        public Completion(ItemStack leftItem, ItemStack rightItem, ItemStack outputItem, Player player, String text) {
+        public StateSnapshot(ItemStack leftItem, ItemStack rightItem, ItemStack outputItem, Player player) {
             this.leftItem = leftItem;
             this.rightItem = rightItem;
             this.outputItem = outputItem;
             this.player = player;
-            this.text = text;
         }
 
         /**
@@ -765,7 +664,7 @@ public class AnvilGUI {
          * @return The text of the rename field
          */
         public String getText() {
-            return text;
+            return outputItem.hasItemMeta() ? outputItem.getItemMeta().getDisplayName() : "";
         }
     }
 }

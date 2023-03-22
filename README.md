@@ -95,9 +95,9 @@ which could include:
 
 The list of actions are ran in the order they are supplied.
 ```java                                                
-builder.onComplete((completion) -> {                 
-    if(completion.getText().equalsIgnoreCase("you")) {
-        completion.getPlayer().sendMessage("You have magical powers!");
+builder.onComplete((stateSnapshot) -> {                 
+    if(stateSnapshot.getText().equalsIgnoreCase("you")) {
+        stateSnapshot.getPlayer().sendMessage("You have magical powers!");
         return Arrays.asList(AnvilGUI.ResponseAction.close());              
     } else {                                           
         return Arrays.asList(AnvilGUI.ResponseAction.replaceInputText("Try again"));   
@@ -185,9 +185,9 @@ new AnvilGUI.Builder()
     .onClose(player -> {                                               //called when the inventory is closing
         player.sendMessage("You closed the inventory.");
     })
-    .onComplete((completion) -> {                                    //called when the inventory output slot is clicked
-        if(completion.getText().equalsIgnoreCase("you")) {
-            completion.getPlayer().sendMessage("You have magical powers!");
+    .onComplete((stateSnapshot) -> {                                    //called when the inventory output slot is clicked
+        if(stateSnapshot.getText().equalsIgnoreCase("you")) {
+            stateSnapshot.getPlayer().sendMessage("You have magical powers!");
             return Arrays.asList(AnvilGUI.ResponseAction.close());
         } else {
             return Arrays.asList(AnvilGUI.ResponseAction.replaceInputText("Try again"));
