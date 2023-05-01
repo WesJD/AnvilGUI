@@ -103,7 +103,10 @@ builder.onClick((slot, stateSnapshot) -> {
     
     if(stateSnapshot.getText().equalsIgnoreCase("you")) {
         stateSnapshot.getPlayer().sendMessage("You have magical powers!");
-        return Arrays.asList(AnvilGUI.ResponseAction.close());              
+        return Arrays.asList(
+            AnvilGUI.ResponseAction.close(),
+            AnvilGUI.ResponseAction.run(() -> myCode(stateSnapshot.getPlayer()))
+        );              
     } else {                                           
         return Arrays.asList(AnvilGUI.ResponseAction.replaceInputText("Try again"));   
     }                                                  
