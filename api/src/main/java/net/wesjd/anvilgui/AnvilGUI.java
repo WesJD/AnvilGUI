@@ -578,9 +578,9 @@ public class AnvilGUI {
         private static StateSnapshot fromAnvilGUI(AnvilGUI anvilGUI) {
             final Inventory inventory = anvilGUI.getInventory();
             return new StateSnapshot(
-                    itemNotNull(inventory.getItem(Slot.INPUT_LEFT).clone()),
-                    itemNotNull(inventory.getItem(Slot.INPUT_RIGHT).clone()),
-                    itemNotNull(inventory.getItem(Slot.OUTPUT).clone()),
+                    itemNotNull(inventory.getItem(Slot.INPUT_LEFT)).clone(),
+                    itemNotNull(inventory.getItem(Slot.INPUT_RIGHT)).clone(),
+                    itemNotNull(inventory.getItem(Slot.OUTPUT)).clone(),
                     anvilGUI.player);
         }
 
