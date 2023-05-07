@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -84,7 +85,7 @@ public class AnvilGUI {
     /** An {@link Consumer} that is called when the anvil GUI is close */
     private final Consumer<StateSnapshot> closeListener;
     /** An {@link BiFunction} that is called when a slot is clicked */
-    private final BiFunction<Integer, StateSnapshot, List<ResponseAction>> clickHandler;
+    private final BiFunction<Integer, StateSnapshot, CompletableFuture<List<ResponseAction>>> clickHandler;
 
     /**
      * The container id of the inventory, used for NMS methods
@@ -124,7 +125,7 @@ public class AnvilGUI {
             boolean preventClose,
             Set<Integer> interactableSlots,
             Consumer<StateSnapshot> closeListener,
-            BiFunction<Integer, StateSnapshot, List<ResponseAction>> clickHandler) {
+            BiFunction<Integer, StateSnapshot, CompletableFuture<List<ResponseAction>>> clickHandler) {
         this.plugin = plugin;
         this.player = player;
         this.inventoryTitle = inventoryTitle;
@@ -229,11 +230,14 @@ public class AnvilGUI {
             final int rawSlot = event.getRawSlot();
             if (rawSlot < 3 || event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
                 event.setCancelled(!interactableSlots.contains(rawSlot));
-                final List<ResponseAction> actions =
+                final CompletableFuture<List<ResponseAction>> actionsFuture =
                         clickHandler.apply(rawSlot, StateSnapshot.fromAnvilGUI(AnvilGUI.this));
-                for (final ResponseAction action : actions) {
-                    action.accept(AnvilGUI.this, clicker);
-                }
+
+                actionsFuture.thenAccept(actions -> {
+                    for (final ResponseAction action : actions) {
+                        action.accept(AnvilGUI.this, clicker);
+                    }
+                });
             }
         }
 
@@ -266,7 +270,7 @@ public class AnvilGUI {
         /** An {@link Consumer} that is called when the anvil GUI is close */
         private Consumer<StateSnapshot> closeListener;
         /** An {@link Function} that is called when a slot in the inventory has been clicked */
-        private BiFunction<Integer, StateSnapshot, List<ResponseAction>> clickHandler;
+        private BiFunction<Integer, StateSnapshot, CompletableFuture<List<ResponseAction>>> clickHandler;
         /** A state that decides where the anvil GUI is able to be closed by the user */
         private boolean preventClose = false;
         /** A set of integers containing the slot numbers that should be modifiable by the user. */
@@ -329,6 +333,24 @@ public class AnvilGUI {
          * @param clickHandler An {@link BiFunction} that is called when the user clicks a slot. The
          *                     {@link Integer} is the slot number corresponding to {@link Slot}, the
          *                     {@link StateSnapshot} contains information about the current state of the anvil,
+         *                     and the response is a {@link CompletableFuture} that will eventually return a
+         *                     list of {@link ResponseAction} to execute in the order that they are supplied.
+         * @return The {@link Builder} instance
+         * @throws IllegalArgumentException when the function supplied is null
+         */
+        public Builder onClickAsync(
+                BiFunction<Integer, StateSnapshot, CompletableFuture<List<ResponseAction>>> clickHandler) {
+            Validate.notNull(clickHandler, "click function cannot be null");
+            this.clickHandler = clickHandler;
+            return this;
+        }
+
+        /**
+         * Do an action when a slot is clicked in the inventory
+         *
+         * @param clickHandler An {@link BiFunction} that is called when the user clicks a slot. The
+         *                     {@link Integer} is the slot number corresponding to {@link Slot}, the
+         *                     {@link StateSnapshot} contains information about the current state of the anvil,
          *                     and the response is a list of {@link ResponseAction} to execute in the order
          *                     that they are supplied.
          * @return The {@link Builder} instance
@@ -336,7 +358,8 @@ public class AnvilGUI {
          */
         public Builder onClick(BiFunction<Integer, StateSnapshot, List<ResponseAction>> clickHandler) {
             Validate.notNull(clickHandler, "click function cannot be null");
-            this.clickHandler = clickHandler;
+            this.clickHandler =
+                    (slot, stateSnapshot) -> CompletableFuture.completedFuture(clickHandler.apply(slot, stateSnapshot));
             return this;
         }
 
