@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -62,6 +63,10 @@ public class AnvilGUI {
      * The player who has the GUI open
      */
     private final Player player;
+    /**
+     * An {@link Executor} that executes tasks on the main server thread
+     */
+    private final Executor mainThreadExecutor;
     /**
      * The title of the anvil inventory
      */
@@ -120,6 +125,7 @@ public class AnvilGUI {
     private AnvilGUI(
             Plugin plugin,
             Player player,
+            Executor mainThreadExecutor,
             String inventoryTitle,
             ItemStack[] initialContents,
             boolean preventClose,
@@ -128,6 +134,7 @@ public class AnvilGUI {
             BiFunction<Integer, StateSnapshot, CompletableFuture<List<ResponseAction>>> clickHandler) {
         this.plugin = plugin;
         this.player = player;
+        this.mainThreadExecutor = mainThreadExecutor;
         this.inventoryTitle = inventoryTitle;
         this.initialContents = initialContents;
         this.preventClose = preventClose;
@@ -233,11 +240,19 @@ public class AnvilGUI {
                 final CompletableFuture<List<ResponseAction>> actionsFuture =
                         clickHandler.apply(rawSlot, StateSnapshot.fromAnvilGUI(AnvilGUI.this));
 
-                actionsFuture.thenAccept(actions -> {
+                final Consumer<List<ResponseAction>> actionsConsumer = actions -> {
                     for (final ResponseAction action : actions) {
                         action.accept(AnvilGUI.this, clicker);
                     }
-                });
+                };
+
+                if (actionsFuture.isDone()) {
+                    // Fast-path without scheduling if clickHandler is performed in sync
+                    actionsFuture.thenAccept(actionsConsumer);
+                } else {
+                    // Execute the runnable on the main thread
+                    actionsFuture.thenAcceptAsync(actionsConsumer, mainThreadExecutor);
+                }
             }
         }
 
@@ -258,7 +273,7 @@ public class AnvilGUI {
             if (open && event.getInventory().equals(inventory)) {
                 closeInventory(false);
                 if (preventClose) {
-                    Bukkit.getScheduler().runTask(plugin, AnvilGUI.this::openInventory);
+                    mainThreadExecutor.execute(AnvilGUI.this::openInventory);
                 }
             }
         }
@@ -267,6 +282,8 @@ public class AnvilGUI {
     /** A builder class for an {@link AnvilGUI} object */
     public static class Builder {
 
+        /** An {@link Executor} that executes tasks on the main server thread */
+        private Executor mainThreadExecutor;
         /** An {@link Consumer} that is called when the anvil GUI is close */
         private Consumer<StateSnapshot> closeListener;
         /** An {@link Function} that is called when a slot in the inventory has been clicked */
@@ -287,6 +304,18 @@ public class AnvilGUI {
         private ItemStack itemRight;
         /** An {@link ItemStack} to be placed in the output slot */
         private ItemStack itemOutput;
+
+        /**
+         * Set a custom main server thread executor. Useful for plugins targeting Folia.
+         *
+         * @param executor The executor to run tasks on
+         * @return The {@link Builder} instance
+         */
+        public Builder mainThreadExecutor(Executor executor) {
+            Validate.notNull(executor, "Executor cannot be null");
+            this.mainThreadExecutor = executor;
+            return this;
+        }
 
         /**
          * Prevents the closing of the anvil GUI by the user
@@ -459,9 +488,15 @@ public class AnvilGUI {
                 itemLeft.setItemMeta(paperMeta);
             }
 
+            // If no executor is specified, execute all tasks with the BukkitScheduler
+            if (mainThreadExecutor == null) {
+                mainThreadExecutor = task -> Bukkit.getScheduler().runTask(plugin, task);
+            }
+
             final AnvilGUI anvilGUI = new AnvilGUI(
                     plugin,
                     player,
+                    mainThreadExecutor,
                     title,
                     new ItemStack[] {itemLeft, itemRight, itemOutput},
                     preventClose,
