@@ -219,6 +219,13 @@ public class AnvilGUI {
      */
     private class ListenUp implements Listener {
 
+        /**
+         * Boolean storing the running status of the latest click handler to prevent double execution.
+         * All accesses to this boolean will be from the main server thread, except for the rare event
+         * that the plugin is disabled and the mainThreadExecutor throws an exception
+         */
+        private boolean clickHandlerRunning = false;
+
         @EventHandler
         public void onInventoryClick(InventoryClickEvent event) {
             if (!event.getInventory().equals(inventory)) {
@@ -238,8 +245,15 @@ public class AnvilGUI {
             final int rawSlot = event.getRawSlot();
             if (rawSlot < 3 || event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
                 event.setCancelled(!interactableSlots.contains(rawSlot));
+                if (clickHandlerRunning) {
+                    // A click handler is running, don't launch another one
+                    return;
+                }
+
                 final CompletableFuture<List<ResponseAction>> actionsFuture =
                         clickHandler.apply(rawSlot, StateSnapshot.fromAnvilGUI(AnvilGUI.this));
+                // Set to running after calling the ClickHandler if the ClickHandler instantly throws an exception
+                clickHandlerRunning = true;
 
                 final Consumer<List<ResponseAction>> actionsConsumer = actions -> {
                     for (final ResponseAction action : actions) {
@@ -248,6 +262,7 @@ public class AnvilGUI {
                 };
 
                 if (actionsFuture.isDone()) {
+                    clickHandlerRunning = false;
                     // Fast-path without scheduling if clickHandler is performed in sync
                     actionsFuture.thenAccept(actionsConsumer).exceptionally(exception -> {
                         plugin.getLogger()
@@ -267,6 +282,8 @@ public class AnvilGUI {
                                                     "An exception occurred in the AnvilGUI clickHandler",
                                                     exception);
                                 }
+                                // Whether an exception occurred or not, set running to false
+                                clickHandlerRunning = false;
                                 return null;
                             });
                 }
@@ -375,6 +392,8 @@ public class AnvilGUI {
 
         /**
          * Do an action when a slot is clicked in the inventory
+         * <p>
+         * The ClickHandler is only called when the previous execution of the ClickHandler has finished.
          *
          * @param clickHandler A {@link ClickHandler} that is called when the user clicks a slot. The
          *                     {@link Integer} is the slot number corresponding to {@link Slot}, the
