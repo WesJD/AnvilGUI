@@ -90,7 +90,7 @@ public class AnvilGUI {
     /** An {@link Consumer} that is called when the anvil GUI is close */
     private final Consumer<StateSnapshot> closeListener;
     /** An {@link BiFunction} that is called when a slot is clicked */
-    private final BiFunction<Integer, StateSnapshot, CompletableFuture<List<ResponseAction>>> clickHandler;
+    private final ClickHandler clickHandler;
 
     /**
      * The container id of the inventory, used for NMS methods
@@ -131,7 +131,7 @@ public class AnvilGUI {
             boolean preventClose,
             Set<Integer> interactableSlots,
             Consumer<StateSnapshot> closeListener,
-            BiFunction<Integer, StateSnapshot, CompletableFuture<List<ResponseAction>>> clickHandler) {
+            ClickHandler clickHandler) {
         this.plugin = plugin;
         this.player = player;
         this.mainThreadExecutor = mainThreadExecutor;
@@ -287,7 +287,7 @@ public class AnvilGUI {
         /** An {@link Consumer} that is called when the anvil GUI is close */
         private Consumer<StateSnapshot> closeListener;
         /** An {@link Function} that is called when a slot in the inventory has been clicked */
-        private BiFunction<Integer, StateSnapshot, CompletableFuture<List<ResponseAction>>> clickHandler;
+        private ClickHandler clickHandler;
         /** A state that decides where the anvil GUI is able to be closed by the user */
         private boolean preventClose = false;
         /** A set of integers containing the slot numbers that should be modifiable by the user. */
@@ -359,7 +359,7 @@ public class AnvilGUI {
         /**
          * Do an action when a slot is clicked in the inventory
          *
-         * @param clickHandler An {@link BiFunction} that is called when the user clicks a slot. The
+         * @param clickHandler A {@link ClickHandler} that is called when the user clicks a slot. The
          *                     {@link Integer} is the slot number corresponding to {@link Slot}, the
          *                     {@link StateSnapshot} contains information about the current state of the anvil,
          *                     and the response is a {@link CompletableFuture} that will eventually return a
@@ -367,8 +367,7 @@ public class AnvilGUI {
          * @return The {@link Builder} instance
          * @throws IllegalArgumentException when the function supplied is null
          */
-        public Builder onClickAsync(
-                BiFunction<Integer, StateSnapshot, CompletableFuture<List<ResponseAction>>> clickHandler) {
+        public Builder onClickAsync(ClickHandler clickHandler) {
             Validate.notNull(clickHandler, "click function cannot be null");
             this.clickHandler = clickHandler;
             return this;
@@ -377,7 +376,7 @@ public class AnvilGUI {
         /**
          * Do an action when a slot is clicked in the inventory
          *
-         * @param clickHandler An {@link BiFunction} that is called when the user clicks a slot. The
+         * @param clickHandler A {@link BiFunction} that is called when the user clicks a slot. The
          *                     {@link Integer} is the slot number corresponding to {@link Slot}, the
          *                     {@link StateSnapshot} contains information about the current state of the anvil,
          *                     and the response is a list of {@link ResponseAction} to execute in the order
@@ -508,8 +507,19 @@ public class AnvilGUI {
         }
     }
 
+    /**
+     * A handler that is called when the user clicks a slot. The
+     * {@link Integer} is the slot number corresponding to {@link Slot}, the
+     * {@link StateSnapshot} contains information about the current state of the anvil,
+     * and the response is a {@link CompletableFuture} that will eventually return a
+     * list of {@link ResponseAction} to execute in the order that they are supplied.
+     */
+    @FunctionalInterface
+    public interface ClickHandler extends BiFunction<Integer, StateSnapshot, CompletableFuture<List<ResponseAction>>> {}
+
     /** An action to run in response to a player clicking the output slot in the GUI. This interface is public
      * and permits you, the developer, to add additional response features easily to your custom AnvilGUIs. */
+    @FunctionalInterface
     public interface ResponseAction extends BiConsumer<AnvilGUI, Player> {
 
         /**
