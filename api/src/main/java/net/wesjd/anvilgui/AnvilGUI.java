@@ -12,6 +12,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.logging.Level;
 import net.wesjd.anvilgui.version.VersionMatcher;
 import net.wesjd.anvilgui.version.VersionWrapper;
 import org.apache.commons.lang.Validate;
@@ -248,10 +249,26 @@ public class AnvilGUI {
 
                 if (actionsFuture.isDone()) {
                     // Fast-path without scheduling if clickHandler is performed in sync
-                    actionsFuture.thenAccept(actionsConsumer);
+                    actionsFuture.thenAccept(actionsConsumer).exceptionally(exception -> {
+                        plugin.getLogger()
+                                .log(Level.SEVERE, "An exception occurred in the AnvilGUI clickHandler", exception);
+                        return null;
+                    });
                 } else {
-                    // Execute the runnable on the main thread
-                    actionsFuture.thenAcceptAsync(actionsConsumer, mainThreadExecutor);
+                    // If the plugin is disabled and the Executor throws an exception, the exception will be passed to
+                    // the .handle method
+                    actionsFuture
+                            .thenAcceptAsync(actionsConsumer, mainThreadExecutor)
+                            .handle((results, exception) -> {
+                                if (exception != null) {
+                                    plugin.getLogger()
+                                            .log(
+                                                    Level.SEVERE,
+                                                    "An exception occurred in the AnvilGUI clickHandler",
+                                                    exception);
+                                }
+                                return null;
+                            });
                 }
             }
         }
