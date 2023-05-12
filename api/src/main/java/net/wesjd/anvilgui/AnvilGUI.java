@@ -90,6 +90,8 @@ public class AnvilGUI {
 
     /** An {@link Consumer} that is called when the anvil GUI is close */
     private final Consumer<StateSnapshot> closeListener;
+    /** A flag that decides the whether the async click handler can be run multiple times in parallel */
+    private final boolean parallelClickHandlerExecution;
     /** An {@link BiFunction} that is called when a slot is clicked */
     private final ClickHandler clickHandler;
 
@@ -117,11 +119,13 @@ public class AnvilGUI {
      *
      * @param plugin           A {@link org.bukkit.plugin.java.JavaPlugin} instance
      * @param player           The {@link Player} to open the inventory for
+     * @param mainThreadExecutor An {@link Executor} that executes on the main server thread
      * @param inventoryTitle   What to have the text already set to
      * @param initialContents  The initial contents of the inventory
      * @param preventClose     Whether to prevent the inventory from closing
      * @param closeListener    A {@link Consumer} when the inventory closes
-     * @param clickHandler     A {@link BiFunction} that is called when the player clicks a slot
+     * @param parallelClickHandlerExecution Flag to allow parallel execution of the click handler
+     * @param clickHandler     A {@link ClickHandler} that is called when the player clicks a slot
      */
     private AnvilGUI(
             Plugin plugin,
@@ -132,6 +136,7 @@ public class AnvilGUI {
             boolean preventClose,
             Set<Integer> interactableSlots,
             Consumer<StateSnapshot> closeListener,
+            boolean parallelClickHandlerExecution,
             ClickHandler clickHandler) {
         this.plugin = plugin;
         this.player = player;
@@ -141,6 +146,7 @@ public class AnvilGUI {
         this.preventClose = preventClose;
         this.interactableSlots = Collections.unmodifiableSet(interactableSlots);
         this.closeListener = closeListener;
+        this.parallelClickHandlerExecution = parallelClickHandlerExecution;
         this.clickHandler = clickHandler;
     }
 
@@ -245,15 +251,13 @@ public class AnvilGUI {
             final int rawSlot = event.getRawSlot();
             if (rawSlot < 3 || event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
                 event.setCancelled(!interactableSlots.contains(rawSlot));
-                if (clickHandlerRunning) {
+                if (clickHandlerRunning && !parallelClickHandlerExecution) {
                     // A click handler is running, don't launch another one
                     return;
                 }
 
                 final CompletableFuture<List<ResponseAction>> actionsFuture =
                         clickHandler.apply(rawSlot, StateSnapshot.fromAnvilGUI(AnvilGUI.this));
-                // Set to running after calling the ClickHandler if the ClickHandler instantly throws an exception
-                clickHandlerRunning = true;
 
                 final Consumer<List<ResponseAction>> actionsConsumer = actions -> {
                     for (final ResponseAction action : actions) {
@@ -262,14 +266,11 @@ public class AnvilGUI {
                 };
 
                 if (actionsFuture.isDone()) {
-                    clickHandlerRunning = false;
                     // Fast-path without scheduling if clickHandler is performed in sync
-                    actionsFuture.thenAccept(actionsConsumer).exceptionally(exception -> {
-                        plugin.getLogger()
-                                .log(Level.SEVERE, "An exception occurred in the AnvilGUI clickHandler", exception);
-                        return null;
-                    });
+                    // Because the future is already completed, .join() will not block the server thread
+                    actionsFuture.thenAccept(actionsConsumer).join();
                 } else {
+                    clickHandlerRunning = true;
                     // If the plugin is disabled and the Executor throws an exception, the exception will be passed to
                     // the .handle method
                     actionsFuture
@@ -320,6 +321,8 @@ public class AnvilGUI {
         private Executor mainThreadExecutor;
         /** An {@link Consumer} that is called when the anvil GUI is close */
         private Consumer<StateSnapshot> closeListener;
+        /** A flag that decides the whether the async click handler can be run multiple times in parallel */
+        private boolean parallelClickHandlerExecution = false;
         /** An {@link Function} that is called when a slot in the inventory has been clicked */
         private ClickHandler clickHandler;
         /** A state that decides where the anvil GUI is able to be closed by the user */
@@ -394,6 +397,7 @@ public class AnvilGUI {
          * Do an action when a slot is clicked in the inventory
          * <p>
          * The ClickHandler is only called when the previous execution of the ClickHandler has finished.
+         * To alter this behaviour use {@link #allowParallelClickHandlerExecution()}
          *
          * @param clickHandler A {@link ClickHandler} that is called when the user clicks a slot. The
          *                     {@link Integer} is the slot number corresponding to {@link Slot}, the
@@ -406,6 +410,20 @@ public class AnvilGUI {
         public Builder onClickAsync(ClickHandler clickHandler) {
             Validate.notNull(clickHandler, "click function cannot be null");
             this.clickHandler = clickHandler;
+            return this;
+        }
+
+        /**
+         * By default, the {@link #onClickAsync(ClickHandler) async click handler} will not run in parallel
+         * and instead wait for the previous {@link CompletableFuture} to finish before executing it again.
+         * <p>
+         * If this trait is desired, it can be enabled by calling this method but may lead to inconsistent
+         * behaviour if not handled properly.
+         *
+         * @return The {@link Builder} instance
+         */
+        public Builder allowParallelClickHandlerExecution() {
+            this.parallelClickHandlerExecution = true;
             return this;
         }
 
@@ -537,6 +555,7 @@ public class AnvilGUI {
                     preventClose,
                     interactableSlots,
                     closeListener,
+                    parallelClickHandlerExecution,
                     clickHandler);
             anvilGUI.openInventory();
             return anvilGUI;
