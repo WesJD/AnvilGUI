@@ -347,6 +347,7 @@ public class AnvilGUI {
          *
          * @param executor The executor to run tasks on
          * @return The {@link Builder} instance
+         * @throws IllegalArgumentException when the executor is null
          */
         public Builder mainThreadExecutor(Executor executor) {
             Validate.notNull(executor, "Executor cannot be null");
