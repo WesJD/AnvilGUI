@@ -6,10 +6,13 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.logging.Level;
 import net.wesjd.anvilgui.version.VersionMatcher;
 import net.wesjd.anvilgui.version.VersionWrapper;
 import org.apache.commons.lang.Validate;
@@ -62,6 +65,10 @@ public class AnvilGUI {
      */
     private final Player player;
     /**
+     * An {@link Executor} that executes tasks on the main server thread
+     */
+    private final Executor mainThreadExecutor;
+    /**
      * The title of the anvil inventory
      */
     private final String inventoryTitle;
@@ -83,8 +90,10 @@ public class AnvilGUI {
 
     /** An {@link Consumer} that is called when the anvil GUI is close */
     private final Consumer<StateSnapshot> closeListener;
+    /** A flag that decides whether the async click handler can be run concurrently */
+    private final boolean concurrentClickHandlerExecution;
     /** An {@link BiFunction} that is called when a slot is clicked */
-    private final BiFunction<Integer, StateSnapshot, List<ResponseAction>> clickHandler;
+    private final ClickHandler clickHandler;
 
     /**
      * The container id of the inventory, used for NMS methods
@@ -110,28 +119,34 @@ public class AnvilGUI {
      *
      * @param plugin           A {@link org.bukkit.plugin.java.JavaPlugin} instance
      * @param player           The {@link Player} to open the inventory for
+     * @param mainThreadExecutor An {@link Executor} that executes on the main server thread
      * @param inventoryTitle   What to have the text already set to
      * @param initialContents  The initial contents of the inventory
      * @param preventClose     Whether to prevent the inventory from closing
      * @param closeListener    A {@link Consumer} when the inventory closes
-     * @param clickHandler     A {@link BiFunction} that is called when the player clicks a slot
+     * @param concurrentClickHandlerExecution Flag to allow concurrent execution of the click handler
+     * @param clickHandler     A {@link ClickHandler} that is called when the player clicks a slot
      */
     private AnvilGUI(
             Plugin plugin,
             Player player,
+            Executor mainThreadExecutor,
             String inventoryTitle,
             ItemStack[] initialContents,
             boolean preventClose,
             Set<Integer> interactableSlots,
             Consumer<StateSnapshot> closeListener,
-            BiFunction<Integer, StateSnapshot, List<ResponseAction>> clickHandler) {
+            boolean concurrentClickHandlerExecution,
+            ClickHandler clickHandler) {
         this.plugin = plugin;
         this.player = player;
+        this.mainThreadExecutor = mainThreadExecutor;
         this.inventoryTitle = inventoryTitle;
         this.initialContents = initialContents;
         this.preventClose = preventClose;
         this.interactableSlots = Collections.unmodifiableSet(interactableSlots);
         this.closeListener = closeListener;
+        this.concurrentClickHandlerExecution = concurrentClickHandlerExecution;
         this.clickHandler = clickHandler;
     }
 
@@ -210,6 +225,13 @@ public class AnvilGUI {
      */
     private class ListenUp implements Listener {
 
+        /**
+         * Boolean storing the running status of the latest click handler to prevent double execution.
+         * All accesses to this boolean will be from the main server thread, except for the rare event
+         * that the plugin is disabled and the mainThreadExecutor throws an exception
+         */
+        private boolean clickHandlerRunning = false;
+
         @EventHandler
         public void onInventoryClick(InventoryClickEvent event) {
             if (!event.getInventory().equals(inventory)) {
@@ -229,10 +251,42 @@ public class AnvilGUI {
             final int rawSlot = event.getRawSlot();
             if (rawSlot < 3 || event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
                 event.setCancelled(!interactableSlots.contains(rawSlot));
-                final List<ResponseAction> actions =
+                if (clickHandlerRunning && !concurrentClickHandlerExecution) {
+                    // A click handler is running, don't launch another one
+                    return;
+                }
+
+                final CompletableFuture<List<ResponseAction>> actionsFuture =
                         clickHandler.apply(rawSlot, StateSnapshot.fromAnvilGUI(AnvilGUI.this));
-                for (final ResponseAction action : actions) {
-                    action.accept(AnvilGUI.this, clicker);
+
+                final Consumer<List<ResponseAction>> actionsConsumer = actions -> {
+                    for (final ResponseAction action : actions) {
+                        action.accept(AnvilGUI.this, clicker);
+                    }
+                };
+
+                if (actionsFuture.isDone()) {
+                    // Fast-path without scheduling if clickHandler is performed in sync
+                    // Because the future is already completed, .join() will not block the server thread
+                    actionsFuture.thenAccept(actionsConsumer).join();
+                } else {
+                    clickHandlerRunning = true;
+                    // If the plugin is disabled and the Executor throws an exception, the exception will be passed to
+                    // the .handle method
+                    actionsFuture
+                            .thenAcceptAsync(actionsConsumer, mainThreadExecutor)
+                            .handle((results, exception) -> {
+                                if (exception != null) {
+                                    plugin.getLogger()
+                                            .log(
+                                                    Level.SEVERE,
+                                                    "An exception occurred in the AnvilGUI clickHandler",
+                                                    exception);
+                                }
+                                // Whether an exception occurred or not, set running to false
+                                clickHandlerRunning = false;
+                                return null;
+                            });
                 }
             }
         }
@@ -254,7 +308,7 @@ public class AnvilGUI {
             if (open && event.getInventory().equals(inventory)) {
                 closeInventory(false);
                 if (preventClose) {
-                    Bukkit.getScheduler().runTask(plugin, AnvilGUI.this::openInventory);
+                    mainThreadExecutor.execute(AnvilGUI.this::openInventory);
                 }
             }
         }
@@ -263,10 +317,14 @@ public class AnvilGUI {
     /** A builder class for an {@link AnvilGUI} object */
     public static class Builder {
 
+        /** An {@link Executor} that executes tasks on the main server thread */
+        private Executor mainThreadExecutor;
         /** An {@link Consumer} that is called when the anvil GUI is close */
         private Consumer<StateSnapshot> closeListener;
+        /** A flag that decides whether the async click handler can be run concurrently */
+        private boolean concurrentClickHandlerExecution = false;
         /** An {@link Function} that is called when a slot in the inventory has been clicked */
-        private BiFunction<Integer, StateSnapshot, List<ResponseAction>> clickHandler;
+        private ClickHandler clickHandler;
         /** A state that decides where the anvil GUI is able to be closed by the user */
         private boolean preventClose = false;
         /** A set of integers containing the slot numbers that should be modifiable by the user. */
@@ -283,6 +341,19 @@ public class AnvilGUI {
         private ItemStack itemRight;
         /** An {@link ItemStack} to be placed in the output slot */
         private ItemStack itemOutput;
+
+        /**
+         * Set a custom main server thread executor. Useful for plugins targeting Folia.
+         *
+         * @param executor The executor to run tasks on
+         * @return The {@link Builder} instance
+         * @throws IllegalArgumentException when the executor is null
+         */
+        public Builder mainThreadExecutor(Executor executor) {
+            Validate.notNull(executor, "Executor cannot be null");
+            this.mainThreadExecutor = executor;
+            return this;
+        }
 
         /**
          * Prevents the closing of the anvil GUI by the user
@@ -325,8 +396,42 @@ public class AnvilGUI {
 
         /**
          * Do an action when a slot is clicked in the inventory
+         * <p>
+         * The ClickHandler is only called when the previous execution of the ClickHandler has finished.
+         * To alter this behaviour use {@link #allowConcurrentClickHandlerExecution()}
          *
-         * @param clickHandler An {@link BiFunction} that is called when the user clicks a slot. The
+         * @param clickHandler A {@link ClickHandler} that is called when the user clicks a slot. The
+         *                     {@link Integer} is the slot number corresponding to {@link Slot}, the
+         *                     {@link StateSnapshot} contains information about the current state of the anvil,
+         *                     and the response is a {@link CompletableFuture} that will eventually return a
+         *                     list of {@link ResponseAction} to execute in the order that they are supplied.
+         * @return The {@link Builder} instance
+         * @throws IllegalArgumentException when the function supplied is null
+         */
+        public Builder onClickAsync(ClickHandler clickHandler) {
+            Validate.notNull(clickHandler, "click function cannot be null");
+            this.clickHandler = clickHandler;
+            return this;
+        }
+
+        /**
+         * By default, the {@link #onClickAsync(ClickHandler) async click handler} will not run concurrently
+         * and instead wait for the previous {@link CompletableFuture} to finish before executing it again.
+         * <p>
+         * If this trait is desired, it can be enabled by calling this method but may lead to inconsistent
+         * behaviour if not handled properly.
+         *
+         * @return The {@link Builder} instance
+         */
+        public Builder allowConcurrentClickHandlerExecution() {
+            this.concurrentClickHandlerExecution = true;
+            return this;
+        }
+
+        /**
+         * Do an action when a slot is clicked in the inventory
+         *
+         * @param clickHandler A {@link BiFunction} that is called when the user clicks a slot. The
          *                     {@link Integer} is the slot number corresponding to {@link Slot}, the
          *                     {@link StateSnapshot} contains information about the current state of the anvil,
          *                     and the response is a list of {@link ResponseAction} to execute in the order
@@ -336,7 +441,8 @@ public class AnvilGUI {
          */
         public Builder onClick(BiFunction<Integer, StateSnapshot, List<ResponseAction>> clickHandler) {
             Validate.notNull(clickHandler, "click function cannot be null");
-            this.clickHandler = clickHandler;
+            this.clickHandler =
+                    (slot, stateSnapshot) -> CompletableFuture.completedFuture(clickHandler.apply(slot, stateSnapshot));
             return this;
         }
 
@@ -436,22 +542,40 @@ public class AnvilGUI {
                 itemLeft.setItemMeta(paperMeta);
             }
 
+            // If no executor is specified, execute all tasks with the BukkitScheduler
+            if (mainThreadExecutor == null) {
+                mainThreadExecutor = task -> Bukkit.getScheduler().runTask(plugin, task);
+            }
+
             final AnvilGUI anvilGUI = new AnvilGUI(
                     plugin,
                     player,
+                    mainThreadExecutor,
                     title,
                     new ItemStack[] {itemLeft, itemRight, itemOutput},
                     preventClose,
                     interactableSlots,
                     closeListener,
+                    concurrentClickHandlerExecution,
                     clickHandler);
             anvilGUI.openInventory();
             return anvilGUI;
         }
     }
 
+    /**
+     * A handler that is called when the user clicks a slot. The
+     * {@link Integer} is the slot number corresponding to {@link Slot}, the
+     * {@link StateSnapshot} contains information about the current state of the anvil,
+     * and the response is a {@link CompletableFuture} that will eventually return a
+     * list of {@link ResponseAction} to execute in the order that they are supplied.
+     */
+    @FunctionalInterface
+    public interface ClickHandler extends BiFunction<Integer, StateSnapshot, CompletableFuture<List<ResponseAction>>> {}
+
     /** An action to run in response to a player clicking the output slot in the GUI. This interface is public
      * and permits you, the developer, to add additional response features easily to your custom AnvilGUIs. */
+    @FunctionalInterface
     public interface ResponseAction extends BiConsumer<AnvilGUI, Player> {
 
         /**
