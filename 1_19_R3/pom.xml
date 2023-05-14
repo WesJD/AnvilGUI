@@ -3,10 +3,11 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>net.wesjd</groupId>
         <artifactId>anvilgui-parent</artifactId>
-        <version>1.6.4-SNAPSHOT</version>
+        <version>1.6.5-SNAPSHOT</version>
     </parent>
 
     <artifactId>anvilgui-1_19_R3</artifactId>
