@@ -585,12 +585,20 @@ public class AnvilGUI {
          */
         static ResponseAction replaceInputText(String text) {
             return (anvilgui, player) -> {
-                final ItemStack outputSlotItem =
-                        anvilgui.getInventory().getItem(Slot.OUTPUT).clone();
-                final ItemMeta meta = outputSlotItem.getItemMeta();
+                ItemStack item = anvilgui.getInventory().getItem(Slot.OUTPUT);
+                if (item == null) {
+                    // Fallback on left input slot if player hasn't typed anything yet
+                    item = anvilgui.getInventory().getItem(Slot.INPUT_LEFT);
+                }
+                if (item == null) {
+                    return; // Do nothing if left input slot is also empty
+                }
+
+                final ItemStack cloned = item.clone();
+                final ItemMeta meta = cloned.getItemMeta();
                 meta.setDisplayName(text);
-                outputSlotItem.setItemMeta(meta);
-                anvilgui.getInventory().setItem(Slot.INPUT_LEFT, outputSlotItem);
+                cloned.setItemMeta(meta);
+                anvilgui.getInventory().setItem(Slot.INPUT_LEFT, cloned);
             };
         }
 
@@ -600,7 +608,7 @@ public class AnvilGUI {
          * @return The {@link ResponseAction} to achieve the inventory open
          */
         static ResponseAction openInventory(Inventory otherInventory) {
-            return (anvigui, player) -> player.openInventory(otherInventory);
+            return (anvilgui, player) -> player.openInventory(otherInventory);
         }
 
         /**
