@@ -120,12 +120,13 @@ asynchronous calculation of the `ResponseAction`s.
 
 ```java
 builder.onClickAsync((slot, stateSnapshot) -> CompletedFuture.supplyAsync(() -> {
+    // this code is now running async
     if (slot != AnvilGUI.Slot.OUTPUT) {
         return Collections.emptyList();
     }
     
     if (database.isMagical(stateSnapshot.getText())) {
-        stateSnapshot.getPlayer().sendMessage("You have magical powers!");
+        // the `ResponseAction`s will run on the main server thread
         return Arrays.asList(
             AnvilGUI.ResponseAction.close(),
             AnvilGUI.ResponseAction.run(() -> myCode(stateSnapshot.getPlayer()))
@@ -211,7 +212,7 @@ a new `AnvilGUI.Builder` object.
 builder.open(player);
 ```                  
 
-### A full example combining all methods
+### A Common Use Case Example
 ```java
 new AnvilGUI.Builder()
     .onClose(stateSnapshot -> {
@@ -229,29 +230,9 @@ new AnvilGUI.Builder()
             return Arrays.asList(AnvilGUI.ResponseAction.replaceInputText("Try again"));
         }
     })
-    .onClickAsync((slot, stateSnapshot) -> CompletedFuture.supplyAsync(() -> {
-        if (slot != AnvilGUI.Slot.OUTPUT) {
-            return Collections.emptyList();
-        }
-    
-        if (database.isMagical(stateSnapshot.getText())) {
-            stateSnapshot.getPlayer().sendMessage("You have magical powers!");
-            return Arrays.asList(
-                AnvilGUI.ResponseAction.close(),
-                AnvilGUI.ResponseAction.run(() -> myCode(stateSnapshot.getPlayer()))
-            );
-        } else {
-            return Arrays.asList(AnvilGUI.ResponseAction.replaceInputText("Try again"));
-        }
-    })
-    .allowConcurrentClickHandlerExecution()                            //Allows concurrent execution of async click handler
     .preventClose()                                                    //prevents the inventory from being closed
-    .interactableSlots(Slot.INPUT_RIGHT)                               //allow player to take out and replace the right input item
     .text("What is the meaning of life?")                              //sets the text the GUI should start with
-    .itemLeft(new ItemStack(Material.IRON_SWORD))                      //use a custom item for the first slot
-    .itemRight(new ItemStack(Material.IRON_SWORD))                     //use a custom item for the second slot
     .title("Enter your answer.")                                       //set the title of the GUI (only works in 1.14+)
-    .mainThreadExecutor(executor)                                      //set custom executor for tasks
     .plugin(myPluginInstance)                                          //set the plugin instance
     .open(myPlayer);                                                   //opens the GUI for the player provided
 ```
