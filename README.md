@@ -84,7 +84,7 @@ builder.onClose(stateSnapshot -> {
 });                                                 
 ``` 
 
-#### `onClick(BiFunction<Integer, AnvilGUI.StateSnapshot, AnvilGUI.Response>)`
+#### `onClick(BiFunction<Integer, AnvilGUI.StateSnapshot, AnvilGUI.ResponseAction>)`
 Takes a `BiFunction` with the slot that was clicked and a snapshot of the current gui state. 
 The function is called when a player clicks any slots in the inventory.
 You must return a `List<AnvilGUI.ResponseAction>`, which could include:
@@ -97,11 +97,11 @@ You must return a `List<AnvilGUI.ResponseAction>`, which could include:
 The list of actions are ran in the order they are supplied.
 ```java                                                
 builder.onClick((slot, stateSnapshot) -> {
-    if(slot != AnvilGUI.Slot.OUTPUT) {
+    if (slot != AnvilGUI.Slot.OUTPUT) {
         return Collections.emptyList();
     }   
     
-    if(stateSnapshot.getText().equalsIgnoreCase("you")) {
+    if (stateSnapshot.getText().equalsIgnoreCase("you")) {
         stateSnapshot.getPlayer().sendMessage("You have magical powers!");
         return Arrays.asList(
             AnvilGUI.ResponseAction.close(),
@@ -111,6 +111,36 @@ builder.onClick((slot, stateSnapshot) -> {
         return Arrays.asList(AnvilGUI.ResponseAction.replaceInputText("Try again"));   
     }                                                  
 });                                                    
+```
+
+#### `onClickAsync(ClickHandler)`
+Takes a `ClickHandler`, a shorthand for `BiFunction<Integer, AnvilGui.StateSnapshot, CompletableFuture<AnvilGUI.ResponseAction>>`,
+that behaves exactly like `onClick()` with the difference that it returns a `CompletableFuture` and therefore allows for
+asynchronous calculation of the `ResponseAction`s.
+
+```java
+builder.onClickAsync((slot, stateSnapshot) -> CompletedFuture.supplyAsync(() -> {
+    if (slot != AnvilGUI.Slot.OUTPUT) {
+        return Collections.emptyList();
+    }
+    
+    if (database.isMagical(stateSnapshot.getText())) {
+        stateSnapshot.getPlayer().sendMessage("You have magical powers!");
+        return Arrays.asList(
+            AnvilGUI.ResponseAction.close(),
+            AnvilGUI.ResponseAction.run(() -> myCode(stateSnapshot.getPlayer()))
+        );
+    } else {
+        return Arrays.asList(AnvilGUI.ResponseAction.replaceInputText("Try again"));
+    }
+}));
+```
+
+#### `allowConcurrentClickHandlerExecution()`
+Tells the AnvilGUI to disable the mechanism that is put into place to prevent concurrent execution of the
+click handler set by `onClickAsync(ClickHandler)`.
+```java                     
+builder.allowConcurrentClickHandlerExecution();     
 ```
 
 #### `interactableSlots(int... slots)`
@@ -166,6 +196,14 @@ Takes the `Plugin` object that is making this anvil gui. It is needed to registe
 builder.plugin(pluginInstance);                 
 ```                            
 
+#### `mainThreadExecutor(Executor)`
+Takes an `Executor` that must execute on the main server thread.
+If the main server thread is not accessible via the Bukkit scheduler, like on Folia servers, it can be swapped for a
+Folia aware executor.
+```java
+builder.mainThreadExecutor(executor);
+```
+
 #### `open(Player)`
 Takes a `Player` that the anvil gui should be opened for. This method can be called multiple times without needing to create
 a new `AnvilGUI.Builder` object.                                                                                            
@@ -179,7 +217,7 @@ new AnvilGUI.Builder()
     .onClose(stateSnapshot -> {
         stateSnapshot.getPlayer().sendMessage("You closed the inventory.");
     })
-    .onClick((slot, stateSnapshot) -> {
+    .onClick((slot, stateSnapshot) -> { // Either use sync or async variant, not both
         if(slot != AnvilGUI.Slot.OUTPUT) {
             return Collections.emptyList();
         }
@@ -191,12 +229,29 @@ new AnvilGUI.Builder()
             return Arrays.asList(AnvilGUI.ResponseAction.replaceInputText("Try again"));
         }
     })
+    .onClickAsync((slot, stateSnapshot) -> CompletedFuture.supplyAsync(() -> {
+        if (slot != AnvilGUI.Slot.OUTPUT) {
+            return Collections.emptyList();
+        }
+    
+        if (database.isMagical(stateSnapshot.getText())) {
+            stateSnapshot.getPlayer().sendMessage("You have magical powers!");
+            return Arrays.asList(
+                AnvilGUI.ResponseAction.close(),
+                AnvilGUI.ResponseAction.run(() -> myCode(stateSnapshot.getPlayer()))
+            );
+        } else {
+            return Arrays.asList(AnvilGUI.ResponseAction.replaceInputText("Try again"));
+        }
+    })
+    .allowConcurrentClickHandlerExecution()                            //Allows concurrent execution of async click handler
     .preventClose()                                                    //prevents the inventory from being closed
     .interactableSlots(Slot.INPUT_RIGHT)                               //allow player to take out and replace the right input item
     .text("What is the meaning of life?")                              //sets the text the GUI should start with
     .itemLeft(new ItemStack(Material.IRON_SWORD))                      //use a custom item for the first slot
     .itemRight(new ItemStack(Material.IRON_SWORD))                     //use a custom item for the second slot
     .title("Enter your answer.")                                       //set the title of the GUI (only works in 1.14+)
+    .mainThreadExecutor(executor)                                      //set custom executor for tasks
     .plugin(myPluginInstance)                                          //set the plugin instance
     .open(myPlayer);                                                   //opens the GUI for the player provided
 ```
