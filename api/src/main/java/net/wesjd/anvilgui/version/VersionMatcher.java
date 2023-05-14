@@ -9,7 +9,9 @@ import org.bukkit.Bukkit;
  * @author Wesley Smith
  * @since 1.2.1
  */
-public class VersionMatcher {
+public final class VersionMatcher {
+
+    private VersionMatcher() {}
 
     /**
      * Matches the server version to it's {@link VersionWrapper}
@@ -17,7 +19,7 @@ public class VersionMatcher {
      * @return The {@link VersionWrapper} for this server
      * @throws IllegalStateException If the version wrapper failed to be instantiated or is unable to be found
      */
-    public VersionWrapper match() {
+    public static VersionWrapper match() {
         final String serverVersion = Bukkit.getServer()
                 .getClass()
                 .getPackage()
@@ -25,9 +27,10 @@ public class VersionMatcher {
                 .split("\\.")[3]
                 .substring(1);
         try {
-            return (VersionWrapper) Class.forName(getClass().getPackage().getName() + ".Wrapper" + serverVersion)
-                    .getDeclaredConstructor()
-                    .newInstance();
+            return (VersionWrapper)
+                    Class.forName(VersionMatcher.class.getPackage().getName() + ".Wrapper" + serverVersion)
+                            .getDeclaredConstructor()
+                            .newInstance();
         } catch (ClassNotFoundException exception) {
             throw new IllegalStateException(
                     "AnvilGUI does not support server version \"" + serverVersion + "\"", exception);

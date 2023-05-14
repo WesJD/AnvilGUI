@@ -31,12 +31,12 @@ import org.bukkit.plugin.Plugin;
  * @author Wesley Smith
  * @since 1.0
  */
-public class AnvilGUI {
+public final class AnvilGUI {
 
     /**
      * The local {@link VersionWrapper} object for the server's version
      */
-    private static final VersionWrapper WRAPPER = new VersionMatcher().match();
+    private static final VersionWrapper WRAPPER = VersionMatcher.match();
 
     /**
      * The variable containing an item with air. Used when the item would be null.
@@ -208,7 +208,7 @@ public class AnvilGUI {
     /**
      * Simply holds the listeners for the GUI
      */
-    private class ListenUp implements Listener {
+    private final class ListenUp implements Listener {
 
         @EventHandler
         public void onInventoryClick(InventoryClickEvent event) {
@@ -261,7 +261,7 @@ public class AnvilGUI {
     }
 
     /** A builder class for an {@link AnvilGUI} object */
-    public static class Builder {
+    public static final class Builder {
 
         /** An {@link Consumer} that is called when the anvil GUI is close */
         private Consumer<StateSnapshot> closeListener;
@@ -502,7 +502,10 @@ public class AnvilGUI {
      * @deprecated Since 1.6.2, use {@link ResponseAction}
      */
     @Deprecated
-    public static class Response {
+    public static final class Response {
+
+        private Response() {}
+
         /**
          * Returns an {@link Response} object for when the anvil GUI is to close
          * @return An {@link Response} object for when the anvil GUI is to display text to the user
@@ -538,7 +541,9 @@ public class AnvilGUI {
     /**
      * Class wrapping the magic constants of slot numbers in an anvil GUI
      */
-    public static class Slot {
+    public static final class Slot {
+
+        private Slot() {}
 
         private static final int[] values = new int[] {Slot.INPUT_LEFT, Slot.INPUT_RIGHT, Slot.OUTPUT};
 
