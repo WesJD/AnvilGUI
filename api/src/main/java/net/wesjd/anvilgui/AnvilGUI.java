@@ -598,7 +598,8 @@ public class AnvilGUI {
                     item = anvilgui.getInventory().getItem(Slot.INPUT_LEFT);
                 }
                 if (item == null) {
-                    throw new IllegalStateException("replaceInputText can only be used if slots OUTPUT or INPUT_LEFT are not empty");
+                    throw new IllegalStateException(
+                            "replaceInputText can only be used if slots OUTPUT or INPUT_LEFT are not empty");
                 }
 
                 final ItemStack cloned = item.clone();
