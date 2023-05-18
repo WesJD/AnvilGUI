@@ -579,18 +579,33 @@ public class AnvilGUI {
     public interface ResponseAction extends BiConsumer<AnvilGUI, Player> {
 
         /**
-         * Replace the input text box value with the provided text value
+         * Replace the input text box value with the provided text value.
+         *
+         * Before using this method, it must be verified by the caller that items are either in
+         * {@link Slot#INPUT_LEFT} or {@link Slot#OUTPUT} present.
+         *
          * @param text The text to write in the input box
          * @return The {@link ResponseAction} to achieve the text replacement
+         * @throws IllegalArgumentException when the text is null
+         * @throws IllegalStateException when the slots {@link Slot#INPUT_LEFT} and {@link Slot#OUTPUT} are <code>null</code>
          */
         static ResponseAction replaceInputText(String text) {
+            Validate.notNull(text, "text cannot be null");
             return (anvilgui, player) -> {
-                final ItemStack outputSlotItem =
-                        anvilgui.getInventory().getItem(Slot.OUTPUT).clone();
-                final ItemMeta meta = outputSlotItem.getItemMeta();
+                ItemStack item = anvilgui.getInventory().getItem(Slot.OUTPUT);
+                if (item == null) {
+                    // Fallback on left input slot if player hasn't typed anything yet
+                    item = anvilgui.getInventory().getItem(Slot.INPUT_LEFT);
+                }
+                if (item == null) {
+                    throw new IllegalStateException("replaceInputText can only be used if slots OUTPUT or INPUT_LEFT are not empty");
+                }
+
+                final ItemStack cloned = item.clone();
+                final ItemMeta meta = cloned.getItemMeta();
                 meta.setDisplayName(text);
-                outputSlotItem.setItemMeta(meta);
-                anvilgui.getInventory().setItem(Slot.INPUT_LEFT, outputSlotItem);
+                cloned.setItemMeta(meta);
+                anvilgui.getInventory().setItem(Slot.INPUT_LEFT, cloned);
             };
         }
 
@@ -598,9 +613,11 @@ public class AnvilGUI {
          * Open another inventory
          * @param otherInventory The inventory to open
          * @return The {@link ResponseAction} to achieve the inventory open
+         * @throws IllegalArgumentException when the otherInventory is null
          */
         static ResponseAction openInventory(Inventory otherInventory) {
-            return (anvigui, player) -> player.openInventory(otherInventory);
+            Validate.notNull(otherInventory, "otherInventory cannot be null");
+            return (anvilgui, player) -> player.openInventory(otherInventory);
         }
 
         /**
@@ -615,8 +632,10 @@ public class AnvilGUI {
          * Run the provided runnable
          * @param runnable The runnable to run
          * @return The {@link ResponseAction} to achieve running the runnable
+         * @throws IllegalArgumentException when the runnable is null
          */
         static ResponseAction run(Runnable runnable) {
+            Validate.notNull(runnable, "runnable cannot be null");
             return (anvilgui, player) -> runnable.run();
         }
     }
