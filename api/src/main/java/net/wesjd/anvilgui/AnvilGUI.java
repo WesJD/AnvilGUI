@@ -71,7 +71,7 @@ public class AnvilGUI {
     /**
      * The title of the anvil inventory
      */
-    private final String inventoryTitle;
+    private final Object inventoryTitle;
     /**
      * The initial contents of the inventory
      */
@@ -131,7 +131,7 @@ public class AnvilGUI {
             Plugin plugin,
             Player player,
             Executor mainThreadExecutor,
-            String inventoryTitle,
+            Object inventoryTitle,
             ItemStack[] initialContents,
             boolean preventClose,
             Set<Integer> interactableSlots,
@@ -332,7 +332,7 @@ public class AnvilGUI {
         /** The {@link Plugin} that this anvil GUI is associated with */
         private Plugin plugin;
         /** The text that will be displayed to the user */
-        private String title = "Repair & Name";
+        private Object title = WRAPPER.literalChatComponent("Repair & Name");
         /** The starting text on the item */
         private String itemText;
         /** An {@link ItemStack} to be put in the left input slot */
@@ -481,7 +481,13 @@ public class AnvilGUI {
          */
         public Builder title(String title) {
             Validate.notNull(title, "title cannot be null");
-            this.title = title;
+            this.title = WRAPPER.literalChatComponent(title);
+            return this;
+        }
+
+        public Builder rawTitle(String json) {
+            Validate.notNull(json, "json cannot be null");
+            this.title = WRAPPER.jsonChatComponent(json);
             return this;
         }
 

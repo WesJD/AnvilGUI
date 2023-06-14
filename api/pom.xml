@@ -25,7 +25,7 @@
             <version>${project.parent.version}</version>
             <scope>compile</scope>
         </dependency>
-        <dependency>
+        <!--dependency>
             <groupId>net.wesjd</groupId>
             <artifactId>anvilgui-1_7_R4</artifactId>
             <version>${project.parent.version}</version>
@@ -174,7 +174,7 @@
             <artifactId>anvilgui-1_19_R3</artifactId>
             <version>${project.parent.version}</version>
             <scope>compile</scope>
-        </dependency>
+        </dependency-->
         <dependency>
             <groupId>net.wesjd</groupId>
             <artifactId>anvilgui-1_20_R1</artifactId>
