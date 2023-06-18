@@ -78,7 +78,7 @@ public final class Wrapper1_20_R1 implements VersionWrapper {
 
     @Override
     public Object newContainerAnvil(Player player, Object title) {
-        return new AnvilContainer(player, getRealNextContainerId(player), title);
+        return new AnvilContainer(player, getRealNextContainerId(player), (IChatBaseComponent) title);
     }
 
     @Override
@@ -92,13 +92,13 @@ public final class Wrapper1_20_R1 implements VersionWrapper {
     }
 
     private static class AnvilContainer extends ContainerAnvil {
-        public AnvilContainer(Player player, int containerId, Object guiTitle) {
+        public AnvilContainer(Player player, int containerId, IChatBaseComponent guiTitle) {
             super(
                     containerId,
                     ((CraftPlayer) player).getHandle().fN(),
                     ContainerAccess.a(((CraftWorld) player.getWorld()).getHandle(), new BlockPosition(0, 0, 0)));
             this.checkReachable = false;
-            setTitle((IChatBaseComponent) guiTitle);
+            setTitle(guiTitle);
         }
 
         @Override

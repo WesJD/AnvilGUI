@@ -35,11 +35,10 @@ public class Wrapper1_8_R1 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
-    public void sendPacketOpenWindow(Player player, int containerId, String guiTitle) {
+    public void sendPacketOpenWindow(Player player, int containerId, Object guiTitle) {
         toNMS(player)
                 .playerConnection
-                .sendPacket(new PacketPlayOutOpenWindow(
-                        containerId, "minecraft:anvil", new ChatMessage(Blocks.ANVIL.a() + ".name")));
+                .sendPacket(new PacketPlayOutOpenWindow(containerId, "minecraft:anvil", (IChatBaseComponent) guiTitle));
     }
 
     /**
@@ -94,8 +93,18 @@ public class Wrapper1_8_R1 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
-    public Object newContainerAnvil(Player player, String guiTitle) {
+    public Object newContainerAnvil(Player player, Object guiTitle) {
         return new AnvilContainer(toNMS(player));
+    }
+
+    @Override
+    public Object literalChatComponent(String content) {
+        return new ChatComponentText(content);
+    }
+
+    @Override
+    public Object jsonChatComponent(String json) {
+        return ChatSerializer.a(json);
     }
 
     /**

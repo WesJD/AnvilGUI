@@ -3,7 +3,7 @@ package net.wesjd.anvilgui.version;
 
 import net.minecraft.core.BlockPosition;
 import net.minecraft.network.chat.ChatComponentText;
-import net.minecraft.network.chat.ChatMessage;
+import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.network.protocol.game.PacketPlayOutCloseWindow;
 import net.minecraft.network.protocol.game.PacketPlayOutOpenWindow;
 import net.minecraft.server.level.EntityPlayer;
@@ -45,10 +45,8 @@ public final class Wrapper1_18_R1 implements VersionWrapper {
     }
 
     @Override
-    public void sendPacketOpenWindow(Player player, int containerId, String inventoryTitle) {
-        toNMS(player)
-                .b
-                .a(new PacketPlayOutOpenWindow(containerId, Containers.h, new ChatComponentText(inventoryTitle)));
+    public void sendPacketOpenWindow(Player player, int containerId, Object inventoryTitle) {
+        toNMS(player).b.a(new PacketPlayOutOpenWindow(containerId, Containers.h, (IChatBaseComponent) inventoryTitle));
     }
 
     @Override
@@ -80,18 +78,28 @@ public final class Wrapper1_18_R1 implements VersionWrapper {
     }
 
     @Override
-    public Object newContainerAnvil(Player player, String title) {
-        return new AnvilContainer(player, getRealNextContainerId(player), title);
+    public Object newContainerAnvil(Player player, Object title) {
+        return new AnvilContainer(player, getRealNextContainerId(player), (IChatBaseComponent) title);
+    }
+
+    @Override
+    public Object literalChatComponent(String content) {
+        return new ChatComponentText(content);
+    }
+
+    @Override
+    public Object jsonChatComponent(String json) {
+        return IChatBaseComponent.ChatSerializer.a(json);
     }
 
     private static class AnvilContainer extends ContainerAnvil {
-        public AnvilContainer(Player player, int containerId, String guiTitle) {
+        public AnvilContainer(Player player, int containerId, IChatBaseComponent guiTitle) {
             super(
                     containerId,
                     ((CraftPlayer) player).getHandle().fq(),
                     ContainerAccess.a(((CraftWorld) player.getWorld()).getHandle(), new BlockPosition(0, 0, 0)));
             this.checkReachable = false;
-            setTitle(new ChatMessage(guiTitle));
+            setTitle(guiTitle);
         }
 
         @Override

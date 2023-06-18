@@ -44,8 +44,8 @@ public final class Wrapper1_19_R2 implements VersionWrapper {
     }
 
     @Override
-    public void sendPacketOpenWindow(Player player, int containerId, String inventoryTitle) {
-        toNMS(player).b.a(new PacketPlayOutOpenWindow(containerId, Containers.h, IChatBaseComponent.a(inventoryTitle)));
+    public void sendPacketOpenWindow(Player player, int containerId, Object inventoryTitle) {
+        toNMS(player).b.a(new PacketPlayOutOpenWindow(containerId, Containers.h, (IChatBaseComponent) inventoryTitle));
     }
 
     @Override
@@ -77,18 +77,28 @@ public final class Wrapper1_19_R2 implements VersionWrapper {
     }
 
     @Override
-    public Object newContainerAnvil(Player player, String title) {
-        return new AnvilContainer(player, getRealNextContainerId(player), title);
+    public Object newContainerAnvil(Player player, Object title) {
+        return new AnvilContainer(player, getRealNextContainerId(player), (IChatBaseComponent) title);
+    }
+
+    @Override
+    public Object literalChatComponent(String content) {
+        return IChatBaseComponent.b(content);
+    }
+
+    @Override
+    public Object jsonChatComponent(String json) {
+        return IChatBaseComponent.ChatSerializer.a(json);
     }
 
     private static class AnvilContainer extends ContainerAnvil {
-        public AnvilContainer(Player player, int containerId, String guiTitle) {
+        public AnvilContainer(Player player, int containerId, IChatBaseComponent guiTitle) {
             super(
                     containerId,
                     ((CraftPlayer) player).getHandle().fE(),
                     ContainerAccess.a(((CraftWorld) player.getWorld()).getHandle(), new BlockPosition(0, 0, 0)));
             this.checkReachable = false;
-            setTitle(IChatBaseComponent.a(guiTitle));
+            setTitle(guiTitle);
         }
 
         @Override

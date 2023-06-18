@@ -3,7 +3,7 @@ package net.wesjd.anvilgui.version;
 
 import net.minecraft.core.BlockPosition;
 import net.minecraft.network.chat.ChatComponentText;
-import net.minecraft.network.chat.ChatMessage;
+import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.network.protocol.game.PacketPlayOutCloseWindow;
 import net.minecraft.network.protocol.game.PacketPlayOutOpenWindow;
 import net.minecraft.server.level.EntityPlayer;
@@ -52,10 +52,9 @@ public class Wrapper1_17_R1 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
-    public void sendPacketOpenWindow(Player player, int containerId, String guiTitle) {
-        toNMS(player)
-                .b
-                .sendPacket(new PacketPlayOutOpenWindow(containerId, Containers.h, new ChatComponentText(guiTitle)));
+    public void sendPacketOpenWindow(Player player, int containerId, Object guiTitle) {
+        toNMS(player).b.sendPacket(new PacketPlayOutOpenWindow(containerId, Containers.h, (IChatBaseComponent)
+                guiTitle));
     }
 
     /**
@@ -110,11 +109,21 @@ public class Wrapper1_17_R1 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
-    public Object newContainerAnvil(Player player, String guiTitle) {
+    public Object newContainerAnvil(Player player, Object guiTitle) {
         if (IS_ONE_SEVENTEEN_ONE) {
-            return new AnvilContainer1_17_1_R1(player, getRealNextContainerId(player), guiTitle);
+            return new AnvilContainer1_17_1_R1(player, getRealNextContainerId(player), (IChatBaseComponent) guiTitle);
         }
-        return new AnvilContainer(player, guiTitle);
+        return new AnvilContainer(player, (IChatBaseComponent) guiTitle);
+    }
+
+    @Override
+    public Object literalChatComponent(String content) {
+        return new ChatComponentText(content);
+    }
+
+    @Override
+    public Object jsonChatComponent(String json) {
+        return IChatBaseComponent.ChatSerializer.a(json);
     }
 
     /**
@@ -131,13 +140,13 @@ public class Wrapper1_17_R1 implements VersionWrapper {
      * Modifications to ContainerAnvil that makes it so you don't have to have xp to use this anvil
      */
     private class AnvilContainer extends ContainerAnvil {
-        public AnvilContainer(Player player, String guiTitle) {
+        public AnvilContainer(Player player, IChatBaseComponent guiTitle) {
             super(
                     Wrapper1_17_R1.this.getRealNextContainerId(player),
                     ((CraftPlayer) player).getHandle().getInventory(),
                     ContainerAccess.at(((CraftWorld) player.getWorld()).getHandle(), new BlockPosition(0, 0, 0)));
             this.checkReachable = false;
-            setTitle(new ChatMessage(guiTitle));
+            setTitle(guiTitle);
         }
 
         @Override

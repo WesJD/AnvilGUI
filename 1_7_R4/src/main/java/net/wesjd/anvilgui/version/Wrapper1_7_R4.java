@@ -35,10 +35,10 @@ public class Wrapper1_7_R4 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
-    public void sendPacketOpenWindow(final Player player, final int containerId, final String guiTitle) {
+    public void sendPacketOpenWindow(final Player player, final int containerId, final Object guiTitle) {
         this.toNMS(player)
                 .playerConnection
-                .sendPacket(new PacketPlayOutOpenWindow(containerId, 8, "Repairing", 9, true));
+                .sendPacket(new PacketPlayOutOpenWindow(containerId, 8, (String) guiTitle, 9, true));
     }
 
     /**
@@ -93,8 +93,18 @@ public class Wrapper1_7_R4 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
-    public Object newContainerAnvil(final Player player, final String guiTitle) {
+    public Object newContainerAnvil(final Player player, final Object guiTitle) {
         return new AnvilContainer(this.toNMS(player));
+    }
+
+    @Override
+    public Object literalChatComponent(String content) {
+        return content;
+    }
+
+    @Override
+    public Object jsonChatComponent(String json) {
+        throw new UnsupportedOperationException("Rich text components are only available from Minecraft 1.8 and up");
     }
 
     /**
