@@ -71,7 +71,7 @@ public class AnvilGUI {
     /**
      * The title of the anvil inventory
      */
-    private final Object inventoryTitle;
+    private final Object titleComponent;
     /**
      * The initial contents of the inventory
      */
@@ -120,7 +120,7 @@ public class AnvilGUI {
      * @param plugin           A {@link org.bukkit.plugin.java.JavaPlugin} instance
      * @param player           The {@link Player} to open the inventory for
      * @param mainThreadExecutor An {@link Executor} that executes on the main server thread
-     * @param inventoryTitle   What to have the text already set to
+     * @param titleComponent   What to have the text already set to
      * @param initialContents  The initial contents of the inventory
      * @param preventClose     Whether to prevent the inventory from closing
      * @param closeListener    A {@link Consumer} when the inventory closes
@@ -131,7 +131,7 @@ public class AnvilGUI {
             Plugin plugin,
             Player player,
             Executor mainThreadExecutor,
-            Object inventoryTitle,
+            Object titleComponent,
             ItemStack[] initialContents,
             boolean preventClose,
             Set<Integer> interactableSlots,
@@ -141,7 +141,7 @@ public class AnvilGUI {
         this.plugin = plugin;
         this.player = player;
         this.mainThreadExecutor = mainThreadExecutor;
-        this.inventoryTitle = inventoryTitle;
+        this.titleComponent = titleComponent;
         this.initialContents = initialContents;
         this.preventClose = preventClose;
         this.interactableSlots = Collections.unmodifiableSet(interactableSlots);
@@ -159,7 +159,7 @@ public class AnvilGUI {
 
         Bukkit.getPluginManager().registerEvents(listener, plugin);
 
-        final Object container = WRAPPER.newContainerAnvil(player, inventoryTitle);
+        final Object container = WRAPPER.newContainerAnvil(player, titleComponent);
 
         inventory = WRAPPER.toBukkitInventory(container);
         // We need to use setItem instead of setContents because a Minecraft ContainerAnvil
@@ -171,7 +171,7 @@ public class AnvilGUI {
         }
 
         containerId = WRAPPER.getNextContainerId(player, container);
-        WRAPPER.sendPacketOpenWindow(player, containerId, inventoryTitle);
+        WRAPPER.sendPacketOpenWindow(player, containerId, titleComponent);
         WRAPPER.setActiveContainer(player, container);
         WRAPPER.setActiveContainerId(container, containerId);
         WRAPPER.addActiveContainerSlotListener(container, player);
@@ -332,7 +332,7 @@ public class AnvilGUI {
         /** The {@link Plugin} that this anvil GUI is associated with */
         private Plugin plugin;
         /** The text that will be displayed to the user */
-        private Object title = WRAPPER.literalChatComponent("Repair & Name");
+        private Object titleComponent = WRAPPER.literalChatComponent("Repair & Name");
         /** The starting text on the item */
         private String itemText;
         /** An {@link ItemStack} to be put in the left input slot */
@@ -473,7 +473,9 @@ public class AnvilGUI {
         }
 
         /**
-         * Sets the AnvilGUI title that is to be displayed to the user
+         * Sets the AnvilGUI title that is to be displayed to the user.
+         * <br>
+         * The provided title will be treated as literal text.
          *
          * @param title The title that is to be displayed to the user
          * @return The {@link Builder} instance
@@ -481,13 +483,23 @@ public class AnvilGUI {
          */
         public Builder title(String title) {
             Validate.notNull(title, "title cannot be null");
-            this.title = WRAPPER.literalChatComponent(title);
+            this.titleComponent = WRAPPER.literalChatComponent(title);
             return this;
         }
 
+        /**
+         * Sets the AnvilGUI title that is to be displayed to the user.
+         * <br>
+         * The provided json will be parsed into rich chat components.
+         *
+         * @param json The title that is to be displayed to the user
+         * @return The {@link Builder} instance
+         * @throws IllegalArgumentException if the title is null
+         * @throws UnsupportedOperationException if this method is called on a Minecraft 1.7 server
+         */
         public Builder rawTitle(String json) {
             Validate.notNull(json, "json cannot be null");
-            this.title = WRAPPER.jsonChatComponent(json);
+            this.titleComponent = WRAPPER.jsonChatComponent(json);
             return this;
         }
 
@@ -557,7 +569,7 @@ public class AnvilGUI {
                     plugin,
                     player,
                     mainThreadExecutor,
-                    title,
+                    titleComponent,
                     new ItemStack[] {itemLeft, itemRight, itemOutput},
                     preventClose,
                     interactableSlots,
