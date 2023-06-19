@@ -38,7 +38,8 @@ public class Wrapper1_9_R1 implements VersionWrapper {
     public void sendPacketOpenWindow(Player player, int containerId, Object guiTitle) {
         toNMS(player)
                 .playerConnection
-                .sendPacket(new PacketPlayOutOpenWindow(containerId, "minecraft:anvil", (IChatBaseComponent) guiTitle));
+                .sendPacket(new PacketPlayOutOpenWindow(
+                        containerId, "minecraft:anvil", new ChatMessage(Blocks.ANVIL.a() + ".name")));
     }
 
     /**
@@ -99,12 +100,12 @@ public class Wrapper1_9_R1 implements VersionWrapper {
 
     @Override
     public Object literalChatComponent(String content) {
-        return new ChatComponentText(content);
+        return null;
     }
 
     @Override
     public Object jsonChatComponent(String json) {
-        return IChatBaseComponent.ChatSerializer.a(json);
+        return null;
     }
 
     /**

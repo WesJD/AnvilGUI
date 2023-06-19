@@ -36,9 +36,8 @@ public class Wrapper1_7_R4 implements VersionWrapper {
      */
     @Override
     public void sendPacketOpenWindow(final Player player, final int containerId, final Object guiTitle) {
-        this.toNMS(player)
-                .playerConnection
-                .sendPacket(new PacketPlayOutOpenWindow(containerId, 8, (String) guiTitle, 9, true));
+        this.toNMS(player).playerConnection.sendPacket(new PacketPlayOutOpenWindow(containerId, 8, "", 9, false));
+        // Passing false as the last parameter instructs the client to use an internal title
     }
 
     /**
@@ -99,12 +98,12 @@ public class Wrapper1_7_R4 implements VersionWrapper {
 
     @Override
     public Object literalChatComponent(String content) {
-        return content;
+        return null;
     }
 
     @Override
     public Object jsonChatComponent(String json) {
-        throw new UnsupportedOperationException("Rich text components are only available from Minecraft 1.8 and up");
+        return null;
     }
 
     /**

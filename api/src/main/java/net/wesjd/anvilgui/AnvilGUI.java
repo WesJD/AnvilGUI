@@ -495,7 +495,6 @@ public class AnvilGUI {
          * @param json The title that is to be displayed to the user
          * @return The {@link Builder} instance
          * @throws IllegalArgumentException if the title is null
-         * @throws UnsupportedOperationException if this method is called on a Minecraft 1.7 server
          */
         public Builder rawTitle(String json) {
             Validate.notNull(json, "json cannot be null");
