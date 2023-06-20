@@ -13,6 +13,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.logging.Level;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.wesjd.anvilgui.version.VersionMatcher;
 import net.wesjd.anvilgui.version.VersionWrapper;
 import org.apache.commons.lang.Validate;
@@ -460,7 +461,10 @@ public class AnvilGUI {
         }
 
         /**
-         * Sets the inital item-text that is displayed to the user
+         * Sets the initial item-text that is displayed to the user.
+         * <br><br>
+         * If the usage of Adventure Components is desired, you must create an item, set the displayname of it
+         * and put it into the AnvilGUI via {@link #itemLeft(ItemStack)} manually.
          *
          * @param text The initial name of the item in the anvil
          * @return The {@link Builder} instance
@@ -495,8 +499,9 @@ public class AnvilGUI {
          * @param json The title that is to be displayed to the user
          * @return The {@link Builder} instance
          * @throws IllegalArgumentException if the title is null
+         * @see net.md_5.bungee.chat.ComponentSerializer#toString(BaseComponent)
          */
-        public Builder rawTitle(String json) {
+        public Builder jsonTitle(String json) {
             Validate.notNull(json, "json cannot be null");
             this.titleComponent = WRAPPER.jsonChatComponent(json);
             return this;

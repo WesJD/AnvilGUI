@@ -186,10 +186,18 @@ builder.itemRight(stack);
 ```         
 
 #### `title(String)`
-Takes a `String` that will be used as the inventory title. Only displayed in Minecraft 1.14 and above.
+Takes a `String` that will be used literally as the inventory title. Only displayed in Minecraft 1.14 and above.
 ```java                            
 builder.title("Enter your answer");
 ```                                
+
+#### `jsonTitle(String)`
+Takes a `String` which contains rich text components serialized as JSON.
+Useful for settings titles with hex color codes or Adventure Component interop.
+Only displayed in Minecraft 1.14 and above.
+```java
+builder.jsonTitle("{\"text\":\"Enter your answer\",\"color\":\"green\"}")
+```
                  
 #### `plugin(Plugin)`
 Takes the `Plugin` object that is making this anvil gui. It is needed to register listeners.
