@@ -547,7 +547,7 @@ public class AnvilGUI {
          *
          * @param player The {@link Player} the anvil GUI should open for
          * @return The {@link AnvilGUI} instance from this builder
-         * @throws IllegalArgumentException when the onComplete function, plugin, or player is null
+         * @throws IllegalArgumentException when the onClick function, plugin, or player is null
          */
         public AnvilGUI open(Player player) {
             Validate.notNull(plugin, "Plugin cannot be null");
