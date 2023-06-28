@@ -35,10 +35,9 @@ public class Wrapper1_7_R4 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
-    public void sendPacketOpenWindow(final Player player, final int containerId, final String guiTitle) {
-        this.toNMS(player)
-                .playerConnection
-                .sendPacket(new PacketPlayOutOpenWindow(containerId, 8, "Repairing", 9, true));
+    public void sendPacketOpenWindow(final Player player, final int containerId, final Object guiTitle) {
+        this.toNMS(player).playerConnection.sendPacket(new PacketPlayOutOpenWindow(containerId, 8, "", 9, false));
+        // Passing false as the last parameter instructs the client to use an internal title
     }
 
     /**
@@ -93,8 +92,18 @@ public class Wrapper1_7_R4 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
-    public Object newContainerAnvil(final Player player, final String guiTitle) {
+    public Object newContainerAnvil(final Player player, final Object guiTitle) {
         return new AnvilContainer(this.toNMS(player));
+    }
+
+    @Override
+    public Object literalChatComponent(String content) {
+        return null;
+    }
+
+    @Override
+    public Object jsonChatComponent(String json) {
+        return null;
     }
 
     /**

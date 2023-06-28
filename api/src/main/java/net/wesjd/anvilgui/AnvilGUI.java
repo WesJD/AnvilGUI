@@ -13,6 +13,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.logging.Level;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.wesjd.anvilgui.version.VersionMatcher;
 import net.wesjd.anvilgui.version.VersionWrapper;
 import org.apache.commons.lang.Validate;
@@ -71,7 +72,7 @@ public class AnvilGUI {
     /**
      * The title of the anvil inventory
      */
-    private final String inventoryTitle;
+    private final Object titleComponent;
     /**
      * The initial contents of the inventory
      */
@@ -120,7 +121,7 @@ public class AnvilGUI {
      * @param plugin           A {@link org.bukkit.plugin.java.JavaPlugin} instance
      * @param player           The {@link Player} to open the inventory for
      * @param mainThreadExecutor An {@link Executor} that executes on the main server thread
-     * @param inventoryTitle   What to have the text already set to
+     * @param titleComponent   What to have the text already set to
      * @param initialContents  The initial contents of the inventory
      * @param preventClose     Whether to prevent the inventory from closing
      * @param closeListener    A {@link Consumer} when the inventory closes
@@ -131,7 +132,7 @@ public class AnvilGUI {
             Plugin plugin,
             Player player,
             Executor mainThreadExecutor,
-            String inventoryTitle,
+            Object titleComponent,
             ItemStack[] initialContents,
             boolean preventClose,
             Set<Integer> interactableSlots,
@@ -141,7 +142,7 @@ public class AnvilGUI {
         this.plugin = plugin;
         this.player = player;
         this.mainThreadExecutor = mainThreadExecutor;
-        this.inventoryTitle = inventoryTitle;
+        this.titleComponent = titleComponent;
         this.initialContents = initialContents;
         this.preventClose = preventClose;
         this.interactableSlots = Collections.unmodifiableSet(interactableSlots);
@@ -159,7 +160,7 @@ public class AnvilGUI {
 
         Bukkit.getPluginManager().registerEvents(listener, plugin);
 
-        final Object container = WRAPPER.newContainerAnvil(player, inventoryTitle);
+        final Object container = WRAPPER.newContainerAnvil(player, titleComponent);
 
         inventory = WRAPPER.toBukkitInventory(container);
         // We need to use setItem instead of setContents because a Minecraft ContainerAnvil
@@ -171,7 +172,7 @@ public class AnvilGUI {
         }
 
         containerId = WRAPPER.getNextContainerId(player, container);
-        WRAPPER.sendPacketOpenWindow(player, containerId, inventoryTitle);
+        WRAPPER.sendPacketOpenWindow(player, containerId, titleComponent);
         WRAPPER.setActiveContainer(player, container);
         WRAPPER.setActiveContainerId(container, containerId);
         WRAPPER.addActiveContainerSlotListener(container, player);
@@ -332,7 +333,7 @@ public class AnvilGUI {
         /** The {@link Plugin} that this anvil GUI is associated with */
         private Plugin plugin;
         /** The text that will be displayed to the user */
-        private String title = "Repair & Name";
+        private Object titleComponent = WRAPPER.literalChatComponent("Repair & Name");
         /** The starting text on the item */
         private String itemText;
         /** An {@link ItemStack} to be put in the left input slot */
@@ -460,7 +461,10 @@ public class AnvilGUI {
         }
 
         /**
-         * Sets the inital item-text that is displayed to the user
+         * Sets the initial item-text that is displayed to the user.
+         * <br><br>
+         * If the usage of Adventure Components is desired, you must create an item, set the displayname of it
+         * and put it into the AnvilGUI via {@link #itemLeft(ItemStack)} manually.
          *
          * @param text The initial name of the item in the anvil
          * @return The {@link Builder} instance
@@ -473,7 +477,9 @@ public class AnvilGUI {
         }
 
         /**
-         * Sets the AnvilGUI title that is to be displayed to the user
+         * Sets the AnvilGUI title that is to be displayed to the user.
+         * <br>
+         * The provided title will be treated as literal text.
          *
          * @param title The title that is to be displayed to the user
          * @return The {@link Builder} instance
@@ -481,7 +487,23 @@ public class AnvilGUI {
          */
         public Builder title(String title) {
             Validate.notNull(title, "title cannot be null");
-            this.title = title;
+            this.titleComponent = WRAPPER.literalChatComponent(title);
+            return this;
+        }
+
+        /**
+         * Sets the AnvilGUI title that is to be displayed to the user.
+         * <br>
+         * The provided json will be parsed into rich chat components.
+         *
+         * @param json The title that is to be displayed to the user
+         * @return The {@link Builder} instance
+         * @throws IllegalArgumentException if the title is null
+         * @see net.md_5.bungee.chat.ComponentSerializer#toString(BaseComponent)
+         */
+        public Builder jsonTitle(String json) {
+            Validate.notNull(json, "json cannot be null");
+            this.titleComponent = WRAPPER.jsonChatComponent(json);
             return this;
         }
 
@@ -525,7 +547,7 @@ public class AnvilGUI {
          *
          * @param player The {@link Player} the anvil GUI should open for
          * @return The {@link AnvilGUI} instance from this builder
-         * @throws IllegalArgumentException when the onComplete function, plugin, or player is null
+         * @throws IllegalArgumentException when the onClick function, plugin, or player is null
          */
         public AnvilGUI open(Player player) {
             Validate.notNull(plugin, "Plugin cannot be null");
@@ -551,7 +573,7 @@ public class AnvilGUI {
                     plugin,
                     player,
                     mainThreadExecutor,
-                    title,
+                    titleComponent,
                     new ItemStack[] {itemLeft, itemRight, itemOutput},
                     preventClose,
                     interactableSlots,

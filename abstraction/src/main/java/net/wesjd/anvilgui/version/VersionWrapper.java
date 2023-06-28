@@ -35,7 +35,7 @@ public interface VersionWrapper {
      * @param containerId    The container id to open
      * @param inventoryTitle The title of the inventory to be opened (only works in Minecraft 1.14 and above)
      */
-    void sendPacketOpenWindow(Player player, int containerId, String inventoryTitle);
+    void sendPacketOpenWindow(Player player, int containerId, Object inventoryTitle);
 
     /**
      * Sends PacketPlayOutCloseWindow to the player with the contaienr id
@@ -91,5 +91,21 @@ public interface VersionWrapper {
      * @param title  The title of the anvil inventory
      * @return The Container instance
      */
-    Object newContainerAnvil(Player player, String title);
+    Object newContainerAnvil(Player player, Object title);
+
+    /**
+     * Creates a new chat component that does not handle the content in any special way
+     *
+     * @param content The content to display
+     * @return Version-specific ChatComponent instance
+     */
+    Object literalChatComponent(String content);
+
+    /**
+     * Creates a new rich chat component from the provided json
+     *
+     * @param json The component to parse
+     * @return Version-specific ChatComponent instance
+     */
+    Object jsonChatComponent(String json);
 }

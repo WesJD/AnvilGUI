@@ -35,7 +35,7 @@ public class Wrapper1_13_R2 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
-    public void sendPacketOpenWindow(Player player, int containerId, String guiTitle) {
+    public void sendPacketOpenWindow(Player player, int containerId, Object guiTitle) {
         toNMS(player)
                 .playerConnection
                 .sendPacket(new PacketPlayOutOpenWindow(
@@ -94,8 +94,18 @@ public class Wrapper1_13_R2 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
-    public Object newContainerAnvil(Player player, String guiTitle) {
+    public Object newContainerAnvil(Player player, Object guiTitle) {
         return new Wrapper1_13_R2.AnvilContainer(toNMS(player));
+    }
+
+    @Override
+    public Object literalChatComponent(String content) {
+        return null;
+    }
+
+    @Override
+    public Object jsonChatComponent(String json) {
+        return null;
     }
 
     /**

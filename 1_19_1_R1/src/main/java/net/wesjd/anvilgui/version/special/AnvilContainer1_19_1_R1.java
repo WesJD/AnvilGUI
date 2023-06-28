@@ -12,13 +12,13 @@ import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 public class AnvilContainer1_19_1_R1 extends ContainerAnvil {
-    public AnvilContainer1_19_1_R1(Player player, int containerId, String guiTitle) {
+    public AnvilContainer1_19_1_R1(Player player, int containerId, IChatBaseComponent guiTitle) {
         super(
                 containerId,
                 ((CraftPlayer) player).getHandle().fA(),
                 ContainerAccess.a(((CraftWorld) player.getWorld()).getHandle(), new BlockPosition(0, 0, 0)));
         this.checkReachable = false;
-        setTitle(IChatBaseComponent.a(guiTitle));
+        setTitle(guiTitle);
     }
 
     @Override

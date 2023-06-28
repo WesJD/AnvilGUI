@@ -42,10 +42,10 @@ public class Wrapper1_14_R1 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
-    public void sendPacketOpenWindow(Player player, int containerId, String guiTitle) {
+    public void sendPacketOpenWindow(Player player, int containerId, Object guiTitle) {
         toNMS(player)
                 .playerConnection
-                .sendPacket(new PacketPlayOutOpenWindow(containerId, Containers.ANVIL, new ChatMessage(guiTitle)));
+                .sendPacket(new PacketPlayOutOpenWindow(containerId, Containers.ANVIL, (IChatBaseComponent) guiTitle));
     }
 
     /**
@@ -100,12 +100,22 @@ public class Wrapper1_14_R1 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
-    public Object newContainerAnvil(Player player, String guiTitle) {
+    public Object newContainerAnvil(Player player, Object guiTitle) {
         if (IS_ONE_FOURTEEN) {
-            return new AnvilContainer1_14_4_R1(player, getRealNextContainerId(player), guiTitle);
+            return new AnvilContainer1_14_4_R1(player, getRealNextContainerId(player), (IChatBaseComponent) guiTitle);
         } else {
-            return new Wrapper1_14_R1.AnvilContainer(player, guiTitle);
+            return new Wrapper1_14_R1.AnvilContainer(player, (IChatBaseComponent) guiTitle);
         }
+    }
+
+    @Override
+    public Object literalChatComponent(String content) {
+        return new ChatComponentText(content);
+    }
+
+    @Override
+    public Object jsonChatComponent(String json) {
+        return IChatBaseComponent.ChatSerializer.a(json);
     }
 
     /**
@@ -123,13 +133,13 @@ public class Wrapper1_14_R1 implements VersionWrapper {
      */
     private class AnvilContainer extends ContainerAnvil {
 
-        public AnvilContainer(Player player, String guiTitle) {
+        public AnvilContainer(Player player, IChatBaseComponent guiTitle) {
             super(
                     getRealNextContainerId(player),
                     ((CraftPlayer) player).getHandle().inventory,
                     ContainerAccess.at(((CraftWorld) player.getWorld()).getHandle(), new BlockPosition(0, 0, 0)));
             this.checkReachable = false;
-            setTitle(new ChatMessage(guiTitle));
+            setTitle(guiTitle);
         }
 
         @Override

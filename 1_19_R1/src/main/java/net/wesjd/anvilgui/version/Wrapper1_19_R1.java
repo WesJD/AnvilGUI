@@ -52,8 +52,8 @@ public final class Wrapper1_19_R1 implements VersionWrapper {
     }
 
     @Override
-    public void sendPacketOpenWindow(Player player, int containerId, String inventoryTitle) {
-        toNMS(player).b.a(new PacketPlayOutOpenWindow(containerId, Containers.h, IChatBaseComponent.a(inventoryTitle)));
+    public void sendPacketOpenWindow(Player player, int containerId, Object inventoryTitle) {
+        toNMS(player).b.a(new PacketPlayOutOpenWindow(containerId, Containers.h, (IChatBaseComponent) inventoryTitle));
     }
 
     @Override
@@ -85,21 +85,31 @@ public final class Wrapper1_19_R1 implements VersionWrapper {
     }
 
     @Override
-    public Object newContainerAnvil(Player player, String title) {
+    public Object newContainerAnvil(Player player, Object title) {
         if (IS_ONE_NINETEEN_ONE) {
-            return new AnvilContainer1_19_1_R1(player, getRealNextContainerId(player), title);
+            return new AnvilContainer1_19_1_R1(player, getRealNextContainerId(player), (IChatBaseComponent) title);
         }
-        return new AnvilContainer(player, getRealNextContainerId(player), title);
+        return new AnvilContainer(player, getRealNextContainerId(player), (IChatBaseComponent) title);
+    }
+
+    @Override
+    public Object literalChatComponent(String content) {
+        return IChatBaseComponent.b(content);
+    }
+
+    @Override
+    public Object jsonChatComponent(String json) {
+        return IChatBaseComponent.ChatSerializer.a(json);
     }
 
     private static class AnvilContainer extends ContainerAnvil {
-        public AnvilContainer(Player player, int containerId, String guiTitle) {
+        public AnvilContainer(Player player, int containerId, IChatBaseComponent guiTitle) {
             super(
                     containerId,
                     ((CraftPlayer) player).getHandle().fB(),
                     ContainerAccess.a(((CraftWorld) player.getWorld()).getHandle(), new BlockPosition(0, 0, 0)));
             this.checkReachable = false;
-            setTitle(IChatBaseComponent.a(guiTitle));
+            setTitle(guiTitle);
         }
 
         @Override
