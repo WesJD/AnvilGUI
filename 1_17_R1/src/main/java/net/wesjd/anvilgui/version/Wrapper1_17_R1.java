@@ -9,10 +9,7 @@ import net.minecraft.network.protocol.game.PacketPlayOutOpenWindow;
 import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.world.IInventory;
 import net.minecraft.world.entity.player.EntityHuman;
-import net.minecraft.world.inventory.Container;
-import net.minecraft.world.inventory.ContainerAccess;
-import net.minecraft.world.inventory.ContainerAnvil;
-import net.minecraft.world.inventory.Containers;
+import net.minecraft.world.inventory.*;
 import net.wesjd.anvilgui.version.special.AnvilContainer1_17_1_R1;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
@@ -151,8 +148,20 @@ public class Wrapper1_17_R1 implements VersionWrapper {
 
         @Override
         public void i() {
-            super.i();
+            // If the output is empty copy the left input into the output
+            Slot output = this.getSlot(2);
+            if (!output.hasItem()) {
+                output.set(this.getSlot(0).getItem().cloneItemStack());
+            }
+
             this.w.set(0);
+
+            // Sync to the client
+            // This call has been added in 1.17.1, to fix
+            // https://hub.spigotmc.org/jira/projects/SPIGOT/issues/SPIGOT-6686
+            // but we can backport it here to 1.17
+            this.updateInventory();
+            this.d();
         }
 
         @Override
