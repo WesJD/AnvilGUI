@@ -116,6 +116,11 @@ public class AnvilGUI {
     private boolean open;
 
     /**
+     * The actual container backing the Anvil GUI
+     */
+    private VersionWrapper.AnvilContainerWrapper container;
+
+    /**
      * Create an AnvilGUI
      *
      * @param plugin           A {@link org.bukkit.plugin.java.JavaPlugin} instance
@@ -160,9 +165,9 @@ public class AnvilGUI {
 
         Bukkit.getPluginManager().registerEvents(listener, plugin);
 
-        final Object container = WRAPPER.newContainerAnvil(player, titleComponent);
+        container = WRAPPER.newContainerAnvil(player, titleComponent);
 
-        inventory = WRAPPER.toBukkitInventory(container);
+        inventory = container.getBukkitInventory();
         // We need to use setItem instead of setContents because a Minecraft ContainerAnvil
         // contains two separate inventories: the result inventory and the ingredients inventory.
         // The setContents method only updates the ingredients inventory unfortunately,
@@ -209,6 +214,50 @@ public class AnvilGUI {
 
         if (closeListener != null) {
             closeListener.accept(StateSnapshot.fromAnvilGUI(this));
+        }
+    }
+
+    /**
+     * Updates the title of the AnvilGUI to the new one.
+     *
+     * @param literalTitle The title to use as literal text
+     * @param preserveRenameText Whether to preserve the entered rename text
+     * @throws IllegalArgumentException when literalTitle is null
+     * @see Builder#title(String)
+     */
+    public void setTitle(String literalTitle, boolean preserveRenameText) {
+        Validate.notNull(literalTitle, "literalTitle cannot be null");
+        setTitle(WRAPPER.literalChatComponent(literalTitle), preserveRenameText);
+    }
+
+    /**
+     * Updates the title of the AnvilGUI to the new one.
+     *
+     * @param json The json used to parse into a rich chat component
+     * @param preserveRenameText Whether to preserve the entered rename text
+     * @throws IllegalArgumentException when json is null
+     * @see Builder#jsonTitle(String)
+     */
+    public void setJsonTitle(String json, boolean preserveRenameText) {
+        Validate.notNull(json, "json cannot be null");
+        setTitle(WRAPPER.jsonChatComponent(json), preserveRenameText);
+    }
+
+    /**
+     * Updates the title of the AnvilGUI to the new one.
+     *
+     * @param title The title as a NMS ChatComponent
+     * @param preserveRenameText Whether to preserve the entered rename text
+     */
+    private void setTitle(Object title, boolean preserveRenameText) {
+        if (!WRAPPER.isCustomTitleSupported()) {
+            return;
+        }
+        String renameText = container.getRenameText();
+        WRAPPER.sendPacketOpenWindow(player, containerId, title);
+        if (preserveRenameText) {
+            // The renameText field is marked as @Nullable in newer versions
+            container.setRenameText(renameText == null ? "" : renameText);
         }
     }
 
@@ -630,6 +679,32 @@ public class AnvilGUI {
                 cloned.setItemMeta(meta);
                 anvilgui.getInventory().setItem(Slot.INPUT_LEFT, cloned);
             };
+        }
+
+        /**
+         * Updates the title of the AnvilGUI to the new one.
+         *
+         * @param literalTitle The title to use as literal text
+         * @param preserveRenameText Whether to preserve the entered rename text
+         * @throws IllegalArgumentException when literalTitle is null
+         * @see Builder#title(String)
+         */
+        static ResponseAction updateTitle(String literalTitle, boolean preserveRenameText) {
+            Validate.notNull(literalTitle, "literalTitle cannot be null");
+            return (anvilGUI, player) -> anvilGUI.setTitle(literalTitle, preserveRenameText);
+        }
+
+        /**
+         * Updates the title of the AnvilGUI to the new one.
+         *
+         * @param json The json used to parse into a rich chat component
+         * @param preserveRenameText Whether to preserve the entered rename text
+         * @throws IllegalArgumentException when json is null
+         * @see Builder#jsonTitle(String)
+         */
+        static ResponseAction updateJsonTitle(String json, boolean preserveRenameText) {
+            Validate.notNull(json, "json cannot be null");
+            return (anvilGUI, player) -> anvilGUI.setJsonTitle(json, preserveRenameText);
         }
 
         /**

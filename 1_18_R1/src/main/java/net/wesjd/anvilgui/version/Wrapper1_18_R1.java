@@ -32,7 +32,7 @@ public final class Wrapper1_18_R1 implements VersionWrapper {
     }
 
     @Override
-    public int getNextContainerId(Player player, Object container) {
+    public int getNextContainerId(Player player, AnvilContainerWrapper container) {
         return ((AnvilContainer) container).getContainerId();
     }
 
@@ -57,25 +57,20 @@ public final class Wrapper1_18_R1 implements VersionWrapper {
     }
 
     @Override
-    public void setActiveContainer(Player player, Object container) {
+    public void setActiveContainer(Player player, AnvilContainerWrapper container) {
         (toNMS(player)).bW = (Container) container;
     }
 
     @Override
-    public void setActiveContainerId(Object container, int containerId) {}
+    public void setActiveContainerId(AnvilContainerWrapper container, int containerId) {}
 
     @Override
-    public void addActiveContainerSlotListener(Object container, Player player) {
+    public void addActiveContainerSlotListener(AnvilContainerWrapper container, Player player) {
         toNMS(player).a((Container) container);
     }
 
     @Override
-    public Inventory toBukkitInventory(Object container) {
-        return ((Container) container).getBukkitView().getTopInventory();
-    }
-
-    @Override
-    public Object newContainerAnvil(Player player, Object title) {
+    public AnvilContainerWrapper newContainerAnvil(Player player, Object title) {
         return new AnvilContainer(player, getRealNextContainerId(player), (IChatBaseComponent) title);
     }
 
@@ -89,7 +84,7 @@ public final class Wrapper1_18_R1 implements VersionWrapper {
         return IChatBaseComponent.ChatSerializer.a(json);
     }
 
-    private static class AnvilContainer extends ContainerAnvil {
+    private static class AnvilContainer extends ContainerAnvil implements AnvilContainerWrapper {
         public AnvilContainer(Player player, int containerId, IChatBaseComponent guiTitle) {
             super(
                     containerId,
@@ -122,6 +117,25 @@ public final class Wrapper1_18_R1 implements VersionWrapper {
 
         public int getContainerId() {
             return this.j;
+        }
+
+        @Override
+        public String getRenameText() {
+            return this.v;
+        }
+
+        @Override
+        public void setRenameText(String text) {
+            // If an item is present in the left input slot change its hover name to the literal text.
+            Slot inputLeft = a(0);
+            if (inputLeft.f()) {
+                inputLeft.e().a(new ChatComponentText(text));
+            }
+        }
+
+        @Override
+        public Inventory getBukkitInventory() {
+            return getBukkitView().getTopInventory();
         }
     }
 }

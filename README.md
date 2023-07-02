@@ -90,6 +90,7 @@ The function is called when a player clicks any slots in the inventory.
 You must return a `List<AnvilGUI.ResponseAction>`, which could include:
 - Closing the inventory (`AnvilGUI.ResponseAction.close()`)
 - Replacing the input text (`AnvilGUI.ResponseAction.replaceInputText(String)`)
+- Updating the title of the inventory (`AnvilGUI.ResponseAction.updateTitle(String, boolean)`)
 - Opening another inventory (`AnvilGUI.ResponseAction.openInventory(Inventory)`)
 - Running generic code (`AnvilGUI.ResponseAction.run(Runnable)`)
 - Nothing! (`Collections.emptyList()`)

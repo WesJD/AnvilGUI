@@ -19,7 +19,7 @@ public class Wrapper1_7_R4 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
-    public int getNextContainerId(final Player player, final Object container) {
+    public int getNextContainerId(final Player player, final AnvilContainerWrapper container) {
         return this.toNMS(player).nextContainerCounter();
     }
 
@@ -60,7 +60,7 @@ public class Wrapper1_7_R4 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
-    public void setActiveContainer(final Player player, final Object container) {
+    public void setActiveContainer(final Player player, final AnvilContainerWrapper container) {
         this.toNMS(player).activeContainer = (Container) container;
     }
 
@@ -68,7 +68,7 @@ public class Wrapper1_7_R4 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
-    public void setActiveContainerId(final Object container, final int containerId) {
+    public void setActiveContainerId(final AnvilContainerWrapper container, final int containerId) {
         ((Container) container).windowId = containerId;
     }
 
@@ -76,7 +76,7 @@ public class Wrapper1_7_R4 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
-    public void addActiveContainerSlotListener(final Object container, final Player player) {
+    public void addActiveContainerSlotListener(final AnvilContainerWrapper container, final Player player) {
         ((Container) container).addSlotListener(this.toNMS(player));
     }
 
@@ -84,16 +84,13 @@ public class Wrapper1_7_R4 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
-    public Inventory toBukkitInventory(final Object container) {
-        return ((Container) container).getBukkitView().getTopInventory();
+    public AnvilContainerWrapper newContainerAnvil(final Player player, final Object guiTitle) {
+        return new AnvilContainer(this.toNMS(player));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public Object newContainerAnvil(final Player player, final Object guiTitle) {
-        return new AnvilContainer(this.toNMS(player));
+    public boolean isCustomTitleSupported() {
+        return false;
     }
 
     @Override
@@ -119,7 +116,7 @@ public class Wrapper1_7_R4 implements VersionWrapper {
     /**
      * Modifications to ContainerAnvil that makes it so you don't have to have xp to use this anvil
      */
-    private class AnvilContainer extends ContainerAnvil {
+    private class AnvilContainer extends ContainerAnvil implements AnvilContainerWrapper {
 
         public AnvilContainer(final EntityHuman entityhuman) {
             super(entityhuman.inventory, entityhuman.world, 0, 0, 0, entityhuman);
@@ -146,5 +143,10 @@ public class Wrapper1_7_R4 implements VersionWrapper {
 
         @Override
         public void b(EntityHuman entityhuman) {}
+
+        @Override
+        public Inventory getBukkitInventory() {
+            return getBukkitView().getTopInventory();
+        }
     }
 }
