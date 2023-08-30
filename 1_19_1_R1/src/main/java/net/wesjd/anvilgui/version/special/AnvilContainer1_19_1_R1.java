@@ -8,11 +8,13 @@ import net.minecraft.world.entity.player.EntityHuman;
 import net.minecraft.world.inventory.ContainerAccess;
 import net.minecraft.world.inventory.ContainerAnvil;
 import net.minecraft.world.inventory.Slot;
+import net.wesjd.anvilgui.version.VersionWrapper;
 import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 
-public class AnvilContainer1_19_1_R1 extends ContainerAnvil {
+public class AnvilContainer1_19_1_R1 extends ContainerAnvil implements VersionWrapper.AnvilContainerWrapper {
     public AnvilContainer1_19_1_R1(Player player, int containerId, IChatBaseComponent guiTitle) {
         super(
                 containerId,
@@ -42,7 +44,26 @@ public class AnvilContainer1_19_1_R1 extends ContainerAnvil {
     @Override
     protected void a(EntityHuman player, IInventory container) {}
 
+    @Override
+    public String getRenameText() {
+        return this.v;
+    }
+
+    @Override
+    public void setRenameText(String text) {
+        // If an item is present in the left input slot change its hover name to the literal text.
+        Slot inputLeft = b(0);
+        if (inputLeft.f()) {
+            inputLeft.e().a(IChatBaseComponent.b(text));
+        }
+    }
+
     public int getContainerId() {
         return this.j;
+    }
+
+    @Override
+    public Inventory getBukkitInventory() {
+        return getBukkitView().getTopInventory();
     }
 }

@@ -2,17 +2,20 @@ package net.wesjd.anvilgui.version.special;
 
 
 import net.minecraft.core.BlockPosition;
+import net.minecraft.network.chat.ChatComponentText;
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.world.IInventory;
 import net.minecraft.world.entity.player.EntityHuman;
 import net.minecraft.world.inventory.ContainerAccess;
 import net.minecraft.world.inventory.ContainerAnvil;
 import net.minecraft.world.inventory.Slot;
+import net.wesjd.anvilgui.version.VersionWrapper;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 
-public class AnvilContainer1_17_1_R1 extends ContainerAnvil {
+public class AnvilContainer1_17_1_R1 extends ContainerAnvil implements VersionWrapper.AnvilContainerWrapper {
     public AnvilContainer1_17_1_R1(Player player, int containerId, IChatBaseComponent guiTitle) {
         super(
                 containerId,
@@ -45,5 +48,24 @@ public class AnvilContainer1_17_1_R1 extends ContainerAnvil {
 
     public int getContainerId() {
         return this.j;
+    }
+
+    @Override
+    public String getRenameText() {
+        return this.v;
+    }
+
+    @Override
+    public void setRenameText(String text) {
+        // If an item is present in the left input slot change its hover name to the literal text.
+        Slot inputLeft = getSlot(0);
+        if (inputLeft.hasItem()) {
+            inputLeft.getItem().a(new ChatComponentText(text));
+        }
+    }
+
+    @Override
+    public Inventory getBukkitInventory() {
+        return getBukkitView().getTopInventory();
     }
 }

@@ -19,7 +19,7 @@ public class Wrapper1_9_R1 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
-    public int getNextContainerId(Player player, Object container) {
+    public int getNextContainerId(Player player, AnvilContainerWrapper container) {
         return toNMS(player).nextContainerCounter();
     }
 
@@ -62,7 +62,7 @@ public class Wrapper1_9_R1 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
-    public void setActiveContainer(Player player, Object container) {
+    public void setActiveContainer(Player player, AnvilContainerWrapper container) {
         toNMS(player).activeContainer = (Container) container;
     }
 
@@ -70,7 +70,7 @@ public class Wrapper1_9_R1 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
-    public void setActiveContainerId(Object container, int containerId) {
+    public void setActiveContainerId(AnvilContainerWrapper container, int containerId) {
         ((Container) container).windowId = containerId;
     }
 
@@ -78,7 +78,7 @@ public class Wrapper1_9_R1 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
-    public void addActiveContainerSlotListener(Object container, Player player) {
+    public void addActiveContainerSlotListener(AnvilContainerWrapper container, Player player) {
         ((Container) container).addSlotListener(toNMS(player));
     }
 
@@ -86,16 +86,13 @@ public class Wrapper1_9_R1 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
-    public Inventory toBukkitInventory(Object container) {
-        return ((Container) container).getBukkitView().getTopInventory();
+    public AnvilContainerWrapper newContainerAnvil(Player player, Object guiTitle) {
+        return new AnvilContainer(toNMS(player));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public Object newContainerAnvil(Player player, Object guiTitle) {
-        return new AnvilContainer(toNMS(player));
+    public boolean isCustomTitleSupported() {
+        return false;
     }
 
     @Override
@@ -121,7 +118,7 @@ public class Wrapper1_9_R1 implements VersionWrapper {
     /**
      * Modifications to ContainerAnvil that makes it so you don't have to have xp to use this anvil
      */
-    private class AnvilContainer extends ContainerAnvil {
+    private class AnvilContainer extends ContainerAnvil implements AnvilContainerWrapper {
 
         public AnvilContainer(EntityHuman entityhuman) {
             super(entityhuman.inventory, entityhuman.world, new BlockPosition(0, 0, 0), entityhuman);
@@ -148,5 +145,10 @@ public class Wrapper1_9_R1 implements VersionWrapper {
 
         @Override
         public void b(EntityHuman entityhuman) {}
+
+        @Override
+        public Inventory getBukkitInventory() {
+            return getBukkitView().getTopInventory();
+        }
     }
 }

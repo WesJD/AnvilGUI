@@ -17,7 +17,7 @@ public class Wrapper1_16_R1 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
-    public int getNextContainerId(Player player, Object container) {
+    public int getNextContainerId(Player player, AnvilContainerWrapper container) {
         return ((AnvilContainer) container).getContainerId();
     }
 
@@ -59,7 +59,7 @@ public class Wrapper1_16_R1 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
-    public void setActiveContainer(Player player, Object container) {
+    public void setActiveContainer(Player player, AnvilContainerWrapper container) {
         toNMS(player).activeContainer = (Container) container;
     }
 
@@ -67,7 +67,7 @@ public class Wrapper1_16_R1 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
-    public void setActiveContainerId(Object container, int containerId) {
+    public void setActiveContainerId(AnvilContainerWrapper container, int containerId) {
         // noop
     }
 
@@ -75,7 +75,7 @@ public class Wrapper1_16_R1 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
-    public void addActiveContainerSlotListener(Object container, Player player) {
+    public void addActiveContainerSlotListener(AnvilContainerWrapper container, Player player) {
         ((Container) container).addSlotListener(toNMS(player));
     }
 
@@ -83,15 +83,7 @@ public class Wrapper1_16_R1 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
-    public Inventory toBukkitInventory(Object container) {
-        return ((Container) container).getBukkitView().getTopInventory();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Object newContainerAnvil(Player player, Object guiTitle) {
+    public AnvilContainerWrapper newContainerAnvil(Player player, Object guiTitle) {
         return new AnvilContainer(player, (IChatBaseComponent) guiTitle);
     }
 
@@ -118,7 +110,7 @@ public class Wrapper1_16_R1 implements VersionWrapper {
     /**
      * Modifications to ContainerAnvil that makes it so you don't have to have xp to use this anvil
      */
-    private class AnvilContainer extends ContainerAnvil {
+    private class AnvilContainer extends ContainerAnvil implements AnvilContainerWrapper {
 
         public AnvilContainer(Player player, IChatBaseComponent guiTitle) {
             super(
@@ -151,6 +143,25 @@ public class Wrapper1_16_R1 implements VersionWrapper {
 
         public int getContainerId() {
             return windowId;
+        }
+
+        @Override
+        public String getRenameText() {
+            return this.renameText;
+        }
+
+        @Override
+        public void setRenameText(String text) {
+            // If an item is present in the left input slot change its hover name to the literal text.
+            Slot inputLeft = getSlot(0);
+            if (inputLeft.hasItem()) {
+                inputLeft.getItem().a(new ChatComponentText(text));
+            }
+        }
+
+        @Override
+        public Inventory getBukkitInventory() {
+            return getBukkitView().getTopInventory();
         }
     }
 }
