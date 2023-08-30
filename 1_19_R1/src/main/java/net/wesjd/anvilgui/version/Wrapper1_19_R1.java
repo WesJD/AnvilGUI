@@ -8,10 +8,7 @@ import net.minecraft.network.protocol.game.PacketPlayOutOpenWindow;
 import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.world.IInventory;
 import net.minecraft.world.entity.player.EntityHuman;
-import net.minecraft.world.inventory.Container;
-import net.minecraft.world.inventory.ContainerAccess;
-import net.minecraft.world.inventory.ContainerAnvil;
-import net.minecraft.world.inventory.Containers;
+import net.minecraft.world.inventory.*;
 import net.wesjd.anvilgui.version.special.AnvilContainer1_19_1_R1;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
@@ -114,8 +111,17 @@ public final class Wrapper1_19_R1 implements VersionWrapper {
 
         @Override
         public void l() {
-            super.l();
+            // If the output is empty copy the left input into the output
+            Slot output = this.b(2);
+            if (!output.f()) {
+                output.e(this.b(0).e().o());
+            }
+
             this.w.a(0);
+
+            // Sync to the client
+            this.b();
+            this.d();
         }
 
         @Override

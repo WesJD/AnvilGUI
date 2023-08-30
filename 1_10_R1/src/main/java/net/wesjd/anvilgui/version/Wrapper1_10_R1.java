@@ -128,6 +128,20 @@ public class Wrapper1_10_R1 implements VersionWrapper {
         }
 
         @Override
+        public void e() {
+            // If the output is empty copy the left input into the output
+            Slot output = this.getSlot(2);
+            if (!output.hasItem()) {
+                output.set(this.getSlot(0).getItem().cloneItemStack());
+            }
+
+            this.a = 0;
+
+            // Sync to the client
+            this.b();
+        }
+
+        @Override
         public boolean a(EntityHuman entityhuman) {
             return true;
         }

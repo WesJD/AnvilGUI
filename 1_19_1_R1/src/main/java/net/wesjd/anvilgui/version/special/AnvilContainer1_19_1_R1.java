@@ -7,6 +7,7 @@ import net.minecraft.world.IInventory;
 import net.minecraft.world.entity.player.EntityHuman;
 import net.minecraft.world.inventory.ContainerAccess;
 import net.minecraft.world.inventory.ContainerAnvil;
+import net.minecraft.world.inventory.Slot;
 import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
@@ -23,8 +24,16 @@ public class AnvilContainer1_19_1_R1 extends ContainerAnvil {
 
     @Override
     public void l() {
-        super.l();
+        // If the output is empty copy the left input into the output
+        Slot output = this.b(2);
+        if (!output.f()) {
+            output.e(this.b(0).e().o());
+        }
+
         this.w.a(0);
+        // Sync to the client
+        this.b();
+        this.d();
     }
 
     @Override

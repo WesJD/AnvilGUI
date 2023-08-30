@@ -144,8 +144,16 @@ public class Wrapper1_14_R1 implements VersionWrapper {
 
         @Override
         public void e() {
-            super.e();
+            // If the output is empty copy the left input into the output
+            Slot output = this.getSlot(2);
+            if (!output.hasItem()) {
+                output.set(this.getSlot(0).getItem().cloneItemStack());
+            }
+
             this.levelCost.a(0);
+
+            // Sync to the client
+            this.c();
         }
 
         @Override
