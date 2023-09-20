@@ -57,7 +57,7 @@ to prevent conflicts with other plugins. Here is an example of how to relocate t
                                 <artifact>*:*</artifact>
                                 <excludeDefaults>false</excludeDefaults>
                                 <includes>
-                                    <include>[YOUR_PLUGIN_PACKAGE].anvilgui</include>
+                                    <include>net/wesjd/anvilgui/**</include>
                                 </includes>
                             </filter>
                         </filters>
