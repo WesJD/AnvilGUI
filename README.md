@@ -18,7 +18,7 @@ on the issues tab.
 
 AnvilGUI requires the usage of Maven or a Maven compatible build system.
 
-```xml
+```java
 <dependency>
     <groupId>net.wesjd</groupId>
     <artifactId>anvilgui</artifactId>
