@@ -17,6 +17,7 @@ on the issues tab.
 ### As a dependency
 
 AnvilGUI requires the usage of Maven or a Maven compatible build system.
+
 ```xml
 <dependency>
     <groupId>net.wesjd</groupId>
@@ -68,6 +69,29 @@ to prevent conflicts with other plugins. Here is an example of how to relocate t
     </plugins>
 </build>
 ```
+
+to implement AnvilGUI on gradle you need to add this code in the build.gradle
+
+```xml
+plugins {
+    id("com.github.johnrengelman.shadow") version "8.1.1" //last version
+}
+
+
+repositories {
+    maven {
+        name = "codemc-snapshots"
+        url = ("https://repo.codemc.io/repository/maven-snapshots/")
+    }
+}
+
+dependencies {
+    implementation ("net.wesjd:anvilgui:1.9.0-SNAPSHOT")
+}
+```
+
+
+
 Note: In order to solve `<minimizeJar>` removing AnvilGUI `VerionWrapper`s from the final jar and making the library unusable,
 ensure that your `<filters>` section contains the example `<filter>` as seen above.
 
@@ -250,6 +274,8 @@ new AnvilGUI.Builder()
 ## Development
 We use Maven to handle our dependencies. Run `mvn clean install` using Java 17 to build the project.
 
+Run `build shadowJar` if you using gradle to build the project
+ 
 ### Spotless
 The project utilizes the [Spotless Maven Plugin](https://github.com/diffplug/spotless/tree/main/plugin-maven) to
 enforce style guidelines. You will not be able to build the project if your code does not meet the guidelines.
