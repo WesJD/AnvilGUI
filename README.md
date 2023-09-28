@@ -18,7 +18,7 @@ on the issues tab.
 
 AnvilGUI requires the usage of Maven or a Maven compatible build system.
 
-```java
+```xml
 <dependency>
     <groupId>net.wesjd</groupId>
     <artifactId>anvilgui</artifactId>
@@ -76,7 +76,7 @@ ensure that your `<filters>` section contains the example `<filter>` as seen abo
 
 to implement AnvilGUI on gradle you need to add this code in the build.gradle
 
-```xml
+```java
 plugins {
     id("com.github.johnrengelman.shadow") version "8.1.1" //last version
 }
