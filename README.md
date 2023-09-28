@@ -70,6 +70,10 @@ to prevent conflicts with other plugins. Here is an example of how to relocate t
 </build>
 ```
 
+Note: In order to solve `<minimizeJar>` removing AnvilGUI `VerionWrapper`s from the final jar and making the library unusable,
+ensure that your `<filters>` section contains the example `<filter>` as seen above.
+
+
 to implement AnvilGUI on gradle you need to add this code in the build.gradle
 
 ```xml
@@ -90,10 +94,6 @@ dependencies {
 }
 ```
 
-
-
-Note: In order to solve `<minimizeJar>` removing AnvilGUI `VerionWrapper`s from the final jar and making the library unusable,
-ensure that your `<filters>` section contains the example `<filter>` as seen above.
 
 ### In your plugin
 
