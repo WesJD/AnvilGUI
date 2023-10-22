@@ -299,7 +299,7 @@ public class AnvilGUI {
             }
 
             final int rawSlot = event.getRawSlot();
-            if (rawSlot < 3 || event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
+            if (rawSlot < 3 && rawSlot >= 0 || event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
                 event.setCancelled(!interactableSlots.contains(rawSlot));
                 if (clickHandlerRunning && !concurrentClickHandlerExecution) {
                     // A click handler is running, don't launch another one
