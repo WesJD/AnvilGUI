@@ -299,6 +299,13 @@ public class AnvilGUI {
             }
 
             final int rawSlot = event.getRawSlot();
+            // prevent players from swapping items in the anvil gui
+            if ((event.getCursor() != null && event.getCursor().getType() != Material.AIR)
+                    && !interactableSlots.contains(rawSlot)) {
+                event.setCancelled(true);
+                return;
+            }
+
             if (rawSlot < 3 && rawSlot >= 0 || event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
                 event.setCancelled(!interactableSlots.contains(rawSlot));
                 if (clickHandlerRunning && !concurrentClickHandlerExecution) {
