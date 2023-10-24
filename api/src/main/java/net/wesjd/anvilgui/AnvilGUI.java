@@ -299,9 +299,22 @@ public class AnvilGUI {
             }
 
             final int rawSlot = event.getRawSlot();
+
+            // ignore items dropped outside the window
+            if (rawSlot == -999) {
+                return;
+            }
+
             // prevent players from swapping items in the anvil gui
             if ((event.getCursor() != null && event.getCursor().getType() != Material.AIR)
-                    && !interactableSlots.contains(rawSlot)) {
+                    && !interactableSlots.contains(rawSlot)
+                    && event.getClickedInventory().equals(inventory)) {
+                event.setCancelled(true);
+                return;
+            }
+
+            // prevent shift moving items from players inv to the anvil inventory
+            if (event.isShiftClick() && event.getClickedInventory().equals(clicker.getInventory())) {
                 event.setCancelled(true);
                 return;
             }
