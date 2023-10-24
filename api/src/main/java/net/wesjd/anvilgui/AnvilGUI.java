@@ -160,9 +160,6 @@ public class AnvilGUI {
      * Opens the anvil GUI
      */
     private void openInventory() {
-        WRAPPER.handleInventoryCloseEvent(player);
-        WRAPPER.setActiveContainerDefault(player);
-
         Bukkit.getPluginManager().registerEvents(listener, plugin);
 
         container = WRAPPER.newContainerAnvil(player, titleComponent);
@@ -177,6 +174,7 @@ public class AnvilGUI {
         }
 
         containerId = WRAPPER.getNextContainerId(player, container);
+        WRAPPER.handleInventoryCloseEvent(player);
         WRAPPER.sendPacketOpenWindow(player, containerId, titleComponent);
         WRAPPER.setActiveContainer(player, container);
         WRAPPER.setActiveContainerId(container, containerId);

@@ -27,6 +27,7 @@ public class Wrapper1_16_R3 implements VersionWrapper {
     @Override
     public void handleInventoryCloseEvent(Player player) {
         CraftEventFactory.handleInventoryCloseEvent(toNMS(player));
+        toNMS(player).o(); // o -> doCloseContainer
     }
 
     /**
