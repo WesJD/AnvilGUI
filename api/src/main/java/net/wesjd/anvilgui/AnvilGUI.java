@@ -160,9 +160,6 @@ public class AnvilGUI {
      * Opens the anvil GUI
      */
     private void openInventory() {
-        WRAPPER.handleInventoryCloseEvent(player);
-        WRAPPER.setActiveContainerDefault(player);
-
         Bukkit.getPluginManager().registerEvents(listener, plugin);
 
         container = WRAPPER.newContainerAnvil(player, titleComponent);
@@ -177,6 +174,7 @@ public class AnvilGUI {
         }
 
         containerId = WRAPPER.getNextContainerId(player, container);
+        WRAPPER.handleInventoryCloseEvent(player);
         WRAPPER.sendPacketOpenWindow(player, containerId, titleComponent);
         WRAPPER.setActiveContainer(player, container);
         WRAPPER.setActiveContainerId(container, containerId);
@@ -299,7 +297,27 @@ public class AnvilGUI {
             }
 
             final int rawSlot = event.getRawSlot();
-            if (rawSlot < 3 || event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
+
+            // ignore items dropped outside the window
+            if (rawSlot == -999) {
+                return;
+            }
+
+            // prevent players from swapping items in the anvil gui
+            if ((event.getCursor() != null && event.getCursor().getType() != Material.AIR)
+                    && !interactableSlots.contains(rawSlot)
+                    && event.getClickedInventory().equals(inventory)) {
+                event.setCancelled(true);
+                return;
+            }
+
+            // prevent shift moving items from players inv to the anvil inventory
+            if (event.isShiftClick() && event.getClickedInventory().equals(clicker.getInventory())) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if (rawSlot < 3 && rawSlot >= 0 || event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
                 event.setCancelled(!interactableSlots.contains(rawSlot));
                 if (clickHandlerRunning && !concurrentClickHandlerExecution) {
                     // A click handler is running, don't launch another one
