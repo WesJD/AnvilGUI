@@ -286,35 +286,33 @@ public class AnvilGUI {
                 return;
             }
 
-            final Player clicker = (Player) event.getWhoClicked();
-            // prevent players from merging items from the anvil inventory
-            final Inventory clickedInventory = event.getClickedInventory();
-            if (clickedInventory != null
-                    && clickedInventory.equals(clicker.getInventory())
-                    && event.getClick().equals(ClickType.DOUBLE_CLICK)) {
-                event.setCancelled(true);
-                return;
-            }
-
             final int rawSlot = event.getRawSlot();
-
             // ignore items dropped outside the window
-            if (rawSlot == -999) {
-                return;
-            }
+            if (rawSlot == -999) return;
 
-            // prevent players from swapping items in the anvil gui
-            if ((event.getCursor() != null && event.getCursor().getType() != Material.AIR)
-                    && !interactableSlots.contains(rawSlot)
-                    && event.getClickedInventory().equals(inventory)) {
-                event.setCancelled(true);
-                return;
-            }
+            final Player clicker = (Player) event.getWhoClicked();
+            final Inventory clickedInventory = event.getClickedInventory();
 
-            // prevent shift moving items from players inv to the anvil inventory
-            if (event.isShiftClick() && event.getClickedInventory().equals(clicker.getInventory())) {
-                event.setCancelled(true);
-                return;
+            if (clickedInventory != null) {
+                if (clickedInventory.equals(clicker.getInventory())) {
+                    // prevent players from merging items from the anvil inventory
+                    if (event.getClick().equals(ClickType.DOUBLE_CLICK)) {
+                        event.setCancelled(true);
+                        return;
+                    }
+                    // prevent shift moving items from players inv to the anvil inventory
+                    if (event.isShiftClick()) {
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
+                // prevent players from swapping items in the anvil gui
+                if ((event.getCursor() != null && event.getCursor().getType() != Material.AIR)
+                        && !interactableSlots.contains(rawSlot)
+                        && event.getClickedInventory().equals(inventory)) {
+                    event.setCancelled(true);
+                    return;
+                }
             }
 
             if (rawSlot < 3 && rawSlot >= 0 || event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
