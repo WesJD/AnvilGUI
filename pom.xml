@@ -43,6 +43,7 @@
         <module>1_19_R3</module>
         <module>1_20_R1</module>
         <module>1_20_R2</module>
+        <module>1_20_R3</module>
     </modules>
 
     <repositories>
