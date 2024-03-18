@@ -24,7 +24,11 @@ public class AnvilContainer1_14_4_R1 extends ContainerAnvil implements VersionWr
         // If the output is empty copy the left input into the output
         Slot output = this.getSlot(2);
         if (!output.hasItem()) {
-            output.set(this.getSlot(0).getItem().cloneItemStack());
+            Slot input = this.getSlot(0);
+
+            if (input.hasItem()) {
+                output.set(input.getItem().cloneItemStack());
+            }
         }
 
         this.levelCost.set(0);
