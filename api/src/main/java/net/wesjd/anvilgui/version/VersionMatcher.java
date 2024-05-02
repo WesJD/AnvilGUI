@@ -16,6 +16,7 @@ public class VersionMatcher {
      * @throws IllegalStateException If the version wrapper failed to be instantiated or is unable to be found
      */
     public VersionWrapper match() {
+        final String packageName = getClass().getPackage().getName();
         final int major = PaperLib.minecraftMajorVersion();
         final int minor = PaperLib.minecraftMinorVersion();
         final int patch = PaperLib.minecraftPatchVersion();
@@ -29,10 +30,8 @@ public class VersionMatcher {
             final String wrapperClassName = String.format(VersionMatcher.PATTERN_AS_STRING, major, minor, patchVersion);
 
             try {
-                final Class<?> wrapperClass =
-                        Class.forName(getClass().getPackage().getName() + "." + wrapperClassName);
-                suitableWrapper =
-                        (VersionWrapper) wrapperClass.getDeclaredConstructor().newInstance();
+                final Class<?> wrapperClass = Class.forName(packageName + "." + wrapperClassName);
+                suitableWrapper = (VersionWrapper) wrapperClass.getDeclaredConstructor().newInstance();
                 break;
             } catch (final ClassNotFoundException exception) {
                 // Ignore for this exception to look for previous patch version.
