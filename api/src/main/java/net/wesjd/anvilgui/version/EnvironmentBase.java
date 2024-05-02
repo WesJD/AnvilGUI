@@ -1,5 +1,6 @@
 package net.wesjd.anvilgui.version;
 
+
 import java.util.Locale;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
@@ -7,9 +8,8 @@ import java.util.regex.Pattern;
 import org.bukkit.Bukkit;
 
 abstract class EnvironmentBase implements Environment {
-    private static final Pattern VERSION_PATTERN = Pattern.compile(
-        "(?i)\\(MC: (\\d)\\.(\\d+)\\.?(\\d+?)?(?: (Pre-Release|Release Candidate) )?(\\d)?\\)"
-    );
+    private static final Pattern VERSION_PATTERN =
+            Pattern.compile("(?i)\\(MC: (\\d)\\.(\\d+)\\.?(\\d+?)?(?: (Pre-Release|Release Candidate) )?(\\d)?\\)");
 
     private final int minecraftMajorVersion;
     private final int minecraftMinorVersion;
@@ -32,14 +32,17 @@ abstract class EnvironmentBase implements Environment {
             final MatchResult matchResult = matcher.toMatchResult();
             try {
                 major = Integer.parseInt(matchResult.group(1), 10);
-            } catch (final Exception ignored) {}
+            } catch (final Exception ignored) {
+            }
             try {
                 minor = Integer.parseInt(matchResult.group(2), 10);
-            } catch (final Exception ignored) {}
+            } catch (final Exception ignored) {
+            }
             if (matchResult.groupCount() >= 3) {
                 try {
                     patch = Integer.parseInt(matchResult.group(3), 10);
-                } catch (final Exception ignored) {}
+                } catch (final Exception ignored) {
+                }
             }
             if (matchResult.groupCount() >= 5) {
                 try {
@@ -49,7 +52,8 @@ abstract class EnvironmentBase implements Environment {
                     } else {
                         releaseCandidate = ver;
                     }
-                } catch (final Exception ignored) {}
+                } catch (final Exception ignored) {
+                }
             }
         }
         this.minecraftMajorVersion = major;
@@ -91,10 +95,8 @@ abstract class EnvironmentBase implements Environment {
 
     @Override
     public boolean isVersion(final int minor, final int patch) {
-        return (
-            this.minecraftMinorVersion > minor ||
-            (this.minecraftMinorVersion >= minor && this.minecraftPatchVersion >= patch)
-        );
+        return (this.minecraftMinorVersion > minor
+                || (this.minecraftMinorVersion >= minor && this.minecraftPatchVersion >= patch));
     }
 
     @Override

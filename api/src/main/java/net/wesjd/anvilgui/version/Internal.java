@@ -3,10 +3,8 @@ package net.wesjd.anvilgui.version;
 final class Internal {
 
     static Environment initialize() {
-        if (
-            Internal.hasClass("com.destroystokyo.paper.PaperConfig") ||
-            Internal.hasClass("io.papermc.paper.configuration.Configuration")
-        ) {
+        if (Internal.hasClass("com.destroystokyo.paper.PaperConfig")
+                || Internal.hasClass("io.papermc.paper.configuration.Configuration")) {
             return new EnvironmentPaper();
         } else if (Internal.hasClass("org.spigotmc.SpigotConfig")) {
             return new EnvironmentSpigot();

@@ -10,8 +10,7 @@ import org.bukkit.Bukkit;
  * @since 1.2.1
  */
 public class VersionMatcher {
-    private static final String PATTERN_AS_STRING =
-        "Wrapper%s_%s%s";
+    private static final String PATTERN_AS_STRING = "Wrapper%s_%s%s";
 
     /**
      * Matches the server version to it's {@link VersionWrapper}

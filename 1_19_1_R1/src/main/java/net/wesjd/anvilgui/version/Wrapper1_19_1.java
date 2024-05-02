@@ -92,9 +92,9 @@ public final class Wrapper1_19_1 implements VersionWrapper {
     public class AnvilContainer extends ContainerAnvil implements VersionWrapper.AnvilContainerWrapper {
         public AnvilContainer(Player player, IChatBaseComponent guiTitle) {
             super(
-                getRealNextContainerId(player),
-                ((CraftPlayer) player).getHandle().fA(),
-                ContainerAccess.a(((CraftWorld) player.getWorld()).getHandle(), new BlockPosition(0, 0, 0)));
+                    getRealNextContainerId(player),
+                    ((CraftPlayer) player).getHandle().fA(),
+                    ContainerAccess.a(((CraftWorld) player.getWorld()).getHandle(), new BlockPosition(0, 0, 0)));
             this.checkReachable = false;
             setTitle(guiTitle);
         }

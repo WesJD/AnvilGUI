@@ -129,9 +129,9 @@ public class Wrapper1_14_4 implements VersionWrapper {
 
         public AnvilContainer(Player player, IChatBaseComponent guiTitle) {
             super(
-                getRealNextContainerId(player),
-                ((CraftPlayer) player).getHandle().inventory,
-                ContainerAccess.at(((CraftWorld) player.getWorld()).getHandle(), new BlockPosition(0, 0, 0)));
+                    getRealNextContainerId(player),
+                    ((CraftPlayer) player).getHandle().inventory,
+                    ContainerAccess.at(((CraftWorld) player.getWorld()).getHandle(), new BlockPosition(0, 0, 0)));
             this.checkReachable = false;
             setTitle(guiTitle);
         }

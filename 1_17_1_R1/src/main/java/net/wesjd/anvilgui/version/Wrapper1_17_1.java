@@ -1,5 +1,6 @@
 package net.wesjd.anvilgui.version;
 
+
 import net.minecraft.core.BlockPosition;
 import net.minecraft.network.chat.ChatComponentText;
 import net.minecraft.network.chat.IChatBaseComponent;
@@ -121,9 +122,9 @@ public class Wrapper1_17_1 implements VersionWrapper {
     private class AnvilContainer extends ContainerAnvil implements VersionWrapper.AnvilContainerWrapper {
         public AnvilContainer(Player player, IChatBaseComponent guiTitle) {
             super(
-                getRealNextContainerId(player),
-                ((CraftPlayer) player).getHandle().getInventory(),
-                ContainerAccess.at(((CraftWorld) player.getWorld()).getHandle(), new BlockPosition(0, 0, 0)));
+                    getRealNextContainerId(player),
+                    ((CraftPlayer) player).getHandle().getInventory(),
+                    ContainerAccess.at(((CraftWorld) player.getWorld()).getHandle(), new BlockPosition(0, 0, 0)));
             this.checkReachable = false;
             setTitle(guiTitle);
         }
