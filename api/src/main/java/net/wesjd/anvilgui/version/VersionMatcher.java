@@ -17,6 +17,7 @@ public class VersionMatcher {
      */
     public VersionWrapper match() {
         final String packageName = getClass().getPackage().getName();
+
         final int major = PaperLib.minecraftMajorVersion();
         final int minor = PaperLib.minecraftMinorVersion();
         final int patch = PaperLib.minecraftPatchVersion();
