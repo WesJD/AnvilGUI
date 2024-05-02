@@ -7,7 +7,6 @@ package net.wesjd.anvilgui.version;
  * @since 1.2.1
  */
 public class VersionMatcher {
-    private static final String PATTERN_AS_STRING = "Wrapper%s_%s%s";
 
     /**
      * Matches the server version to it's {@link VersionWrapper}
@@ -16,6 +15,7 @@ public class VersionMatcher {
      * @throws IllegalStateException If the version wrapper failed to be instantiated or is unable to be found
      */
     public VersionWrapper match() {
+        final String classPattern = "Wrapper%s_%s%s";
         final String packageName = getClass().getPackage().getName();
 
         final int major = PaperLib.minecraftMajorVersion();
@@ -27,7 +27,7 @@ public class VersionMatcher {
         VersionWrapper suitableWrapper = null;
         for (int i = patch; i >= 0; --i) {
             final String patchVersion = i == 0 ? "" : "_" + i;
-            final String wrapperClassName = String.format(VersionMatcher.PATTERN_AS_STRING, major, minor, patchVersion);
+            final String wrapperClassName = String.format(classPattern, major, minor, patchVersion);
 
             try {
                 final Class<?> wrapperClass = Class.forName(packageName + "." + wrapperClassName);
