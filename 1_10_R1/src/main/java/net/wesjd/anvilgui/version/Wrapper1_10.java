@@ -8,12 +8,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
 /**
- * {@link VersionWrapper} implemented for NMS version 1.10.2
+ * {@link VersionWrapper} implemented for NMS version 1.10
  *
  * @author Wesley Smith
  * @since 1.0
  */
-public class Wrapper1_10_2 implements VersionWrapper {
+public class Wrapper1_10 implements VersionWrapper {
 
     /**
      * {@inheritDoc}
@@ -88,7 +88,7 @@ public class Wrapper1_10_2 implements VersionWrapper {
      */
     @Override
     public AnvilContainerWrapper newContainerAnvil(Player player, Object guiTitle) {
-        return new Wrapper1_10_2.AnvilContainer(toNMS(player));
+        return new Wrapper1_10.AnvilContainer(toNMS(player));
     }
 
     @Override

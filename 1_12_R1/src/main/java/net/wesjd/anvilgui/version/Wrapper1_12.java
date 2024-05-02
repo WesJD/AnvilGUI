@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
 /**
- * {@link VersionWrapper} implemented for NMS version 1.12.2
+ * {@link VersionWrapper} implemented for NMS version 1.12
  *
  * @author Wesley Smith
  * @since 1.1.1

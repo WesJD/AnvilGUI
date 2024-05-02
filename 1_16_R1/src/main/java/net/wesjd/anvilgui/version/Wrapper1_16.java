@@ -8,7 +8,7 @@ import org.bukkit.craftbukkit.v1_16_R1.event.CraftEventFactory;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
-public class Wrapper1_16_1 implements VersionWrapper {
+public class Wrapper1_16 implements VersionWrapper {
     private int getRealNextContainerId(Player player) {
         return toNMS(player).nextContainerCounter();
     }

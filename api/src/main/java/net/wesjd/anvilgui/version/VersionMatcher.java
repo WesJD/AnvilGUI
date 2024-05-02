@@ -1,8 +1,5 @@
 package net.wesjd.anvilgui.version;
 
-
-import org.bukkit.Bukkit;
-
 /**
  * Matches the server's NMS version to its {@link VersionWrapper}
  *
@@ -23,22 +20,34 @@ public class VersionMatcher {
         final int minor = PaperLib.minecraftMinorVersion();
         final int patch = PaperLib.minecraftPatchVersion();
 
-        final String serverVersion = Bukkit.getServer()
-                .getClass()
-                .getPackage()
-                .getName()
-                .split("\\.")[3]
-                .substring(1);
-        try {
-            return (VersionWrapper) Class.forName(getClass().getPackage().getName() + ".Wrapper" + serverVersion)
-                    .getDeclaredConstructor()
-                    .newInstance();
-        } catch (ClassNotFoundException exception) {
+        VersionWrapper suitableWrapper = null;
+
+        // Start searching for suitable VersionWrapper
+        // starting from the current patch version going downward
+        for (int i = patch; i >= 0; --i) {
+            final String patchVersion = i == 0 ? "" : "_" + i;
+            final String wrapperClassName = String.format(VersionMatcher.PATTERN_AS_STRING, major, minor, patchVersion);
+
+            try {
+                final Class<?> wrapperClass =
+                        Class.forName(getClass().getPackage().getName() + "." + wrapperClassName);
+                suitableWrapper =
+                        (VersionWrapper) wrapperClass.getDeclaredConstructor().newInstance();
+                break;
+            } catch (final ClassNotFoundException exception) {
+                // Ignore for this exception to look for previous patch version.
+            } catch (final ReflectiveOperationException exception) {
+                throw new IllegalStateException(
+                        "Failed to instantiate version wrapper for server version " + major + "." + minor + "." + i,
+                        exception);
+            }
+        }
+
+        if (suitableWrapper == null) {
             throw new IllegalStateException(
-                    "AnvilGUI does not support server version \"" + serverVersion + "\"", exception);
-        } catch (ReflectiveOperationException exception) {
-            throw new IllegalStateException(
-                    "Failed to instantiate version wrapper for version " + serverVersion, exception);
+                    "No compatible version wrapper found for server version " + major + "." + minor);
+        } else {
+            return suitableWrapper;
         }
     }
 }
