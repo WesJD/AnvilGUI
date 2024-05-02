@@ -38,7 +38,8 @@ public class VersionMatcher {
                 // Ignore for this exception to look for previous patch version.
             } catch (final ReflectiveOperationException exception) {
                 throw new IllegalStateException(
-                        "Failed to instantiate version wrapper for server version v" + major + "." + minor + "." + patch,
+                        "Failed to instantiate version wrapper for server version v" + major + "." + minor + "."
+                                + patch,
                         exception);
             }
         }
