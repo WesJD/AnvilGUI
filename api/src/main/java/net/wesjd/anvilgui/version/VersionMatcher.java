@@ -10,6 +10,8 @@ import org.bukkit.Bukkit;
  * @since 1.2.1
  */
 public class VersionMatcher {
+    private static final String PATTERN_AS_STRING =
+        "Wrapper%s_%s%s";
 
     /**
      * Matches the server version to it's {@link VersionWrapper}
@@ -18,6 +20,10 @@ public class VersionMatcher {
      * @throws IllegalStateException If the version wrapper failed to be instantiated or is unable to be found
      */
     public VersionWrapper match() {
+        final int major = PaperLib.minecraftMajorVersion();
+        final int minor = PaperLib.minecraftMinorVersion();
+        final int patch = PaperLib.minecraftPatchVersion();
+
         final String serverVersion = Bukkit.getServer()
                 .getClass()
                 .getPackage()
