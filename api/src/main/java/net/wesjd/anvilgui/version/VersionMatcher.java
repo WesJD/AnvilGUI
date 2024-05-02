@@ -22,17 +22,17 @@ public class VersionMatcher {
         final int minor = PaperLib.minecraftMinorVersion();
         final int patch = PaperLib.minecraftPatchVersion();
 
-        VersionWrapper suitableWrapper = null;
-
         // Start searching for suitable VersionWrapper
         // starting from the current patch version going downward
+        VersionWrapper suitableWrapper = null;
         for (int i = patch; i >= 0; --i) {
             final String patchVersion = i == 0 ? "" : "_" + i;
             final String wrapperClassName = String.format(VersionMatcher.PATTERN_AS_STRING, major, minor, patchVersion);
 
             try {
                 final Class<?> wrapperClass = Class.forName(packageName + "." + wrapperClassName);
-                suitableWrapper = (VersionWrapper) wrapperClass.getDeclaredConstructor().newInstance();
+                suitableWrapper =
+                        (VersionWrapper) wrapperClass.getDeclaredConstructor().newInstance();
                 break;
             } catch (final ClassNotFoundException exception) {
                 // Ignore for this exception to look for previous patch version.
