@@ -7,6 +7,7 @@ package net.wesjd.anvilgui.version;
  * @since 1.2.1
  */
 public class VersionMatcher {
+    private final VersionProvider versionProvider = new VersionProvider();
 
     /**
      * Matches the server version to it's {@link VersionWrapper}
@@ -18,9 +19,9 @@ public class VersionMatcher {
         final String classPattern = "Wrapper%s_%s%s";
         final String packageName = getClass().getPackage().getName();
 
-        final int major = PaperLib.minecraftMajorVersion();
-        final int minor = PaperLib.minecraftMinorVersion();
-        final int patch = PaperLib.minecraftPatchVersion();
+        final int major = this.versionProvider.major();
+        final int minor = this.versionProvider.minor();
+        final int patch = this.versionProvider.patch();
 
         // Start searching for suitable VersionWrapper
         // starting from the current patch version going downward
