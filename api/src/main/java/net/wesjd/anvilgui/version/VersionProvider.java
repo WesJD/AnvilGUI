@@ -10,9 +10,9 @@ final class VersionProvider {
     private static final Pattern VERSION_PATTERN =
             Pattern.compile("(?i)\\(MC: (\\d)\\.(\\d+)\\.?(\\d+?)?(?: (Pre-Release|Release Candidate) )?(\\d)?\\)");
 
-    private final int minecraftMajorVersion;
-    private final int minecraftMinorVersion;
-    private final int minecraftPatchVersion;
+    private final int major;
+    private final int minor;
+    private final int patch;
 
     VersionProvider() {
         this(Bukkit.getVersion());
@@ -40,20 +40,20 @@ final class VersionProvider {
                 }
             }
         }
-        this.minecraftMajorVersion = major;
-        this.minecraftMinorVersion = minor;
-        this.minecraftPatchVersion = patch;
+        this.major = major;
+        this.minor = minor;
+        this.patch = patch;
     }
 
     int major() {
-        return this.minecraftMajorVersion;
+        return this.major;
     }
 
     int minor() {
-        return this.minecraftMinorVersion;
+        return this.minor;
     }
 
     int patch() {
-        return this.minecraftPatchVersion;
+        return this.patch;
     }
 }
