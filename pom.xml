@@ -16,34 +16,34 @@
     <modules>
         <module>api</module>
         <module>abstraction</module>
-        <module>1_7_R4</module>
-        <module>1_8_R1</module>
-        <module>1_8_R2</module>
-        <module>1_8_R3</module>
-        <module>1_9_R1</module>
-        <module>1_9_R2</module>
-        <module>1_10_R1</module>
-        <module>1_11_R1</module>
-        <module>1_12_R1</module>
-        <module>1_13_R1</module>
-        <module>1_13_R2</module>
-        <module>1_14_R1</module>
-        <module>1_14_4_R1</module>
-        <module>1_15_R1</module>
-        <module>1_16_R1</module>
-        <module>1_16_R2</module>
-        <module>1_16_R3</module>
-        <module>1_17_R1</module>
-        <module>1_17_1_R1</module>
-        <module>1_18_R1</module>
-        <module>1_18_R2</module>
-        <module>1_19_R1</module>
-        <module>1_19_1_R1</module>
-        <module>1_19_R2</module>
-        <module>1_19_R3</module>
-        <module>1_20_R1</module>
-        <module>1_20_R2</module>
-        <module>1_20_R3</module>
+        <module>1_7_10</module>
+        <module>1_8</module>
+        <module>1_8_3</module>
+        <module>1_8_8</module>
+        <module>1_9</module>
+        <module>1_9_4</module>
+        <module>1_10_2</module>
+        <module>1_11</module>
+        <module>1_12</module>
+        <module>1_13</module>
+        <module>1_13_1</module>
+        <module>1_14</module>
+        <module>1_14_4</module>
+        <module>1_15</module>
+        <module>1_16</module>
+        <module>1_16_2</module>
+        <module>1_16_4</module>
+        <module>1_17</module>
+        <module>1_17_1</module>
+        <module>1_18</module>
+        <module>1_18_2</module>
+        <module>1_19</module>
+        <module>1_19_1</module>
+        <module>1_19_3</module>
+        <module>1_19_4</module>
+        <module>1_20</module>
+        <module>1_20_2</module>
+        <module>1_20_3</module>
     </modules>
 
     <repositories>
