@@ -46,24 +46,28 @@ final class VersionProvider {
 
     VersionProvider(final String bukkitVersion) {
         final Matcher matcher = VersionProvider.VERSION_PATTERN.matcher(bukkitVersion);
-        int major = 1;
-        int minor = 0;
+        if (!matcher.find()) {
+            throw new IllegalArgumentException("Invalid bukkit version: " + bukkitVersion);
+        }
+        final MatchResult matchResult = matcher.toMatchResult();
+        final int major;
+        try {
+            major = Integer.parseInt(matchResult.group(1), 10);
+        } catch (final Exception exception) {
+            throw new IllegalArgumentException("Cannot parse major version: " + bukkitVersion, exception);
+        }
+        final int minor;
+        try {
+            minor = Integer.parseInt(matchResult.group(2), 10);
+        } catch (final Exception exception) {
+            throw new IllegalArgumentException("Cannot parse minor version: " + bukkitVersion, exception);
+        }
         int patch = 0;
-        if (matcher.find()) {
-            final MatchResult matchResult = matcher.toMatchResult();
+        if (matchResult.groupCount() >= 3) {
             try {
-                major = Integer.parseInt(matchResult.group(1), 10);
-            } catch (final Exception ignored) {
-            }
-            try {
-                minor = Integer.parseInt(matchResult.group(2), 10);
-            } catch (final Exception ignored) {
-            }
-            if (matchResult.groupCount() >= 3) {
-                try {
-                    patch = Integer.parseInt(matchResult.group(3), 10);
-                } catch (final Exception ignored) {
-                }
+                patch = Integer.parseInt(matchResult.group(3), 10);
+            } catch (final Exception exception) {
+                throw new IllegalArgumentException("Cannot parse patch version: " + bukkitVersion, exception);
             }
         }
         this.major = major;
