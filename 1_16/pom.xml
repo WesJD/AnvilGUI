@@ -10,7 +10,7 @@
         <version>1.9.3-SNAPSHOT</version>
     </parent>
 
-    <artifactId>anvilgui-1_16_1</artifactId>
+    <artifactId>anvilgui-1_16</artifactId>
 
     <dependencies>
         <dependency>

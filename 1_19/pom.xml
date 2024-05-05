@@ -21,12 +21,6 @@
         </dependency>
         <dependency>
             <groupId>net.wesjd</groupId>
-            <artifactId>anvilgui-1_19_1_R1</artifactId>
-            <version>${project.parent.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.wesjd</groupId>
             <artifactId>anvilgui-abstraction</artifactId>
             <version>${project.parent.version}</version>
             <scope>provided</scope>
