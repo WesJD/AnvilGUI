@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 import org.bukkit.Bukkit;
 
 /**
- * Partially copied from <a href="https://github.com/PaperMC/PaperLib/blob/master/src/main/java/io/papermc/lib/environments/Environment.java#L56">here</a>.
+ * Partially copied from <a href="https://github.com/PaperMC/PaperLib/blob/69e76fc9036e7b5f2c967bd21db31043724ef9e3/src/main/java/io/papermc/lib/environments/Environment.java#L56">here</a>.
  */
 final class VersionProvider {
     private static final Pattern VERSION_PATTERN =
