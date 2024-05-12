@@ -44,6 +44,7 @@
         <module>1_20_R1</module>
         <module>1_20_R2</module>
         <module>1_20_R3</module>
+        <module>1_20_R4</module>
     </modules>
 
     <repositories>
