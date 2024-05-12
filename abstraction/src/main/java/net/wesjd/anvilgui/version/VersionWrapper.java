@@ -1,6 +1,5 @@
 package net.wesjd.anvilgui.version;
 
-
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 

@@ -1,6 +1,5 @@
 package net.wesjd.anvilgui.version.special;
 
-
 import net.minecraft.core.BlockPosition;
 import net.minecraft.network.chat.ChatComponentText;
 import net.minecraft.network.chat.IChatBaseComponent;

@@ -1,6 +1,5 @@
 package net.wesjd.anvilgui.version;
 
-
 import net.minecraft.server.v1_16_R1.*;
 import org.bukkit.craftbukkit.v1_16_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R1.entity.CraftPlayer;
