@@ -248,7 +248,7 @@ new AnvilGUI.Builder()
 
 
 ## Development
-We use Maven to handle our dependencies. Run `mvn clean install` using Java 17 to build the project.
+We use Maven to handle our dependencies. Run `mvn clean install` using Java 21 to build the project.
 
 ### Spotless
 The project utilizes the [Spotless Maven Plugin](https://github.com/diffplug/spotless/tree/main/plugin-maven) to
