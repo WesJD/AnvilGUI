@@ -1,6 +1,8 @@
 package net.wesjd.anvilgui.version;
 
 import net.minecraft.core.BlockPosition;
+import net.minecraft.core.IRegistryCustom;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.network.protocol.game.PacketPlayOutCloseWindow;
 import net.minecraft.network.protocol.game.PacketPlayOutOpenWindow;
@@ -8,13 +10,13 @@ import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.world.IInventory;
 import net.minecraft.world.entity.player.EntityHuman;
 import net.minecraft.world.inventory.*;
-import org.bukkit.craftbukkit.v1_20_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
+import org.bukkit.craftbukkit.v1_20_R4.CraftWorld;
+import org.bukkit.craftbukkit.v1_20_R4.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_20_R4.event.CraftEventFactory;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
-public final class Wrapper1_20_R1 implements VersionWrapper {
+public final class Wrapper1_20_R4 implements VersionWrapper {
     private int getRealNextContainerId(Player player) {
         return toNMS(player).nextContainerCounter();
     }
@@ -37,27 +39,27 @@ public final class Wrapper1_20_R1 implements VersionWrapper {
     @Override
     public void handleInventoryCloseEvent(Player player) {
         CraftEventFactory.handleInventoryCloseEvent(toNMS(player));
-        toNMS(player).r(); // r -> doCloseContainer
+        toNMS(player).s(); // s -> doCloseContainer
     }
 
     @Override
     public void sendPacketOpenWindow(Player player, int containerId, Object inventoryTitle) {
-        toNMS(player).c.a(new PacketPlayOutOpenWindow(containerId, Containers.h, (IChatBaseComponent) inventoryTitle));
+        toNMS(player).c.b(new PacketPlayOutOpenWindow(containerId, Containers.i, (IChatBaseComponent) inventoryTitle));
     }
 
     @Override
     public void sendPacketCloseWindow(Player player, int containerId) {
-        toNMS(player).c.a(new PacketPlayOutCloseWindow(containerId));
+        toNMS(player).c.b(new PacketPlayOutCloseWindow(containerId));
     }
 
     @Override
     public void setActiveContainerDefault(Player player) {
-        toNMS(player).bR = toNMS(player).bQ;
+        toNMS(player).cb = toNMS(player).ca; // cb -> containerMenu, ca -> inventoryMenu
     }
 
     @Override
     public void setActiveContainer(Player player, AnvilContainerWrapper container) {
-        toNMS(player).bR = (Container) container;
+        toNMS(player).cb = (Container) container;
     }
 
     @Override
@@ -75,19 +77,19 @@ public final class Wrapper1_20_R1 implements VersionWrapper {
 
     @Override
     public Object literalChatComponent(String content) {
-        return IChatBaseComponent.b(content);
+        return IChatBaseComponent.b(content); // IChatBaseComponent.b -> Component.literal
     }
 
     @Override
     public Object jsonChatComponent(String json) {
-        return IChatBaseComponent.ChatSerializer.a(json);
+        return IChatBaseComponent.ChatSerializer.a(json, IRegistryCustom.b);
     }
 
     private static class AnvilContainer extends ContainerAnvil implements AnvilContainerWrapper {
         public AnvilContainer(Player player, int containerId, IChatBaseComponent guiTitle) {
             super(
                     containerId,
-                    ((CraftPlayer) player).getHandle().fN(),
+                    ((CraftPlayer) player).getHandle().gc(),
                     ContainerAccess.a(((CraftWorld) player.getWorld()).getHandle(), new BlockPosition(0, 0, 0)));
             this.checkReachable = false;
             setTitle(guiTitle);
@@ -96,16 +98,16 @@ public final class Wrapper1_20_R1 implements VersionWrapper {
         @Override
         public void m() {
             // If the output is empty copy the left input into the output
-            Slot output = this.b(2);
-            if (!output.f()) {
-                output.e(this.b(0).e().p());
+            Slot output = this.b(2); // b -> getSlot
+            if (!output.h()) { // h -> hasItem
+                output.f(this.b(0).g().s()); // f -> set, g -> getItem, s -> copy
             }
 
-            this.w.a(0);
+            this.w.a(0); // w -> cost, a -> set
 
             // Sync to the client
-            this.b();
-            this.d();
+            this.b(); // b -> sendAllDataToRemote
+            this.d(); // d -> broadcastChanges
         }
 
         @Override
@@ -127,8 +129,12 @@ public final class Wrapper1_20_R1 implements VersionWrapper {
         public void setRenameText(String text) {
             // If an item is present in the left input slot change its hover name to the literal text.
             Slot inputLeft = b(0);
-            if (inputLeft.f()) {
-                inputLeft.e().a(IChatBaseComponent.b(text));
+            if (inputLeft.h()) {
+                inputLeft
+                        .g()
+                        .b(
+                                DataComponents.g,
+                                IChatBaseComponent.b(text)); // DataComponents.g -> DataComponents.CUSTOM_NAME
             }
         }
 
