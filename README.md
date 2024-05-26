@@ -38,7 +38,7 @@ to prevent conflicts with other plugins. Here is an example of how to relocate t
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-shade-plugin</artifactId>
-            <version>${shade.version}</version> <!-- The version must be at least 3.3.0 -->
+            <version>${shade.version}</version> <!-- The version must be at least 3.5.0 -->
             <executions>
                 <execution>
                     <phase>package</phase>
