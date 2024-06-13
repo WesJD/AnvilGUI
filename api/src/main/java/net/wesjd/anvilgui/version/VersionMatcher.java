@@ -30,6 +30,8 @@ public class VersionMatcher {
 
             if (major == 20 && minor >= 5) {
                 rVersion = "1_20_R4";
+            } else if (major == 21) {
+                rVersion = "1_21_R1";
             } else {
                 throw new IllegalStateException(
                         "AnvilGUI does not support bukkit server version \"" + Bukkit.getBukkitVersion() + "\"");
