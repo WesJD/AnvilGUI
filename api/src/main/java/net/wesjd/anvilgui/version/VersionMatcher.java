@@ -24,6 +24,8 @@ public class VersionMatcher {
             this.put("1.21", "1_21_R1");
         }
     };
+    /* This needs to be updated to reflect the newest available version wrapper */
+    private static final String FALLBACK_REVISION = "1_21_R1";
 
     /**
      * Matches the server version to it's {@link VersionWrapper}
@@ -36,13 +38,8 @@ public class VersionMatcher {
 
         String rVersion;
         if (!craftBukkitPackage.contains(".v")) { // cb package not relocated (i.e. paper 1.20.5+)
-            // separating major and minor versions, example: 1.20.4-R0.1-SNAPSHOT -> major = 20, minor = 4
             final String version = Bukkit.getBukkitVersion().split("-")[0];
-            if (!VERSION_TO_REVISION.containsKey(version)) {
-                throw new IllegalStateException(
-                        "AnvilGUI does not support bukkit server version \"" + Bukkit.getBukkitVersion() + "\"");
-            }
-            rVersion = VERSION_TO_REVISION.get(version);
+            rVersion = VERSION_TO_REVISION.getOrDefault(version, FALLBACK_REVISION);
         } else {
             rVersion = craftBukkitPackage.split("\\.")[3].substring(1);
         }
