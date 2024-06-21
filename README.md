@@ -21,7 +21,7 @@ AnvilGUI requires the usage of Maven or a Maven compatible build system.
 <dependency>
     <groupId>net.wesjd</groupId>
     <artifactId>anvilgui</artifactId>
-    <version>1.9.5-SNAPSHOT</version>
+    <version>1.9.6-SNAPSHOT</version>
 </dependency>
 
 <repository>
