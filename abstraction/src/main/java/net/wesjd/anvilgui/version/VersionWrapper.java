@@ -37,12 +37,20 @@ public interface VersionWrapper {
     void sendPacketOpenWindow(Player player, int containerId, Object inventoryTitle);
 
     /**
-     * Sends PacketPlayOutCloseWindow to the player with the contaienr id
+     * Sends PacketPlayOutCloseWindow to the player with the container id
      *
      * @param player      The player to send the packet to
      * @param containerId The container id to close
      */
     void sendPacketCloseWindow(Player player, int containerId);
+
+    /**
+     * Sends PacketPlayOutExperience to the player with the experience level
+     *
+     * @param player          The player to send the packet to
+     * @param experienceLevel The experience level to set
+     */
+    void sendPacketExperienceChange(Player player, int experienceLevel);
 
     /**
      * Sets the NMS player's active container to the default one
