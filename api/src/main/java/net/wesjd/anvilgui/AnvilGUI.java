@@ -163,45 +163,6 @@ public class AnvilGUI {
     }
 
     /**
-     * Create an AnvilGUI
-     *
-     * @deprecated Use instead {@link AnvilGUI(Plugin, Player, Executor, Object, ItemStack[], boolean, Set, Consumer, boolean, AnvilGUI.ClickHandler)}
-     * @param plugin           A {@link org.bukkit.plugin.java.JavaPlugin} instance
-     * @param player           The {@link Player} to open the inventory for
-     * @param mainThreadExecutor An {@link Executor} that executes on the main server thread
-     * @param titleComponent   What to have the text already set to
-     * @param initialContents  The initial contents of the inventory
-     * @param preventClose     Whether to prevent the inventory from closing
-     * @param closeListener    A {@link Consumer} when the inventory closes
-     * @param concurrentClickHandlerExecution Flag to allow concurrent execution of the click handler
-     * @param clickHandler     A {@link ClickHandler} that is called when the player clicks a slot
-     */
-    @Deprecated
-    private AnvilGUI(
-            Plugin plugin,
-            Player player,
-            Executor mainThreadExecutor,
-            Object titleComponent,
-            ItemStack[] initialContents,
-            boolean preventClose,
-            Set<Integer> interactableSlots,
-            Consumer<StateSnapshot> closeListener,
-            boolean concurrentClickHandlerExecution,
-            ClickHandler clickHandler) {
-        this.plugin = plugin;
-        this.player = player;
-        this.mainThreadExecutor = mainThreadExecutor;
-        this.titleComponent = titleComponent;
-        this.initialContents = initialContents;
-        this.preventClose = preventClose;
-        this.geyserCompatibility = true;
-        this.interactableSlots = Collections.unmodifiableSet(interactableSlots);
-        this.closeListener = closeListener;
-        this.concurrentClickHandlerExecution = concurrentClickHandlerExecution;
-        this.clickHandler = clickHandler;
-    }
-
-    /**
      * Opens the anvil GUI
      */
     private void openInventory() {
@@ -498,10 +459,10 @@ public class AnvilGUI {
         }
 
         /**
-         * Toggles compatibility with Geyser software
+         * Disables compatibility with Geyser software
          */
-        public Builder geyserCompat(boolean enabled) {
-            geyserCompatibility = enabled;
+        public Builder disableGeyserCompat() {
+            geyserCompatibility = false;
             return this;
         }
 
