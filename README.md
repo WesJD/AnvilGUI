@@ -158,6 +158,13 @@ Useful for situations like password input to play.
 builder.preventClose();
 ```
 
+#### `geyserCompat()`
+This toggles compatibility with Geyser software, specifically being able to use AnvilGUI with 0 experience level on Bedrock.
+Enabled by default.
+```java
+builder.geyserCompat();
+```
+
 #### `text(String)`
 Takes a `String` that contains what the initial text in the renaming field should be set to.
 If `itemLeft` is provided, then the display name is set to the provided text. If no `itemLeft`
