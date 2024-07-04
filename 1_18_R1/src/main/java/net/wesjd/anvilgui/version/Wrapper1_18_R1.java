@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPosition;
 import net.minecraft.network.chat.ChatComponentText;
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.network.protocol.game.PacketPlayOutCloseWindow;
+import net.minecraft.network.protocol.game.PacketPlayOutExperience;
 import net.minecraft.network.protocol.game.PacketPlayOutOpenWindow;
 import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.world.IInventory;
@@ -49,6 +50,11 @@ public final class Wrapper1_18_R1 implements VersionWrapper {
     @Override
     public void sendPacketCloseWindow(Player player, int containerId) {
         toNMS(player).b.a(new PacketPlayOutCloseWindow(containerId));
+    }
+
+    @Override
+    public void sendPacketExperienceChange(Player player, int experienceLevel) {
+        toNMS(player).b.a(new PacketPlayOutExperience(0f, 0, experienceLevel));
     }
 
     @Override

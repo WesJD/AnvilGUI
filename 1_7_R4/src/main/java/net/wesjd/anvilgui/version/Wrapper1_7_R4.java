@@ -52,6 +52,14 @@ public class Wrapper1_7_R4 implements VersionWrapper {
      * {@inheritDoc}
      */
     @Override
+    public void sendPacketExperienceChange(final Player player, final int experienceLevel) {
+        toNMS(player).playerConnection.sendPacket(new PacketPlayOutExperience(0f, 0, experienceLevel));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void setActiveContainerDefault(final Player player) {
         this.toNMS(player).activeContainer = this.toNMS(player).defaultContainer;
     }

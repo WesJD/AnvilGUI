@@ -21,7 +21,7 @@ AnvilGUI requires the usage of Maven or a Maven compatible build system.
 <dependency>
     <groupId>net.wesjd</groupId>
     <artifactId>anvilgui</artifactId>
-    <version>1.9.6-SNAPSHOT</version>
+    <version>1.10.0-SNAPSHOT</version>
 </dependency>
 
 <repository>
@@ -156,6 +156,13 @@ Tells the AnvilGUI to prevent the user from pressing escape to close the invento
 Useful for situations like password input to play.
 ```java
 builder.preventClose();
+```
+
+#### `geyserCompat()`
+This toggles compatibility with Geyser software, specifically being able to use AnvilGUI with 0 experience level on Bedrock.
+Enabled by default.
+```java
+builder.geyserCompat();
 ```
 
 #### `text(String)`
