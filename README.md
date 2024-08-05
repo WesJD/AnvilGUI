@@ -6,7 +6,20 @@ decompiled code. AnvilGUI provides a straightforward, versatile, and easy-to-use
 depend on version specific code.
 
 ## Requirements
-Java 8 and Bukkit / Spigot. Most server versions in the [Spigot Repository](https://hub.spigotmc.org/nexus/) are supported.
+- Java 8 and Bukkit / Spigot. Most server versions in the [Spigot Repository](https://hub.spigotmc.org/nexus/) are supported.
+- Your plugin must be using Spigot mappings, Mojang mappings are not supported. This is because AnvilGUI is compiled against Spigot mappings.
+    - Note that you can still use Mojang mappings during development, if you are using the [Paperweight Userdev](https://docs.papermc.io/paper/dev/userdev) toolchain. But make sure to read the instructions below so that you enable Spigot mappings for your plugin.
+
+### How to make sure you are using Spigot mappings
+
+You need to be using Spigot mappings in order for AnvilGUI to work, but how can you be sure that you are? The questions below will help you clear things out.
+
+1. Is your plugin a [Bukkit plugin](https://docs.papermc.io/paper/dev/plugin-yml)? Your plugin is a Bukkit plugin if it contains a `plugin.yml` file and ***does not*** contain a `paper-plugin.yml` file. In that case, by default, you are using Spigot mappings.
+    - Note that you can still use the Paper API even if your plugin is a Bukkit plugin. The Paper plugin system provides some additional features on top of the Paper API, but is not needed in order to use the Paper API.
+
+2. Is your plugin a [Paper plugin](https://docs.papermc.io/paper/dev/getting-started/paper-plugins)? Your plugin is always a Paper plugin if it contains a `paper-plugin.yml` file, even if it also contains a `plugin.yml` file. In that case, by default, you ***are not*** using Spigot mappings, but can enable them via a manifest entry [according to these instructions](https://docs.papermc.io/paper/dev/project-setup#spigot-mappings).
+
+3. Are you using the [Paperweight Userdev](https://docs.papermc.io/paper/dev/userdev) toolchain? In that case, by default, you ***are not*** using Spigot mappings, but can enable them using [the reobfArtifactConfiguration option](https://docs.papermc.io/paper/dev/userdev#compiling-to-spigot-mappings).
 
 ### My version isn't supported
 If you are a developer, submit a pull request adding a wrapper module for your version. Otherwise, please create an issue
