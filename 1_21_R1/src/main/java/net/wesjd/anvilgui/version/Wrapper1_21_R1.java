@@ -146,7 +146,10 @@ public final class Wrapper1_21_R1 implements VersionWrapper {
 
         @Override
         public Inventory getBukkitInventory() {
-            return getBukkitView().getTopInventory();
+            // NOTE: We need to call Container#getBukkitView() instead of ContainerAnvil#getBukkitView()
+            // because ContainerAnvil#getBukkitView() had an ABI breakage in the middle of the Minecraft 1.21
+            // development cycle for Spigot. For more info, see: https://github.com/WesJD/AnvilGUI/issues/342
+            return ((Container) this).getBukkitView().getTopInventory();
         }
     }
 }
