@@ -319,7 +319,13 @@ public class AnvilGUI {
             final Inventory clickedInventory = event.getClickedInventory();
 
             if (clickedInventory != null) {
-                if (clickedInventory.equals(clicker.getInventory())) {
+                // We could in some cases allow quick-move (shift) and stack merge (double-click) even if only
+                // one input slot is interactable, but figuring that out would require re-implementing all the
+                // inventory logic, so instead we'll just require both input slots to be interactable.
+                // The plugin using AnvilGUI could still reimplement that logic on its own if desired.
+                final boolean bothInputSlotsInteractable =
+                        interactableSlots.contains(Slot.INPUT_LEFT) && interactableSlots.contains(Slot.INPUT_RIGHT);
+                if (clickedInventory.equals(clicker.getInventory()) && !bothInputSlotsInteractable) {
                     // prevent players from merging items from the anvil inventory
                     if (event.getClick().equals(ClickType.DOUBLE_CLICK)) {
                         event.setCancelled(true);
@@ -334,13 +340,13 @@ public class AnvilGUI {
                 // prevent players from swapping items in the anvil gui
                 if ((event.getCursor() != null && event.getCursor().getType() != Material.AIR)
                         && !interactableSlots.contains(rawSlot)
-                        && event.getClickedInventory().equals(inventory)) {
+                        && clickedInventory.equals(inventory)) {
                     event.setCancelled(true);
                     return;
                 }
             }
 
-            if (rawSlot < 3 && rawSlot >= 0 || event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
+            if (rawSlot < 3 && rawSlot >= 0) {
                 event.setCancelled(!interactableSlots.contains(rawSlot));
                 if (clickHandlerRunning && !concurrentClickHandlerExecution) {
                     // A click handler is running, don't launch another one
