@@ -70,9 +70,13 @@ public class AnvilGUI {
      */
     private final Executor mainThreadExecutor;
     /**
-     * The title of the anvil inventory
+     * The initial title of the anvil inventory
      */
     private final Object titleComponent;
+    /**
+     * The initial value for the final level cost
+     */
+    private final int levelCost;
     /**
      * The initial contents of the inventory
      */
@@ -130,6 +134,7 @@ public class AnvilGUI {
      * @param player              The {@link Player} to open the inventory for
      * @param mainThreadExecutor  An {@link Executor} that executes on the main server thread
      * @param titleComponent      What to have the text already set to
+     * @param levelCost           What to have the final level cost already set to
      * @param initialContents     The initial contents of the inventory
      * @param preventClose        Whether to prevent the inventory from closing
      * @param geyserCompatibility Whether to enable compatibility with Geyser software
@@ -142,6 +147,7 @@ public class AnvilGUI {
             Player player,
             Executor mainThreadExecutor,
             Object titleComponent,
+            int levelCost,
             ItemStack[] initialContents,
             boolean preventClose,
             boolean geyserCompatibility,
@@ -153,6 +159,7 @@ public class AnvilGUI {
         this.player = player;
         this.mainThreadExecutor = mainThreadExecutor;
         this.titleComponent = titleComponent;
+        this.levelCost = levelCost;
         this.initialContents = initialContents;
         this.preventClose = preventClose;
         this.geyserCompatibility = geyserCompatibility;
@@ -169,6 +176,7 @@ public class AnvilGUI {
         Bukkit.getPluginManager().registerEvents(listener, plugin);
 
         container = WRAPPER.newContainerAnvil(player, titleComponent);
+        container.setLevelCost(levelCost);
 
         inventory = container.getBukkitInventory();
         // We need to use setItem instead of setContents because a Minecraft ContainerAnvil
@@ -319,7 +327,13 @@ public class AnvilGUI {
             final Inventory clickedInventory = event.getClickedInventory();
 
             if (clickedInventory != null) {
-                if (clickedInventory.equals(clicker.getInventory())) {
+                // We could in some cases allow quick-move (shift) and stack merge (double-click) even if only
+                // one input slot is interactable, but figuring that out would require re-implementing all the
+                // inventory logic, so instead we'll just require both input slots to be interactable.
+                // The plugin using AnvilGUI could still reimplement that logic on its own if desired.
+                final boolean inputSlotsInteractable =
+                        interactableSlots.contains(Slot.INPUT_LEFT) && interactableSlots.contains(Slot.INPUT_RIGHT);
+                if (clickedInventory.equals(clicker.getInventory()) && !inputSlotsInteractable) {
                     // prevent players from merging items from the anvil inventory
                     if (event.getClick().equals(ClickType.DOUBLE_CLICK)) {
                         event.setCancelled(true);
@@ -334,13 +348,13 @@ public class AnvilGUI {
                 // prevent players from swapping items in the anvil gui
                 if ((event.getCursor() != null && event.getCursor().getType() != Material.AIR)
                         && !interactableSlots.contains(rawSlot)
-                        && event.getClickedInventory().equals(inventory)) {
+                        && clickedInventory.equals(inventory)) {
                     event.setCancelled(true);
                     return;
                 }
             }
 
-            if (rawSlot < 3 && rawSlot >= 0 || event.getAction().equals(InventoryAction.MOVE_TO_OTHER_INVENTORY)) {
+            if (rawSlot < 3 && rawSlot >= 0) {
                 event.setCancelled(!interactableSlots.contains(rawSlot));
                 if (clickHandlerRunning && !concurrentClickHandlerExecution) {
                     // A click handler is running, don't launch another one
@@ -426,6 +440,8 @@ public class AnvilGUI {
         private Plugin plugin;
         /** The text that will be displayed to the user */
         private Object titleComponent = WRAPPER.literalChatComponent("Repair & Name");
+        /** The final level cost in the anvil */
+        private int levelCost = 0;
         /** The starting text on the item */
         private String itemText;
         /** An {@link ItemStack} to be put in the left input slot */
@@ -608,6 +624,17 @@ public class AnvilGUI {
         }
 
         /**
+         * Sets the final level cost in the anvil. Defaults to 0.
+         *
+         * @param levelCost the level cost to set
+         * @return The {@link Builder} instance
+         */
+        public Builder levelCost(int levelCost) {
+            this.levelCost = levelCost;
+            return this;
+        }
+
+        /**
          * Sets the {@link ItemStack} to be put in the first slot
          *
          * @param item The {@link ItemStack} to be put in the first slot
@@ -674,6 +701,7 @@ public class AnvilGUI {
                     player,
                     mainThreadExecutor,
                     titleComponent,
+                    levelCost,
                     new ItemStack[] {itemLeft, itemRight, itemOutput},
                     preventClose,
                     geyserCompatibility,

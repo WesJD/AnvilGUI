@@ -34,7 +34,7 @@ AnvilGUI requires the usage of Maven or a Maven compatible build system.
 <dependency>
     <groupId>net.wesjd</groupId>
     <artifactId>anvilgui</artifactId>
-    <version>1.10.3-SNAPSHOT</version>
+    <version>1.11.0-SNAPSHOT</version>
 </dependency>
 
 <repository>
@@ -217,7 +217,13 @@ Takes a `String` which contains rich text components serialized as JSON.
 Useful for settings titles with hex color codes or Adventure Component interop.
 Only displayed in Minecraft 1.14 and above.
 ```java
-builder.jsonTitle("{\"text\":\"Enter your answer\",\"color\":\"green\"}")
+builder.jsonTitle("{\"text\":\"Enter your answer\",\"color\":\"green\"}");
+```
+
+#### `levelCost(int)`
+Takes an `int` which is set as the final level cost in the anvil. Defaults to 0.
+```java
+builder.levelCost(7);
 ```
 
 #### `plugin(Plugin)`

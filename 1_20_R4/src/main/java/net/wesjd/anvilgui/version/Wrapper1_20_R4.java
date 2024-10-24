@@ -92,6 +92,9 @@ public final class Wrapper1_20_R4 implements VersionWrapper {
     }
 
     private static class AnvilContainer extends ContainerAnvil implements AnvilContainerWrapper {
+
+        private int finalLevelCost = 0;
+
         public AnvilContainer(Player player, int containerId, IChatBaseComponent guiTitle) {
             super(
                     containerId,
@@ -109,7 +112,7 @@ public final class Wrapper1_20_R4 implements VersionWrapper {
                 output.f(this.b(0).g().s()); // f -> set, g -> getItem, s -> copy
             }
 
-            this.w.a(0); // w -> cost, a -> set
+            this.w.a(finalLevelCost); // w -> cost, a -> set
 
             // Sync to the client
             this.b(); // b -> sendAllDataToRemote
@@ -142,6 +145,11 @@ public final class Wrapper1_20_R4 implements VersionWrapper {
                                 DataComponents.g,
                                 IChatBaseComponent.b(text)); // DataComponents.g -> DataComponents.CUSTOM_NAME
             }
+        }
+
+        @Override
+        public void setLevelCost(int levelCost) {
+            this.finalLevelCost = levelCost;
         }
 
         @Override
