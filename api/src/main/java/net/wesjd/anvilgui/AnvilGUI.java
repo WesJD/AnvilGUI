@@ -70,9 +70,13 @@ public class AnvilGUI {
      */
     private final Executor mainThreadExecutor;
     /**
-     * The title of the anvil inventory
+     * The initial title of the anvil inventory
      */
     private final Object titleComponent;
+    /**
+     * The initial value for the final level cost
+     */
+    private final int levelCost;
     /**
      * The initial contents of the inventory
      */
@@ -130,6 +134,7 @@ public class AnvilGUI {
      * @param player              The {@link Player} to open the inventory for
      * @param mainThreadExecutor  An {@link Executor} that executes on the main server thread
      * @param titleComponent      What to have the text already set to
+     * @param levelCost           What to have the final level cost already set to
      * @param initialContents     The initial contents of the inventory
      * @param preventClose        Whether to prevent the inventory from closing
      * @param geyserCompatibility Whether to enable compatibility with Geyser software
@@ -142,6 +147,7 @@ public class AnvilGUI {
             Player player,
             Executor mainThreadExecutor,
             Object titleComponent,
+            int levelCost,
             ItemStack[] initialContents,
             boolean preventClose,
             boolean geyserCompatibility,
@@ -153,6 +159,7 @@ public class AnvilGUI {
         this.player = player;
         this.mainThreadExecutor = mainThreadExecutor;
         this.titleComponent = titleComponent;
+        this.levelCost = levelCost;
         this.initialContents = initialContents;
         this.preventClose = preventClose;
         this.geyserCompatibility = geyserCompatibility;
@@ -169,6 +176,7 @@ public class AnvilGUI {
         Bukkit.getPluginManager().registerEvents(listener, plugin);
 
         container = WRAPPER.newContainerAnvil(player, titleComponent);
+        container.setLevelCost(levelCost);
 
         inventory = container.getBukkitInventory();
         // We need to use setItem instead of setContents because a Minecraft ContainerAnvil
@@ -347,6 +355,23 @@ public class AnvilGUI {
             }
 
             if (rawSlot < 3 && rawSlot >= 0) {
+                // Sync player XP by sending the server-side XP to the client.
+                // This is required because after clicking to take the output item, the client may decide to take
+                // some XP for the anvil recipe, thus creating a desync where client XP is different from server XP,
+                // unless the server decided to take exactly the same amount of experience.
+                // Some concrete examples where this will happen:
+                // - InventoryClickEvent is cancelled, due to interactableSlots or some other reason
+                //   (server takes no XP, client may still take XP if final level cost is not 0)
+                // - Bedrock Edition players via Geyser/Floodgate
+                //   (client always takes XP according to vanilla behavior)
+                // Arguably in the case of cancelling InventoryClickEvent, the server should be
+                // responsible for syncing the XP, but at the time of writing Bukkit/Spigot/Paper does not do that.
+                if (rawSlot == Slot.OUTPUT) {
+                    // TODO: This "works", but doesn't take into account the XP points that the player
+                    // may have (it only syncs the XP levels). We need to also sync the XP points.
+                    WRAPPER.sendPacketExperienceChange(clicker, clicker.getLevel());
+                }
+
                 event.setCancelled(!interactableSlots.contains(rawSlot));
                 if (clickHandlerRunning && !concurrentClickHandlerExecution) {
                     // A click handler is running, don't launch another one
@@ -432,6 +457,8 @@ public class AnvilGUI {
         private Plugin plugin;
         /** The text that will be displayed to the user */
         private Object titleComponent = WRAPPER.literalChatComponent("Repair & Name");
+        /** The final level cost in the anvil */
+        private int levelCost = 0;
         /** The starting text on the item */
         private String itemText;
         /** An {@link ItemStack} to be put in the left input slot */
@@ -614,6 +641,26 @@ public class AnvilGUI {
         }
 
         /**
+         * Sets the final level cost in the anvil. Defaults to 0.
+         * <p>
+         * Note that by default, {@link #interactableSlots(int...)} does not contain {@link Slot#OUTPUT},
+         * which means that the level cost will not be taken from the player since they can't take the output item.
+         * You can either make the output slot interactible if you want vanilla behavior, or add code that
+         * takes levels from the player in your {@link #onClick(BiFunction)} handler if you want custom behavior.
+         * <p>
+         * Also note that the level cost will not be displayed to Geyser/Floodgate players in the Bedrock Edition client
+         * because the Bedrock client uses a hardcoded value based on the vanilla anvil recipes,
+         * but the custom level cost will still be taken from the player, if and when they take the output item.
+         *
+         * @param levelCost the level cost to set
+         * @return The {@link Builder} instance
+         */
+        public Builder levelCost(int levelCost) {
+            this.levelCost = levelCost;
+            return this;
+        }
+
+        /**
          * Sets the {@link ItemStack} to be put in the first slot
          *
          * @param item The {@link ItemStack} to be put in the first slot
@@ -680,6 +727,7 @@ public class AnvilGUI {
                     player,
                     mainThreadExecutor,
                     titleComponent,
+                    levelCost,
                     new ItemStack[] {itemLeft, itemRight, itemOutput},
                     preventClose,
                     geyserCompatibility,

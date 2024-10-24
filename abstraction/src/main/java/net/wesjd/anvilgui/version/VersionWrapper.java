@@ -141,6 +141,13 @@ public interface VersionWrapper {
         default void setRenameText(String text) {}
 
         /**
+         * Sets the final level cost in the anvil.
+         *
+         * @param levelCost The level cost to set
+         */
+        void setLevelCost(int levelCost);
+
+        /**
          * Gets the {@link Inventory} wrapper of the NMS container
          *
          * @return The inventory of the NMS container

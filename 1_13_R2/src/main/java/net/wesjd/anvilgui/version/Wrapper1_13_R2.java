@@ -128,6 +128,8 @@ public class Wrapper1_13_R2 implements VersionWrapper {
      */
     private class AnvilContainer extends ContainerAnvil implements AnvilContainerWrapper {
 
+        private int finalLevelCost = 0;
+
         public AnvilContainer(EntityHuman entityhuman) {
             super(entityhuman.inventory, entityhuman.world, new BlockPosition(0, 0, 0), entityhuman);
             this.checkReachable = false;
@@ -145,7 +147,7 @@ public class Wrapper1_13_R2 implements VersionWrapper {
                 }
             }
 
-            this.levelCost = 0;
+            this.levelCost = finalLevelCost;
 
             // Sync to the client
             this.b();
@@ -156,6 +158,11 @@ public class Wrapper1_13_R2 implements VersionWrapper {
 
         @Override
         protected void a(EntityHuman entityhuman, World world, IInventory iinventory) {}
+
+        @Override
+        public void setLevelCost(int levelCost) {
+            this.finalLevelCost = levelCost;
+        }
 
         @Override
         public Inventory getBukkitInventory() {

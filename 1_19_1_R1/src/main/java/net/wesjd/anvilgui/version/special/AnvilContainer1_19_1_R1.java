@@ -14,6 +14,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
 public class AnvilContainer1_19_1_R1 extends ContainerAnvil implements VersionWrapper.AnvilContainerWrapper {
+
+    private int finalLevelCost = 0;
+
     public AnvilContainer1_19_1_R1(Player player, int containerId, IChatBaseComponent guiTitle) {
         super(
                 containerId,
@@ -31,7 +34,7 @@ public class AnvilContainer1_19_1_R1 extends ContainerAnvil implements VersionWr
             output.e(this.b(0).e().o());
         }
 
-        this.w.a(0);
+        this.w.a(finalLevelCost);
         // Sync to the client
         this.b();
         this.d();
@@ -55,6 +58,11 @@ public class AnvilContainer1_19_1_R1 extends ContainerAnvil implements VersionWr
         if (inputLeft.f()) {
             inputLeft.e().a(IChatBaseComponent.b(text));
         }
+    }
+
+    @Override
+    public void setLevelCost(int levelCost) {
+        this.finalLevelCost = levelCost;
     }
 
     public int getContainerId() {

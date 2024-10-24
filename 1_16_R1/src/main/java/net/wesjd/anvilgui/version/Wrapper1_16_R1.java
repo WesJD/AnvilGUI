@@ -120,6 +120,8 @@ public class Wrapper1_16_R1 implements VersionWrapper {
      */
     private class AnvilContainer extends ContainerAnvil implements AnvilContainerWrapper {
 
+        private int finalLevelCost = 0;
+
         public AnvilContainer(Player player, IChatBaseComponent guiTitle) {
             super(
                     getRealNextContainerId(player),
@@ -141,7 +143,7 @@ public class Wrapper1_16_R1 implements VersionWrapper {
                 }
             }
 
-            this.levelCost.set(0);
+            this.levelCost.set(finalLevelCost);
 
             // Sync to the client
             this.c();
@@ -169,6 +171,11 @@ public class Wrapper1_16_R1 implements VersionWrapper {
             if (inputLeft.hasItem()) {
                 inputLeft.getItem().a(new ChatComponentText(text));
             }
+        }
+
+        @Override
+        public void setLevelCost(int levelCost) {
+            this.finalLevelCost = levelCost;
         }
 
         @Override

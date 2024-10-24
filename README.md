@@ -217,7 +217,22 @@ Takes a `String` which contains rich text components serialized as JSON.
 Useful for settings titles with hex color codes or Adventure Component interop.
 Only displayed in Minecraft 1.14 and above.
 ```java
-builder.jsonTitle("{\"text\":\"Enter your answer\",\"color\":\"green\"}")
+builder.jsonTitle("{\"text\":\"Enter your answer\",\"color\":\"green\"}");
+```
+
+#### `levelCost(int)`
+Takes an `int` which is set as the final level cost in the anvil. Defaults to 0.
+
+Note that by default, `interactableSlots` does not contain `AnvilGUI.Slot.OUTPUT`,
+which means that the level cost will not be taken from the player since they can't take the output item.
+You can either make the output slot interactible if you want vanilla behavior, or add code that
+takes levels from the player in your `onClick` handler if you want custom behavior.
+
+Also note that the level cost will not be displayed to Geyser/Floodgate players in the Bedrock Edition client
+because the Bedrock client uses a hardcoded value based on the vanilla anvil recipes,
+but the custom level cost will still be taken from the player when they take the output item.
+```java
+builder.levelCost(7);
 ```
 
 #### `plugin(Plugin)`
