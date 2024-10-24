@@ -138,6 +138,9 @@ public class Wrapper1_17_R1 implements VersionWrapper {
      * Modifications to ContainerAnvil that makes it so you don't have to have xp to use this anvil
      */
     private class AnvilContainer extends ContainerAnvil implements AnvilContainerWrapper {
+
+        private int finalLevelCost = 0;
+
         public AnvilContainer(Player player, IChatBaseComponent guiTitle) {
             super(
                     Wrapper1_17_R1.this.getRealNextContainerId(player),
@@ -159,7 +162,7 @@ public class Wrapper1_17_R1 implements VersionWrapper {
                 }
             }
 
-            this.w.set(0);
+            this.w.set(finalLevelCost);
 
             // Sync to the client
             // This call has been added in 1.17.1, to fix
@@ -191,6 +194,11 @@ public class Wrapper1_17_R1 implements VersionWrapper {
             if (inputLeft.hasItem()) {
                 inputLeft.getItem().a(new ChatComponentText(text));
             }
+        }
+
+        @Override
+        public void setLevelCost(int levelCost) {
+            this.finalLevelCost = levelCost;
         }
 
         @Override

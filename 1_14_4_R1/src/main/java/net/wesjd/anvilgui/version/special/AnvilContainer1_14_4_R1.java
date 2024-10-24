@@ -9,6 +9,8 @@ import org.bukkit.inventory.Inventory;
 
 public class AnvilContainer1_14_4_R1 extends ContainerAnvil implements VersionWrapper.AnvilContainerWrapper {
 
+    private int finalLevelCost = 0;
+
     public AnvilContainer1_14_4_R1(Player player, int containerId, IChatBaseComponent guiTitle) {
         super(
                 containerId,
@@ -30,7 +32,7 @@ public class AnvilContainer1_14_4_R1 extends ContainerAnvil implements VersionWr
             }
         }
 
-        this.levelCost.set(0);
+        this.levelCost.set(finalLevelCost);
 
         // Sync to the client
         this.c();
@@ -58,6 +60,11 @@ public class AnvilContainer1_14_4_R1 extends ContainerAnvil implements VersionWr
         if (inputLeft.hasItem()) {
             inputLeft.getItem().a(new ChatComponentText(text));
         }
+    }
+
+    @Override
+    public void setLevelCost(int levelCost) {
+        this.finalLevelCost = levelCost;
     }
 
     @Override

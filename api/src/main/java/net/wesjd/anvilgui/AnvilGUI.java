@@ -70,9 +70,13 @@ public class AnvilGUI {
      */
     private final Executor mainThreadExecutor;
     /**
-     * The title of the anvil inventory
+     * The initial title of the anvil inventory
      */
     private final Object titleComponent;
+    /**
+     * The initial value for the final level cost
+     */
+    private final int levelCost;
     /**
      * The initial contents of the inventory
      */
@@ -130,6 +134,7 @@ public class AnvilGUI {
      * @param player              The {@link Player} to open the inventory for
      * @param mainThreadExecutor  An {@link Executor} that executes on the main server thread
      * @param titleComponent      What to have the text already set to
+     * @param levelCost           What to have the final level cost already set to
      * @param initialContents     The initial contents of the inventory
      * @param preventClose        Whether to prevent the inventory from closing
      * @param geyserCompatibility Whether to enable compatibility with Geyser software
@@ -142,6 +147,7 @@ public class AnvilGUI {
             Player player,
             Executor mainThreadExecutor,
             Object titleComponent,
+            int levelCost,
             ItemStack[] initialContents,
             boolean preventClose,
             boolean geyserCompatibility,
@@ -153,6 +159,7 @@ public class AnvilGUI {
         this.player = player;
         this.mainThreadExecutor = mainThreadExecutor;
         this.titleComponent = titleComponent;
+        this.levelCost = levelCost;
         this.initialContents = initialContents;
         this.preventClose = preventClose;
         this.geyserCompatibility = geyserCompatibility;
@@ -169,6 +176,7 @@ public class AnvilGUI {
         Bukkit.getPluginManager().registerEvents(listener, plugin);
 
         container = WRAPPER.newContainerAnvil(player, titleComponent);
+        container.setLevelCost(levelCost);
 
         inventory = container.getBukkitInventory();
         // We need to use setItem instead of setContents because a Minecraft ContainerAnvil
@@ -432,6 +440,8 @@ public class AnvilGUI {
         private Plugin plugin;
         /** The text that will be displayed to the user */
         private Object titleComponent = WRAPPER.literalChatComponent("Repair & Name");
+        /** The final level cost in the anvil */
+        private int levelCost = 0;
         /** The starting text on the item */
         private String itemText;
         /** An {@link ItemStack} to be put in the left input slot */
@@ -614,6 +624,17 @@ public class AnvilGUI {
         }
 
         /**
+         * Sets the final level cost in the anvil. Defaults to 0.
+         *
+         * @param levelCost the level cost to set
+         * @return The {@link Builder} instance
+         */
+        public Builder levelCost(int levelCost) {
+            this.levelCost = levelCost;
+            return this;
+        }
+
+        /**
          * Sets the {@link ItemStack} to be put in the first slot
          *
          * @param item The {@link ItemStack} to be put in the first slot
@@ -680,6 +701,7 @@ public class AnvilGUI {
                     player,
                     mainThreadExecutor,
                     titleComponent,
+                    levelCost,
                     new ItemStack[] {itemLeft, itemRight, itemOutput},
                     preventClose,
                     geyserCompatibility,
