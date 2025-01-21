@@ -254,7 +254,7 @@ public class AnvilGUI {
         Validate.notNull(literalTitle, "literalTitle cannot be null");
         if (VersionMatcher.requiresMini)
             literalTitle = MiniMessage.miniMessage()
-                    .serialize(LegacyComponentSerializer.legacyAmpersand().deserialize(title.replace('§', '&')));
+                    .serialize(LegacyComponentSerializer.legacyAmpersand().deserialize(literalTitle.replace('§', '&')));
 
         setTitle(WRAPPER.literalChatComponent(literalTitle), preserveRenameText);
     }

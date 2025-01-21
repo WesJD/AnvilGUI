@@ -72,11 +72,13 @@ public class VersionMatcher {
         String craftBukkitPackage = Bukkit.getServer().getClass().getPackage().getName();
         if (!craftBukkitPackage.contains(".v")) { // cb package not relocated (i.e. paper 1.20.5+)
             try {
-                int version = Integer.parseInt(Bukkit.getBukkitVersion().split("-")[0].replace(".", ""));
+                int version =
+                        Integer.parseInt(Bukkit.getBukkitVersion().split("-")[0].replace(".", ""));
 
                 if (version >= 1214) // Check for server version above or equal to 1.21.4
-                    return true;
-            } catch (NumberFormatException e) {} // Invalid version number
+                return true;
+            } catch (NumberFormatException e) {
+            } // Invalid version number
         }
 
         return false;
