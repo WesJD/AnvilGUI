@@ -31,6 +31,9 @@ public class VersionMatcher {
     /* This needs to be updated to reflect the newest available version wrapper */
     private static final String FALLBACK_REVISION = "1_21_R3";
 
+    // Paper 1.21.4+ removes support for legacy color codes when opening the inventory using packets
+    public static final boolean requiresMini = needsMiniMessage();
+
     /**
      * Matches the server version to it's {@link VersionWrapper}
      *
@@ -57,5 +60,25 @@ public class VersionMatcher {
         } catch (ReflectiveOperationException exception) {
             throw new IllegalStateException("Failed to instantiate version wrapper for version " + rVersion, exception);
         }
+    }
+
+    /**
+     * Checks if the server runs paper 1.21.4+ cause it removes support for legacy color codes in the inventory title
+     * so we parse any legacy color codes to MiniMessage format
+     *
+     * @return true if this server doesn't support legacy color codes, false otherwise
+     */
+    private static boolean needsMiniMessage() {
+        String craftBukkitPackage = Bukkit.getServer().getClass().getPackage().getName();
+        if (!craftBukkitPackage.contains(".v")) { // cb package not relocated (i.e. paper 1.20.5+)
+            try {
+                int version = Integer.parseInt(Bukkit.getBukkitVersion().split("-")[0].replace(".", ""));
+
+                if (version >= 1214) // Check for server version above or equal to 1.21.4
+                    return true;
+            } catch (NumberFormatException e) {} // Invalid version number
+        }
+
+        return false;
     }
 }

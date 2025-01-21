@@ -12,6 +12,8 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.logging.Level;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.wesjd.anvilgui.version.VersionMatcher;
 import net.wesjd.anvilgui.version.VersionWrapper;
@@ -250,6 +252,10 @@ public class AnvilGUI {
      */
     public void setTitle(String literalTitle, boolean preserveRenameText) {
         Validate.notNull(literalTitle, "literalTitle cannot be null");
+        if (VersionMatcher.requiresMini)
+            literalTitle = MiniMessage.miniMessage()
+                    .serialize(LegacyComponentSerializer.legacyAmpersand().deserialize(title.replace('§', '&')));
+
         setTitle(WRAPPER.literalChatComponent(literalTitle), preserveRenameText);
     }
 
@@ -587,6 +593,10 @@ public class AnvilGUI {
          */
         public Builder title(String title) {
             Validate.notNull(title, "title cannot be null");
+            if (VersionMatcher.requiresMini)
+                title = MiniMessage.miniMessage()
+                        .serialize(LegacyComponentSerializer.legacyAmpersand().deserialize(title.replace('§', '&')));
+
             this.titleComponent = WRAPPER.literalChatComponent(title);
             return this;
         }

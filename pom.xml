@@ -6,7 +6,7 @@
 
     <groupId>net.wesjd</groupId>
     <artifactId>anvilgui-parent</artifactId>
-    <version>1.10.4-SNAPSHOT</version>
+    <version>1.10.5-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
@@ -54,6 +54,10 @@
         <repository>
             <id>nms-repo</id>
             <url>https://repo.codemc.org/repository/nms/</url>
+        </repository>
+        <repository>
+            <id>papermc</id>
+            <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
         <repository>
             <id>opencollab-snapshot</id>
