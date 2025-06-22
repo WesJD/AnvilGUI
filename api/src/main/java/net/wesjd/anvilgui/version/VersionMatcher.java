@@ -50,10 +50,9 @@ public class VersionMatcher {
         }
 
         boolean isMojMap = isMojangMapped(rVersion);
-        String wrapperPrefix = isMojMap ? "MojangWrapper" : "Wrapper";
 
         try {
-            return (VersionWrapper) Class.forName(getClass().getPackage().getName() + "." + wrapperPrefix + rVersion)
+            return (VersionWrapper) getWrapperClass(rVersion, isMojMap)
                     .getDeclaredConstructor()
                     .newInstance();
         } catch (ClassNotFoundException exception) {
@@ -61,6 +60,18 @@ public class VersionMatcher {
         } catch (ReflectiveOperationException exception) {
             throw new IllegalStateException("Failed to instantiate version wrapper for version " + rVersion, exception);
         }
+    }
+
+    private Class<?> getWrapperClass(String version, boolean isMojMap) throws ClassNotFoundException {
+        String pkg = getClass().getPackage().getName();
+        if (isMojMap) { // if mojang-mapped server, use MojangWrapper
+            try {
+                return Class.forName(pkg+".MojangWrapper"+version);
+            } catch (ClassNotFoundException ignored) {
+            }
+        }
+        // then try usual wrapper
+        return Class.forName(pkg+".Wrapper"+version);
     }
 
     private static boolean isMojangMapped(String version) {
