@@ -52,9 +52,8 @@ public class VersionMatcher {
         boolean isMojMap = isMojangMapped(rVersion);
 
         try {
-            return (VersionWrapper) getWrapperClass(rVersion, isMojMap)
-                    .getDeclaredConstructor()
-                    .newInstance();
+            return (VersionWrapper)
+                    getWrapperClass(rVersion, isMojMap).getDeclaredConstructor().newInstance();
         } catch (ClassNotFoundException exception) {
             throw new IllegalStateException("AnvilGUI does not support server version \"" + rVersion + "\"", exception);
         } catch (ReflectiveOperationException exception) {
@@ -66,12 +65,12 @@ public class VersionMatcher {
         String pkg = getClass().getPackage().getName();
         if (isMojMap) { // if mojang-mapped server, use MojangWrapper
             try {
-                return Class.forName(pkg+".MojangWrapper"+version);
+                return Class.forName(pkg + ".MojangWrapper" + version);
             } catch (ClassNotFoundException ignored) {
             }
         }
         // then try usual wrapper
-        return Class.forName(pkg+".Wrapper"+version);
+        return Class.forName(pkg + ".Wrapper" + version);
     }
 
     private static boolean isMojangMapped(String version) {
