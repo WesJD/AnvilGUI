@@ -49,8 +49,11 @@ public class VersionMatcher {
             rVersion = craftBukkitPackage.split("\\.")[3].substring(1);
         }
 
+        boolean isMojMap = isMojangMapped(rVersion);
+        String wrapperPrefix = isMojMap ? "MojangWrapper" : "Wrapper";
+
         try {
-            return (VersionWrapper) Class.forName(getClass().getPackage().getName() + ".Wrapper" + rVersion)
+            return (VersionWrapper) Class.forName(getClass().getPackage().getName() + "." + wrapperPrefix + rVersion)
                     .getDeclaredConstructor()
                     .newInstance();
         } catch (ClassNotFoundException exception) {
@@ -58,5 +61,19 @@ public class VersionMatcher {
         } catch (ReflectiveOperationException exception) {
             throw new IllegalStateException("Failed to instantiate version wrapper for version " + rVersion, exception);
         }
+    }
+
+    private static boolean isMojangMapped(String version) {
+        try {
+            Class.forName("com.destroystokyo.paper.ParticleBuilder");
+        } catch (ClassNotFoundException ignored) {
+            return false;
+        }
+
+        final String[] versionNumbers = version.replace("R", "").split("_");
+        int major = Integer.parseInt(versionNumbers[1]);
+        int minor = versionNumbers.length > 2 ? Integer.parseInt(versionNumbers[2]) : 0;
+        if (major == 20 && minor == 4) return true; // 1.20.5/6
+        return major > 20; // >= 1.21
     }
 }
