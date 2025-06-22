@@ -49,7 +49,7 @@
             <plugin>
                 <groupId>ca.bkaw</groupId>
                 <artifactId>paper-nms-maven-plugin</artifactId>
-                <version>1.4.7</version>
+                <version>1.4.8-SNAPSHOT</version>
             </plugin>
         </plugins>
     </build>
