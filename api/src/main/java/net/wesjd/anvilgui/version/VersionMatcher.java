@@ -75,12 +75,13 @@ public class VersionMatcher {
     }
 
     private static boolean isMojangMapped(String version) {
+        // firstly check for paper
         try {
             Class.forName("com.destroystokyo.paper.ParticleBuilder");
         } catch (ClassNotFoundException ignored) {
             return false;
         }
-
+        // then check version
         final String[] versionNumbers = version.replace("R", "").split("_");
         int major = Integer.parseInt(versionNumbers[1]);
         int minor = versionNumbers.length > 2 ? Integer.parseInt(versionNumbers[2]) : 0;
