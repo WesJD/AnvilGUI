@@ -29,6 +29,7 @@ public class VersionMatcher {
             this.put("1.21.5", "1_21_R4");
             this.put("1.21.6", "1_21_R5");
             this.put("1.21.7", "1_21_R5");
+            this.put("1.21.8", "1_21_R5");
         }
     };
     /* This needs to be updated to reflect the newest available version wrapper */
