@@ -17,3 +17,6 @@ src/libs
 */google-java-format.xml
 
 dependency-reduced-pom.xml
+
+# paper-nms:init task temporary folder
+.paper-nms/

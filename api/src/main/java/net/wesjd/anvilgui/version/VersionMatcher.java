@@ -52,14 +52,42 @@ public class VersionMatcher {
             rVersion = craftBukkitPackage.split("\\.")[3].substring(1);
         }
 
+        boolean isMojMap = isMojangMapped(rVersion);
+
         try {
-            return (VersionWrapper) Class.forName(getClass().getPackage().getName() + ".Wrapper" + rVersion)
-                    .getDeclaredConstructor()
-                    .newInstance();
+            return (VersionWrapper)
+                    getWrapperClass(rVersion, isMojMap).getDeclaredConstructor().newInstance();
         } catch (ClassNotFoundException exception) {
             throw new IllegalStateException("AnvilGUI does not support server version \"" + rVersion + "\"", exception);
         } catch (ReflectiveOperationException exception) {
             throw new IllegalStateException("Failed to instantiate version wrapper for version " + rVersion, exception);
         }
+    }
+
+    private Class<?> getWrapperClass(String version, boolean isMojMap) throws ClassNotFoundException {
+        String pkg = getClass().getPackage().getName();
+        if (isMojMap) { // if mojang-mapped server, use MojangWrapper
+            try {
+                return Class.forName(pkg + ".MojangWrapper" + version);
+            } catch (ClassNotFoundException ignored) {
+            }
+        }
+        // then try usual wrapper
+        return Class.forName(pkg + ".Wrapper" + version);
+    }
+
+    private static boolean isMojangMapped(String version) {
+        // firstly check for paper
+        try {
+            Class.forName("com.destroystokyo.paper.ParticleBuilder");
+        } catch (ClassNotFoundException ignored) {
+            return false;
+        }
+        // then check version
+        final String[] versionNumbers = version.replace("R", "").split("_");
+        int major = Integer.parseInt(versionNumbers[1]);
+        int minor = versionNumbers.length > 2 ? Integer.parseInt(versionNumbers[2]) : 0;
+        if (major == 20 && minor == 4) return true; // 1.20.5/6
+        return major > 20; // >= 1.21
     }
 }

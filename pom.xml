@@ -50,6 +50,7 @@
         <module>1_21_R3</module>
         <module>1_21_R4</module>
         <module>1_21_R5</module>
+        <module>Mojang1_21_R4</module>
     </modules>
 
     <repositories>
