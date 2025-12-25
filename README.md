@@ -1,272 +1,32 @@
 > [!NOTE]
 > The Maven repository for AnvilGUI has moved as of version `1.10.11-SNAPSHOT`.
 >
-> Please replace...
+> Replace:
 > ```xml
 > <repository>
->    <id>codemc-snapshots</id>
->    <url>https://repo.codemc.io/repository/maven-snapshots/</url>
+>   <id>codemc-snapshots</id>
+>   <url>https://repo.codemc.io/repository/maven-snapshots/</url>
 > </repository>
 > ```
-> 
-> with...
+>
+> With:
 > ```xml
 > <repository>
->    <id>mvn-wesjd-net</id>
->    <url>https://mvn.wesjd.net/</url>
+>   <id>mvn-wesjd-net</id>
+>   <url>https://mvn.wesjd.net/</url>
 > </repository>
 > ```
 
 # AnvilGUI
-AnvilGUI is a library to capture user input in Minecraft through an anvil inventory. Anvil inventories within the realm
-of the Minecraft / Bukkit / Spigot / Paper API are extremely finnicky and ultimately don't support the ability to use them fully for
-the task of user input. As a result, the only way to achieve user input with an anvil inventory requires interaction with obfuscated,
-decompiled code. AnvilGUI provides a straightforward, versatile, and easy-to-use solution without having your project
-depend on version specific code.
 
-## Requirements
-- Java 8 and Bukkit / Spigot. Most server versions in the [Spigot Repository](https://hub.spigotmc.org/nexus/) are supported.
-- Your plugin must be using Spigot mappings, Mojang mappings are not supported. This is because AnvilGUI is compiled against Spigot mappings.
-    - Note that you can still use Mojang mappings during development, if you are using the [Paperweight Userdev](https://docs.papermc.io/paper/dev/userdev) toolchain. But make sure to read the instructions below so that you enable Spigot mappings for your plugin.
+**AnvilGUI** is a Minecraft Java Edition library that supports capturing user input from an anvil inventory without touching version-specific code.
 
-### How to make sure you are using Spigot mappings
-
-You need to be using Spigot mappings in order for AnvilGUI to work, but how can you be sure that you are? The questions below will help you clear things out.
-
-1. Is your plugin a [Bukkit plugin](https://docs.papermc.io/paper/dev/plugin-yml)? Your plugin is a Bukkit plugin if it contains a `plugin.yml` file and ***does not*** contain a `paper-plugin.yml` file. In that case, by default, you are using Spigot mappings.
-    - Note that you can still use the Paper API even if your plugin is a Bukkit plugin. The Paper plugin system provides some additional features on top of the Paper API, but is not needed in order to use the Paper API.
-
-2. Is your plugin a [Paper plugin](https://docs.papermc.io/paper/dev/getting-started/paper-plugins)? Your plugin is always a Paper plugin if it contains a `paper-plugin.yml` file, even if it also contains a `plugin.yml` file. In that case, by default, you ***are not*** using Spigot mappings, but can enable them via a manifest entry [according to these instructions](https://docs.papermc.io/paper/dev/project-setup#spigot-mappings).
-
-3. Are you using the [Paperweight Userdev](https://docs.papermc.io/paper/dev/userdev) toolchain? In that case, by default, you ***are not*** using Spigot mappings, but can enable them using [the reobfArtifactConfiguration option](https://docs.papermc.io/paper/dev/userdev#compiling-to-spigot-mappings).
-
-### My version isn't supported
-If you are a developer, submit a pull request adding a wrapper module for your version. Otherwise, please create an issue
-on the issues tab.
-
-## Usage
-
-### As a dependency
-
-AnvilGUI requires the usage of Maven or a Maven compatible build system.
-```xml
-<dependency>
-    <groupId>net.wesjd</groupId>
-    <artifactId>anvilgui</artifactId>
-    <version>1.10.11-SNAPSHOT</version>
-</dependency>
-
-<repository>
-    <id>mvn-wesjd-net</id>
-    <url>https://mvn.wesjd.net/</url>
-</repository>
-```
-
-It is best to be a good citizen and relocate the dependency to within your namespace in order
-to prevent conflicts with other plugins. Here is an example of how to relocate the dependency:
-```xml
-<build>
-    <plugins>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-shade-plugin</artifactId>
-            <version>${shade.version}</version> <!-- The version must be at least 3.5.0 -->
-            <executions>
-                <execution>
-                    <phase>package</phase>
-                    <goals>
-                        <goal>shade</goal>
-                    </goals>
-                    <configuration>
-                        <relocations>
-                            <relocation>
-                                <pattern>net.wesjd.anvilgui</pattern>
-                                <shadedPattern>[YOUR_PLUGIN_PACKAGE].anvilgui</shadedPattern> <!-- Replace [YOUR_PLUGIN_PACKAGE] with your namespace -->
-                            </relocation>
-                        </relocations>
-                        <filters>
-                            <filter>
-                                <artifact>*:*</artifact>
-                                <excludeDefaults>false</excludeDefaults>
-                                <includes>
-                                    <include>net/wesjd/anvilgui/**</include>
-                                </includes>
-                            </filter>
-                        </filters>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
-    </plugins>
-</build>
-```
-Note: In order to solve `<minimizeJar>` removing AnvilGUI `VerionWrapper`s from the final jar and making the library unusable,
-ensure that your `<filters>` section contains the example `<filter>` as seen above.
-
-### In your plugin
-
-The `AnvilGUI.Builder` class is how you build an AnvilGUI.
-The following methods allow you to modify various parts of the displayed GUI. Javadocs are available [here](http://docs.wesjd.net/AnvilGUI/).
-
-#### `onClose(Consumer<StateSnapshot>)`
-Takes a `Consumer<StateSnapshot>` argument that is called when a player closes the anvil gui.
-```java
-builder.onClose(stateSnapshot -> {
-    stateSnapshot.getPlayer().sendMessage("You closed the inventory.");
-});
-```
-
-#### `onClick(BiFunction<Integer, AnvilGUI.StateSnapshot, AnvilGUI.ResponseAction>)`
-Takes a `BiFunction` with the slot that was clicked and a snapshot of the current gui state.
-The function is called when a player clicks any slots in the inventory.
-You must return a `List<AnvilGUI.ResponseAction>`, which could include:
-- Closing the inventory (`AnvilGUI.ResponseAction.close()`)
-- Replacing the input text (`AnvilGUI.ResponseAction.replaceInputText(String)`)
-- Updating the title of the inventory (`AnvilGUI.ResponseAction.updateTitle(String, boolean)`)
-- Opening another inventory (`AnvilGUI.ResponseAction.openInventory(Inventory)`)
-- Running generic code (`AnvilGUI.ResponseAction.run(Runnable)`)
-- Nothing! (`Collections.emptyList()`)
-
-The list of actions are ran in the order they are supplied.
-```java
-builder.onClick((slot, stateSnapshot) -> {
-    if (slot != AnvilGUI.Slot.OUTPUT) {
-        return Collections.emptyList();
-    }
-
-    if (stateSnapshot.getText().equalsIgnoreCase("you")) {
-        stateSnapshot.getPlayer().sendMessage("You have magical powers!");
-        return Arrays.asList(
-            AnvilGUI.ResponseAction.close(),
-            AnvilGUI.ResponseAction.run(() -> myCode(stateSnapshot.getPlayer()))
-        );
-    } else {
-        return Arrays.asList(AnvilGUI.ResponseAction.replaceInputText("Try again"));
-    }
-});
-```
-
-#### `onClickAsync(ClickHandler)`
-Takes a `ClickHandler`, a shorthand for `BiFunction<Integer, AnvilGui.StateSnapshot, CompletableFuture<AnvilGUI.ResponseAction>>`,
-that behaves exactly like `onClick()` with the difference that it returns a `CompletableFuture` and therefore allows for
-asynchronous calculation of the `ResponseAction`s.
-
-```java
-builder.onClickAsync((slot, stateSnapshot) -> CompletedFuture.supplyAsync(() -> {
-    // this code is now running async
-    if (slot != AnvilGUI.Slot.OUTPUT) {
-        return Collections.emptyList();
-    }
-
-    if (database.isMagical(stateSnapshot.getText())) {
-        // the `ResponseAction`s will run on the main server thread
-        return Arrays.asList(
-            AnvilGUI.ResponseAction.close(),
-            AnvilGUI.ResponseAction.run(() -> myCode(stateSnapshot.getPlayer()))
-        );
-    } else {
-        return Arrays.asList(AnvilGUI.ResponseAction.replaceInputText("Try again"));
-    }
-}));
-```
-
-#### `allowConcurrentClickHandlerExecution()`
-Tells the AnvilGUI to disable the mechanism that is put into place to prevent concurrent execution of the
-click handler set by `onClickAsync(ClickHandler)`.
-```java
-builder.allowConcurrentClickHandlerExecution();
-```
-
-#### `interactableSlots(int... slots)`
-This allows or denies users to take / input items in the anvil slots that are provided. This feature is useful when you try to make a inputting system using an anvil gui.
-```java
-builder.interactableSlots(Slot.INPUT_LEFT, Slot.INPUT_RIGHT);
-```
-
-#### `preventClose()`
-Tells the AnvilGUI to prevent the user from pressing escape to close the inventory.
-Useful for situations like password input to play.
-```java
-builder.preventClose();
-```
-
-#### `geyserCompat()`
-This toggles compatibility with Geyser software, specifically being able to use AnvilGUI with 0 experience level on Bedrock.
-Enabled by default.
-```java
-builder.geyserCompat();
-```
-
-#### `text(String)`
-Takes a `String` that contains what the initial text in the renaming field should be set to.
-If `itemLeft` is provided, then the display name is set to the provided text. If no `itemLeft`
-is set, then a piece of paper will be used.
-```java
-builder.text("What is the meaning of life?");
-```
-
-#### `itemLeft(ItemStack)`
-Takes a custom `ItemStack` to be placed in the left input slot.
-```java
-ItemStack stack = new ItemStack(Material.IRON_SWORD);
-ItemMeta meta = stack.getItemMeta();
-meta.setLore(Arrays.asList("Sharp iron sword"));
-stack.setItemMeta(meta);
-builder.itemLeft(stack);
-```
-
-#### `itemRight(ItemStack)`
-Takes a custom `ItemStack` to be placed in the right input slot.
-```java
-ItemStack stack = new ItemStack(Material.IRON_INGOT);
-ItemMeta meta = stack.getItemMeta();
-meta.setLore(Arrays.asList("A piece of metal"));
-stack.setItemMeta(meta);
-builder.itemRight(stack);
-```
-
-#### `title(String)`
-Takes a `String` that will be used literally as the inventory title. Only displayed in Minecraft 1.14 and above.
-```java
-builder.title("Enter your answer");
-```
-
-#### `jsonTitle(String)`
-Takes a `String` which contains rich text components serialized as JSON.
-Useful for settings titles with hex color codes or Adventure Component interop.
-Only displayed in Minecraft 1.14 and above.
-```java
-builder.jsonTitle("{\"text\":\"Enter your answer\",\"color\":\"green\"}")
-```
-
-#### `plugin(Plugin)`
-Takes the `Plugin` object that is making this anvil gui. It is needed to register listeners.
-```java
-builder.plugin(pluginInstance);
-```
-
-#### `mainThreadExecutor(Executor)`
-Takes an `Executor` that must execute on the main server thread.
-If the main server thread is not accessible via the Bukkit scheduler, like on Folia servers, it can be swapped for a
-Folia aware executor.
-```java
-builder.mainThreadExecutor(executor);
-```
-
-#### `open(Player)`
-Takes a `Player` that the anvil gui should be opened for. This method can be called multiple times without needing to create
-a new `AnvilGUI.Builder` object.
-```java
-builder.open(player);
-```
-
-### A Common Use Case Example
 ```java
 new AnvilGUI.Builder()
     .onClose(stateSnapshot -> {
         stateSnapshot.getPlayer().sendMessage("You closed the inventory.");
     })
-    .onClick((slot, stateSnapshot) -> { // Either use sync or async variant, not both
+    .onClick((slot, stateSnapshot) -> {
         if(slot != AnvilGUI.Slot.OUTPUT) {
             return Collections.emptyList();
         }
@@ -278,21 +38,112 @@ new AnvilGUI.Builder()
             return Arrays.asList(AnvilGUI.ResponseAction.replaceInputText("Try again"));
         }
     })
-    .preventClose()                                                    //prevents the inventory from being closed
-    .text("What is the meaning of life?")                              //sets the text the GUI should start with
-    .title("Enter your answer.")                                       //set the title of the GUI (only works in 1.14+)
-    .plugin(myPluginInstance)                                          //set the plugin instance
-    .open(myPlayer);                                                   //opens the GUI for the player provided
+    .preventClose()
+    .text("What is the meaning of life?")
+    .title("Enter your answer")
+    .plugin(plugin)
+    .open(player);
 ```
 
+[More usage information is available in USAGE.md](USAGE)
 
-## Development
-We use Maven to handle our dependencies. Run `mvn clean install` using Java 21 to build the project.
+## Installation
 
-### Spotless
-The project utilizes the [Spotless Maven Plugin](https://github.com/diffplug/spotless/tree/main/plugin-maven) to
-enforce style guidelines. You will not be able to build the project if your code does not meet the guidelines.
-To fix all code formatting issues, simply run `mvn spotless:apply`.
+Add the repository and dependency to your POM:
 
-## License
-This project is licensed under the [MIT License](LICENSE).
+```xml
+<repository>
+    <id>mvn-wesjd-net</id>
+    <url>https://mvn.wesjd.net/</url>
+</repository>
+
+<dependency>
+  <groupId>net.wesjd</groupId>
+  <artifactId>anvilgui</artifactId>
+  <version>1.10.11-SNAPSHOT</version>
+  <scope>compile</scope> <!-- Include the library in your JAR -->
+</dependency>
+```
+
+Since AnvilGUI is a library, it must be shaded into your plugin. Follow the example shade config below to ensure that:
+1. You avoid classpath conflicts with other plugins
+2. You do not break the library when minimizing your JAR
+
+```xml
+<build>
+  <plugins>
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-shade-plugin</artifactId>
+      <version>${shade.version}</version> <!-- The version must be at least 3.5.0 -->
+      <executions>
+        <execution>
+          <phase>package</phase>
+          <goals>
+            <goal>shade</goal>
+          </goals>
+          <configuration>
+           <!--
+             If multiple plugins use AnvilGUI but use different AnvilGUI versions,
+             one of the plugins functionality may break. To avoid these classpath
+             conflicts, relocate AnvilGUI to your plugin's namespace.
+           -->              
+            <relocations>
+              <relocation>
+                <pattern>net.wesjd.anvilgui</pattern>
+                <shadedPattern>[YOUR_PLUGIN_PACKAGE].anvilgui</shadedPattern>
+              </relocation>
+            </relocation>
+              
+            <!-- 
+              AnvilGUI works by loading the appropriate anvil implementation at
+              runtime via reflection. When minimize JAR is enabled, the shade 
+              plugin will see no usages of the anvil implementation classes and 
+              omit them from the shaded artifacts. To solve this, add a filter 
+              that always includes the entire library.
+            -->
+            <filters>
+              <filter>
+                <artifact>*:*</artifact>
+                <excludeDefaults>false</excludeDefaults>
+                <includes>
+                  <include>net/wesjd/anvilgui/**</include>
+                </includes>
+              </filter>
+            </filters>
+          </configuration>
+        </execution>
+      </executions>
+    </plugin>
+  </plugins>
+</build>
+```
+
+## Requirements
+
+- Java 8+
+- Bukkit / Spigot / Paper for Minecraft 1.7+
+- Spigot mappings
+
+
+### Ensuring you are using Spigot mappings
+
+AnvilGUI is compiled against Spigot mappings. Mojang mappings are not supported at runtime. You can still develop using Mojang mappings when using Paperweight. See below.
+
+### Bukkit Plugin
+
+Your plugin is a [Bukkit plugin](https://docs.papermc.io/paper/dev/plugin-yml) if it contains a `plugin.yml` and **does not** contain a `paper-plugin.yml`.
+
+Bukkit plugins use Spigot mappings by default.
+
+Note that you can still use the Paper API even if your plugin is a Bukkit plugin. The Paper plugin system provides some additional features on top of the Paper API, but is not needed in order to use the Paper API.
+
+### Paper Plugin
+
+Your plugin is a [Paper plugin](https://docs.papermc.io/paper/dev/getting-started/paper-plugins) if it contains a `paper-plugin.yml` (even if `plugin.yml` is also present).
+
+Paper plugins **do not** use Spigot mappings by default. You must [explicitly enable them via your manifest](https://docs.papermc.io/paper/dev/project-setup#spigot-mappings).
+
+### Paperweight Userdev
+
+If you are using the [Paperweight Userdev](https://docs.papermc.io/paper/dev/userdev) toolchain, you must enable Spigot mappings via [the reobfArtifactConfiguration option](https://docs.papermc.io/paper/dev/userdev#compiling-to-spigot-mappings).
