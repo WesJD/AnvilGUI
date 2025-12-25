@@ -22,7 +22,7 @@ jobs:
       - name: Build and save artifacts
         run: |
           mkdir -p deploy-temp
-          mvn clean deploy -DaltDeploymentRepository=local-repo::default::file://$PWD/deploy-temp
+          mvn clean deploy -B -DaltDeploymentRepository=local-repo::default::file://$PWD/deploy-temp
 
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.9.0
