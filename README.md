@@ -1,4 +1,23 @@
-# AnvilGUI [![Build Status](https://ci.codemc.io/job/WesJD/job/AnvilGUI/badge/icon)](https://ci.codemc.io/job/WesJD/job/AnvilGUI/)
+> [!NOTE]
+> The Maven repository for AnvilGUI has moved as of version `1.10.11-SNAPSHOT`.
+>
+> Please replace...
+> ```xml
+> <repository>
+>    <id>codemc-snapshots</id>
+>    <url>https://repo.codemc.io/repository/maven-snapshots/</url>
+> </repository>
+> ```
+> 
+> with...
+> ```xml
+> <repository>
+>    <id>mvn-wesjd-net</id>
+>    <url>https://mvn.wesjd.net/</url>
+> </repository>
+> ```
+
+# AnvilGUI
 AnvilGUI is a library to capture user input in Minecraft through an anvil inventory. Anvil inventories within the realm
 of the Minecraft / Bukkit / Spigot / Paper API are extremely finnicky and ultimately don't support the ability to use them fully for
 the task of user input. As a result, the only way to achieve user input with an anvil inventory requires interaction with obfuscated,
