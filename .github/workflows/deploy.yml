@@ -25,7 +25,7 @@ jobs:
           mvn clean deploy -DaltDeploymentRepository=local-repo::default::file://$PWD/deploy-temp
 
       - name: Setup SSH
-        uses: webfactory/ssh-agent@v0.8.1
+        uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.MVN_WESJD_NET_DEPLOY_KEY }}
 
