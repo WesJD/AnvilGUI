@@ -7,10 +7,33 @@
     <parent>
         <groupId>net.wesjd</groupId>
         <artifactId>anvilgui-parent</artifactId>
-        <version>1.10.11-SNAPSHOT</version>
+        <version>1.10.11</version>
     </parent>
 
     <artifactId>anvilgui</artifactId>
+
+    <name>AnvilGUI</name>
+    <description>Capture user input in Minecraft through an anvil GUI in under 20 lines of code</description>
+    <url>https://github.com/WesJD/AnvilGUI</url>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://github.com/WesJD/AnvilGUI/blob/master/LICENSE</url>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>https://github.com/WesJD/AnvilGUI</url>
+        <connection>scm:git:https://github.com/WesJD/AnvilGUI.git</connection>
+    </scm>
+
+    <developers>
+        <developer>
+            <name>Wesley Smith</name>
+            <email>me@wesleysmith.dev</email>
+        </developer>
+    </developers>
 
     <dependencies>
         <dependency>
@@ -250,14 +273,38 @@
     </dependencies>
 
     <build>
+        <!-- Considering this project is purely used as a library, it makes sense for the default goal
+         to install -->
         <defaultGoal>clean install javadoc:javadoc</defaultGoal>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <!--
+                    Since the minimum java version the project uses is 1.8, the
+                    common api needs to be compiled with the minimum version so
+                    any MC server version can use it.
+                -->
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <!-- Putting this configuration only in api/ because otherwise it would create a javadoc folder for each
                      subproject that would not get removed with the clean task -->
@@ -269,4 +316,67 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>official-release</id>
+            <build>
+                <plugins>
+                    <!-- Central requires GPG signing -->
+                    <plugin>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <configuration>
+                            <keyname>7D51EEA4AD426408</keyname>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- Central requires sources to be attached -->
+                    <plugin>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <!-- Central requires javadocs to be attached -->
+                    <plugin>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <publishingServerId>central</publishingServerId>
+                            <autoPublish>true</autoPublish>
+                            <waitUntil>published</waitUntil>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
