@@ -3,7 +3,7 @@ name: Deploy to mvn.wesjd.net
 on:
   push:
     branches:
-      - deploy-mvn-wesjd-net
+      - master
 
 jobs:
   deploy:
