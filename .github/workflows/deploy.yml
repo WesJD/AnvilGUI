@@ -35,6 +35,7 @@ jobs:
           repository: WesJD/mvn.wesjd.net
           path: mvn-wesjd-net
           ref: main
+          ssh-key: ${{ secrets.MVN_WESJD_NET_DEPLOY_KEY }}
 
       - name: Copy artifacts
         run: cp -R deploy-temp/* mvn-wesjd-net/
@@ -42,6 +43,7 @@ jobs:
       - name: Commit and push
         run: |
           cd mvn-wesjd-net
+          git remote set-url origin git@github.com:WesJD/mvn.wesjd.net.git
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add .
