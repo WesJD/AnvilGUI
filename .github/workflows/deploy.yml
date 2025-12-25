@@ -1,0 +1,52 @@
+name: Deploy to mvn.wesjd.net
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source repo
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Build and save artifacts
+        run: |
+          mkdir -p deploy-temp
+          mvn clean deploy -B -DaltDeploymentRepository=local-repo::file://$PWD/deploy-temp
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.MVN_WESJD_NET_DEPLOY_KEY }}
+
+      - name: Checkout artifact repository
+        uses: actions/checkout@v4
+        with:
+          repository: WesJD/mvn.wesjd.net
+          path: mvn-wesjd-net
+          ref: main
+          ssh-key: ${{ secrets.MVN_WESJD_NET_DEPLOY_KEY }}
+
+      - name: Copy artifacts
+        run: cp -R deploy-temp/* mvn-wesjd-net/
+
+      - name: Commit and push
+        run: |
+          cd mvn-wesjd-net
+          git remote set-url origin git@github.com:WesJD/mvn.wesjd.net.git
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Add new build from $GITHUB_REPOSITORY@$GITHUB_SHA (run #${GITHUB_RUN_NUMBER})"
+          git push
+
