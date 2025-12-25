@@ -38,8 +38,8 @@ AnvilGUI requires the usage of Maven or a Maven compatible build system.
 </dependency>
 
 <repository>
-    <id>codemc-snapshots</id>
-    <url>https://repo.codemc.io/repository/maven-snapshots/</url>
+    <id>mvn-wesjd-net</id>
+    <url>https://mvn.wesjd.net/</url>
 </repository>
 ```
 
