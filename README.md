@@ -144,6 +144,5 @@ Your plugin is a [Paper plugin](https://docs.papermc.io/paper/dev/getting-starte
 
 Paper plugins **do not** use Spigot mappings by default. You must [explicitly enable them via your manifest](https://docs.papermc.io/paper/dev/project-setup#spigot-mappings).
 
-### Paperweight Userdev
-
-If you are using the [Paperweight Userdev](https://docs.papermc.io/paper/dev/userdev) toolchain, you must enable Spigot mappings via [the reobfArtifactConfiguration option](https://docs.papermc.io/paper/dev/userdev#compiling-to-spigot-mappings).
+If you are accessing server internals in your paper plugin, you need to reobfuscate
+your plugin to Spigot mappings. Assuming you are using the [Paperweight Userdev](https://docs.papermc.io/paper/dev/userdev) toolchain, enable Spigot mappings via [the reobfArtifactConfiguration option](https://docs.papermc.io/paper/dev/userdev#compiling-to-spigot-mappings).
