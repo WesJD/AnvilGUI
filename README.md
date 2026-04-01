@@ -1,5 +1,5 @@
 > [!NOTE]
-> The Maven repository for AnvilGUI has moved as of version `1.10.11-SNAPSHOT`.
+> The Maven repository for AnvilGUI has moved as of version `1.10.12-SNAPSHOT`.
 >
 > Replace:
 > ```xml
@@ -60,7 +60,7 @@ Add the repository and dependency to your POM:
 <dependency>
   <groupId>net.wesjd</groupId>
   <artifactId>anvilgui</artifactId>
-  <version>1.10.11-SNAPSHOT</version>
+  <version>1.10.12-SNAPSHOT</version>
   <scope>compile</scope> <!-- Include the library in your JAR -->
 </dependency>
 ```
