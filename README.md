@@ -1,5 +1,5 @@
 > [!NOTE]
-> The Maven repository for AnvilGUI has moved as of version `1.10.12-SNAPSHOT`.
+> The Maven repository for AnvilGUI has moved as of version `1.10.11-SNAPSHOT`.
 >
 > Replace:
 > ```xml
