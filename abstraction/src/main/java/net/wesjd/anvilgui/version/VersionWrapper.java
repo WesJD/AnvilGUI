@@ -1,7 +1,9 @@
 package net.wesjd.anvilgui.version;
 
+import java.util.function.Function;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * Wraps versions to be able to easily use different NMS server versions
@@ -140,6 +142,13 @@ public interface VersionWrapper {
          */
         default void setRenameText(String text) {}
 
+        default void setRenameVisitor(Function<String, ItemStack> renameVisitor) {}
+
+        default void setLeftItem(ItemStack item) {}
+
+        default void setMiddleItem(ItemStack item) {}
+
+        default void setRightItem(ItemStack item) {}
         /**
          * Gets the {@link Inventory} wrapper of the NMS container
          *

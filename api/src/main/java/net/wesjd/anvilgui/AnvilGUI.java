@@ -94,6 +94,8 @@ public class AnvilGUI {
 
     /** An {@link Consumer} that is called when the anvil GUI is close */
     private final Consumer<StateSnapshot> closeListener;
+
+    private final BiFunction<String, StateSnapshot, ItemStack> renameVisitor;
     /** A flag that decides whether the async click handler can be run concurrently */
     private final boolean concurrentClickHandlerExecution;
     /** An {@link BiFunction} that is called when a slot is clicked */
@@ -126,16 +128,17 @@ public class AnvilGUI {
     /**
      * Create an AnvilGUI
      *
-     * @param plugin              A {@link org.bukkit.plugin.java.JavaPlugin} instance
-     * @param player              The {@link Player} to open the inventory for
-     * @param mainThreadExecutor  An {@link Executor} that executes on the main server thread
-     * @param titleComponent      What to have the text already set to
-     * @param initialContents     The initial contents of the inventory
-     * @param preventClose        Whether to prevent the inventory from closing
-     * @param geyserCompatibility Whether to enable compatibility with Geyser software
-     * @param closeListener       A {@link Consumer} when the inventory closes
+     * @param plugin                          A {@link org.bukkit.plugin.java.JavaPlugin} instance
+     * @param player                          The {@link Player} to open the inventory for
+     * @param mainThreadExecutor              An {@link Executor} that executes on the main server thread
+     * @param titleComponent                  What to have the text already set to
+     * @param initialContents                 The initial contents of the inventory
+     * @param preventClose                    Whether to prevent the inventory from closing
+     * @param geyserCompatibility             Whether to enable compatibility with Geyser software
+     * @param closeListener                   A {@link Consumer} when the inventory closes
+     * @param renameVisitor
      * @param concurrentClickHandlerExecution Flag to allow concurrent execution of the click handler
-     * @param clickHandler        A {@link ClickHandler} that is called when the player clicks a slot
+     * @param clickHandler                    A {@link ClickHandler} that is called when the player clicks a slot
      */
     private AnvilGUI(
             Plugin plugin,
@@ -147,6 +150,7 @@ public class AnvilGUI {
             boolean geyserCompatibility,
             Set<Integer> interactableSlots,
             Consumer<StateSnapshot> closeListener,
+            BiFunction<String, StateSnapshot, ItemStack> renameVisitor,
             boolean concurrentClickHandlerExecution,
             ClickHandler clickHandler) {
         this.plugin = plugin;
@@ -158,8 +162,13 @@ public class AnvilGUI {
         this.geyserCompatibility = geyserCompatibility;
         this.interactableSlots = Collections.unmodifiableSet(interactableSlots);
         this.closeListener = closeListener;
+        this.renameVisitor = renameVisitor;
         this.concurrentClickHandlerExecution = concurrentClickHandlerExecution;
         this.clickHandler = clickHandler;
+    }
+
+    public VersionWrapper.AnvilContainerWrapper getContainer() {
+        return container;
     }
 
     /**
@@ -169,6 +178,13 @@ public class AnvilGUI {
         Bukkit.getPluginManager().registerEvents(listener, plugin);
 
         container = WRAPPER.newContainerAnvil(player, titleComponent);
+
+        if (renameVisitor != null) {
+            container.setRenameVisitor(s -> {
+                StateSnapshot stateSnapshot = StateSnapshot.fromAnvilGUI(this);
+                return renameVisitor.apply(s, stateSnapshot);
+            });
+        }
 
         inventory = container.getBukkitInventory();
         // We need to use setItem instead of setContents because a Minecraft ContainerAnvil
@@ -412,6 +428,8 @@ public class AnvilGUI {
         private Executor mainThreadExecutor;
         /** An {@link Consumer} that is called when the anvil GUI is close */
         private Consumer<StateSnapshot> closeListener;
+
+        private BiFunction<String, StateSnapshot, ItemStack> renameVisitor;
         /** A flag that decides whether the async click handler can be run concurrently */
         private boolean concurrentClickHandlerExecution = false;
         /** An {@link Function} that is called when a slot in the inventory has been clicked */
@@ -492,6 +510,12 @@ public class AnvilGUI {
         public Builder onClose(Consumer<StateSnapshot> closeListener) {
             Validate.notNull(closeListener, "closeListener cannot be null");
             this.closeListener = closeListener;
+            return this;
+        }
+
+        public Builder onRename(BiFunction<String, StateSnapshot, ItemStack> renameVisitor) {
+            Validate.notNull(renameVisitor, "renameVisitor cannot be null");
+            this.renameVisitor = renameVisitor;
             return this;
         }
 
@@ -679,6 +703,7 @@ public class AnvilGUI {
                     geyserCompatibility,
                     interactableSlots,
                     closeListener,
+                    renameVisitor,
                     concurrentClickHandlerExecution,
                     clickHandler);
             anvilGUI.openInventory();
@@ -870,13 +895,16 @@ public class AnvilGUI {
          */
         private static StateSnapshot fromAnvilGUI(AnvilGUI anvilGUI) {
             final Inventory inventory = anvilGUI.getInventory();
+
             return new StateSnapshot(
+                    anvilGUI.container,
                     itemNotNull(inventory.getItem(Slot.INPUT_LEFT)).clone(),
                     itemNotNull(inventory.getItem(Slot.INPUT_RIGHT)).clone(),
                     itemNotNull(inventory.getItem(Slot.OUTPUT)).clone(),
                     anvilGUI.player);
         }
 
+        private final VersionWrapper.AnvilContainerWrapper container;
         /**
          * The {@link ItemStack} in the anvilGui slots
          */
@@ -894,11 +922,21 @@ public class AnvilGUI {
          * @param outputItem The item that would have been outputted, when the items would have been combined
          * @param player The player that clicked the output slot
          */
-        public StateSnapshot(ItemStack leftItem, ItemStack rightItem, ItemStack outputItem, Player player) {
+        public StateSnapshot(
+                VersionWrapper.AnvilContainerWrapper container,
+                ItemStack leftItem,
+                ItemStack rightItem,
+                ItemStack outputItem,
+                Player player) {
+            this.container = container;
             this.leftItem = leftItem;
             this.rightItem = rightItem;
             this.outputItem = outputItem;
             this.player = player;
+        }
+
+        public VersionWrapper.AnvilContainerWrapper getContainer() {
+            return container;
         }
 
         /**
@@ -944,7 +982,7 @@ public class AnvilGUI {
          * @return The text of the rename field
          */
         public String getText() {
-            return outputItem.hasItemMeta() ? outputItem.getItemMeta().getDisplayName() : "";
+            return container.getRenameText();
         }
     }
 }
