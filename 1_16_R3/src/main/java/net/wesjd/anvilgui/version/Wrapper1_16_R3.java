@@ -1,11 +1,14 @@
 package net.wesjd.anvilgui.version;
 
+import java.util.function.Function;
 import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_16_R3.event.CraftEventFactory;
+import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 public class Wrapper1_16_R3 implements VersionWrapper {
     private int getRealNextContainerId(Player player) {
@@ -120,6 +123,8 @@ public class Wrapper1_16_R3 implements VersionWrapper {
      */
     private class AnvilContainer extends ContainerAnvil implements AnvilContainerWrapper {
 
+        private Function<String, ItemStack> renameVisitor;
+
         public AnvilContainer(Player player, IChatBaseComponent guiTitle) {
             super(
                     getRealNextContainerId(player),
@@ -127,6 +132,21 @@ public class Wrapper1_16_R3 implements VersionWrapper {
                     ContainerAccess.at(((CraftWorld) player.getWorld()).getHandle(), new BlockPosition(0, 0, 0)));
             this.checkReachable = false;
             setTitle(guiTitle);
+        }
+
+        @Override
+        public void setLeftItem(ItemStack item) {
+            this.getSlot(0).set(CraftItemStack.asNMSCopy(item));
+        }
+
+        @Override
+        public void setMiddleItem(ItemStack item) {
+            this.getSlot(1).set(CraftItemStack.asNMSCopy(item));
+        }
+
+        @Override
+        public void setRightItem(ItemStack item) {
+            this.getSlot(2).set(CraftItemStack.asNMSCopy(item));
         }
 
         @Override
@@ -172,8 +192,30 @@ public class Wrapper1_16_R3 implements VersionWrapper {
         }
 
         @Override
+        public void setRenameVisitor(Function<String, ItemStack> renameVisitor) {
+            this.renameVisitor = renameVisitor;
+        }
+
+        @Override
         public Inventory getBukkitInventory() {
             return getBukkitView().getTopInventory();
+        }
+
+        @Override
+        public void a(String s) {
+            if (renameVisitor == null) {
+                super.a(s);
+                return;
+            }
+
+            ItemStack item = renameVisitor.apply(s);
+            if (item == null) {
+                super.a(s);
+                return;
+            }
+
+            this.renameText = s;
+            this.getSlot(2).set(CraftItemStack.asNMSCopy(item));
         }
     }
 }
