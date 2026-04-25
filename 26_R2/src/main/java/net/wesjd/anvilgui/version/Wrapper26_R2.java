@@ -1,5 +1,6 @@
 package net.wesjd.anvilgui.version;
 
+import java.lang.reflect.Method;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
@@ -15,8 +16,6 @@ import org.bukkit.craftbukkit.event.CraftEventFactory;
 import org.bukkit.craftbukkit.util.CraftChatMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-
-import java.lang.reflect.Method;
 
 public final class Wrapper26_R2 implements VersionWrapper {
     private int getRealNextContainerId(Player player) {
@@ -94,8 +93,7 @@ public final class Wrapper26_R2 implements VersionWrapper {
     }
 
     @Override
-    public void setActiveContainerId(AnvilContainerWrapper container, int containerId) {
-    }
+    public void setActiveContainerId(AnvilContainerWrapper container, int containerId) {}
 
     @Override
     public void addActiveContainerSlotListener(AnvilContainerWrapper container, Player player) {
@@ -143,12 +141,10 @@ public final class Wrapper26_R2 implements VersionWrapper {
         }
 
         @Override
-        public void removed(net.minecraft.world.entity.player.Player player) {
-        }
+        public void removed(net.minecraft.world.entity.player.Player player) {}
 
         @Override
-        protected void clearContainer(net.minecraft.world.entity.player.Player player, Container container) {
-        }
+        protected void clearContainer(net.minecraft.world.entity.player.Player player, Container container) {}
 
         public int getContainerId() {
             return this.containerId;
