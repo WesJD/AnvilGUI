@@ -54,7 +54,9 @@ public final class Wrapper26_R1 implements VersionWrapper {
                 Class<?> inventoryCloseEventReasonClass =
                         Class.forName("org.bukkit.event.inventory.InventoryCloseEvent$Reason");
                 Method handleInventoryCloseEventMethod = CraftEventFactory.class.getMethod(
-                        "handleInventoryCloseEvent", ServerPlayer.class, inventoryCloseEventReasonClass);
+                        "handleInventoryCloseEvent",
+                        net.minecraft.world.entity.player.Player.class,
+                        inventoryCloseEventReasonClass);
                 handleInventoryCloseEventMethod.invoke(
                         null,
                         toNMS(player),
