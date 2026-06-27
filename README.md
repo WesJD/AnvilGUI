@@ -60,7 +60,7 @@ Add the repository and dependency to your POM:
 <dependency>
   <groupId>net.wesjd</groupId>
   <artifactId>anvilgui</artifactId>
-  <version>1.10.13-SNAPSHOT</version>
+  <version>1.10.14-SNAPSHOT</version>
   <scope>compile</scope> <!-- Include the library in your JAR -->
 </dependency>
 ```

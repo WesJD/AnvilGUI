@@ -6,7 +6,7 @@
 
     <groupId>net.wesjd</groupId>
     <artifactId>anvilgui-parent</artifactId>
-    <version>1.10.13-SNAPSHOT</version>
+    <version>1.10.14-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
@@ -53,6 +53,7 @@
         <module>1_21_R6</module>
         <module>1_21_R7</module>
         <module>26_R1</module>
+        <module>26_R2</module>
     </modules>
 
     <repositories>
