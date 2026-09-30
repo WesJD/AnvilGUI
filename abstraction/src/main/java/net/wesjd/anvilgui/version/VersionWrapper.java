@@ -1,7 +1,9 @@
 package net.wesjd.anvilgui.version;
 
+import java.util.function.Function;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * Wraps versions to be able to easily use different NMS server versions
@@ -139,6 +141,46 @@ public interface VersionWrapper {
          * @param text The text to set
          */
         default void setRenameText(String text) {}
+
+        /**
+         * Sets a function that is asked for the output item every time the player edits the rename text.
+         * <br><br>
+         * If the function returns {@code null} the vanilla result is used. Works only if {@link #isExtendedApiSupported()}.
+         *
+         * @param renameVisitor The function mapping the rename text to the output item
+         */
+        default void setRenameVisitor(Function<String, ItemStack> renameVisitor) {}
+
+        /**
+         * Puts the item directly into the left input slot
+         *
+         * @param item The item to set
+         */
+        default void setLeftItem(ItemStack item) {}
+
+        /**
+         * Puts the item directly into the right input slot
+         *
+         * @param item The item to set
+         */
+        default void setMiddleItem(ItemStack item) {}
+
+        /**
+         * Puts the item directly into the output slot
+         *
+         * @param item The item to set
+         */
+        default void setRightItem(ItemStack item) {}
+
+        /**
+         * Whether this version implements {@link #setRenameVisitor}, {@link #setLeftItem},
+         * {@link #setMiddleItem} and {@link #setRightItem}
+         *
+         * @return true if the extended API works on this version
+         */
+        default boolean isExtendedApiSupported() {
+            return false;
+        }
 
         /**
          * Gets the {@link Inventory} wrapper of the NMS container

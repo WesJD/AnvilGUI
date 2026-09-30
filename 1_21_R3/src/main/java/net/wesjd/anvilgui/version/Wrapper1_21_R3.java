@@ -1,5 +1,6 @@
 package net.wesjd.anvilgui.version;
 
+import java.util.function.Function;
 import net.minecraft.core.BlockPosition;
 import net.minecraft.core.IRegistryCustom;
 import net.minecraft.core.component.DataComponents;
@@ -15,8 +16,10 @@ import net.minecraft.world.inventory.Container;
 import org.bukkit.craftbukkit.v1_21_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_21_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_21_R3.event.CraftEventFactory;
+import org.bukkit.craftbukkit.v1_21_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 public final class Wrapper1_21_R3 implements VersionWrapper {
     private int getRealNextContainerId(Player player) {
@@ -93,6 +96,9 @@ public final class Wrapper1_21_R3 implements VersionWrapper {
     }
 
     private static class AnvilContainer extends ContainerAnvil implements AnvilContainerWrapper {
+
+        private Function<String, ItemStack> renameVisitor;
+
         public AnvilContainer(Player player, int containerId, IChatBaseComponent guiTitle) {
             super(
                     containerId,
@@ -103,11 +109,34 @@ public final class Wrapper1_21_R3 implements VersionWrapper {
         }
 
         @Override
+        public boolean isExtendedApiSupported() {
+            return true;
+        }
+
+        @Override
+        public void setLeftItem(ItemStack item) {
+            this.b(0).f(CraftItemStack.asNMSCopy(item));
+        }
+
+        @Override
+        public void setMiddleItem(ItemStack item) {
+            this.b(1).f(CraftItemStack.asNMSCopy(item));
+        }
+
+        @Override
+        public void setRightItem(ItemStack item) {
+            this.b(2).f(CraftItemStack.asNMSCopy(item));
+        }
+
+        @Override
         public void l() {
             // If the output is empty copy the left input into the output
             Slot output = this.b(2); // b -> getSlot
             if (!output.h()) { // h -> hasItem
-                output.f(this.b(0).g().v()); // f -> set, g -> getItem, v -> copy
+                Slot input = this.b(0);
+                if (input.h()) {
+                    output.f(input.g().v()); // f -> set, g -> getItem, v -> copy
+                }
             }
 
             this.y.a(0); // y -> cost, a -> set
@@ -146,11 +175,36 @@ public final class Wrapper1_21_R3 implements VersionWrapper {
         }
 
         @Override
+        public void setRenameVisitor(Function<String, ItemStack> renameVisitor) {
+            this.renameVisitor = renameVisitor;
+        }
+
+        @Override
         public Inventory getBukkitInventory() {
             // NOTE: We need to call Container#getBukkitView() instead of ContainerAnvil#getBukkitView()
             // because ContainerAnvil#getBukkitView() had an ABI breakage in the middle of the Minecraft 1.21
             // development cycle for Spigot. For more info, see: https://github.com/WesJD/AnvilGUI/issues/342
             return ((Container) this).getBukkitView().getTopInventory();
+        }
+
+        @Override
+        public boolean a(String s) {
+            if (renameVisitor == null) {
+                return super.a(s);
+            }
+
+            // The visitor reads the rename text through StateSnapshot#getText, so it has to be current
+            String previousText = this.x;
+            this.x = s;
+            ItemStack item = renameVisitor.apply(s);
+            if (item == null) {
+                this.x = previousText; // the vanilla method ignores a name equal to the current one
+                return super.a(s);
+            }
+
+            this.b(2).f(CraftItemStack.asNMSCopy(item));
+            l();
+            return true;
         }
     }
 }

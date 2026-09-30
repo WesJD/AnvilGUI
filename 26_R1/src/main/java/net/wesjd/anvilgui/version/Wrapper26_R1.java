@@ -1,6 +1,7 @@
 package net.wesjd.anvilgui.version;
 
 import java.lang.reflect.Method;
+import java.util.function.Function;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
@@ -17,9 +18,11 @@ import net.minecraft.world.inventory.Slot;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.craftbukkit.event.CraftEventFactory;
+import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.util.CraftChatMessage;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 public final class Wrapper26_R1 implements VersionWrapper {
     private int getRealNextContainerId(Player player) {
@@ -118,6 +121,8 @@ public final class Wrapper26_R1 implements VersionWrapper {
     }
 
     private static class AnvilContainer extends AnvilMenu implements AnvilContainerWrapper {
+        private Function<String, ItemStack> renameVisitor;
+
         public AnvilContainer(Player player, int containerId, Component guiTitle) {
             super(
                     containerId,
@@ -125,6 +130,51 @@ public final class Wrapper26_R1 implements VersionWrapper {
                     ContainerLevelAccess.create(((CraftWorld) player.getWorld()).getHandle(), new BlockPos(0, 0, 0)));
             this.checkReachable = false;
             setTitle(guiTitle);
+        }
+
+        @Override
+        public boolean isExtendedApiSupported() {
+            return true;
+        }
+
+        @Override
+        public void setLeftItem(ItemStack item) {
+            this.getSlot(0).set(CraftItemStack.asNMSCopy(item));
+        }
+
+        @Override
+        public void setMiddleItem(ItemStack item) {
+            this.getSlot(1).set(CraftItemStack.asNMSCopy(item));
+        }
+
+        @Override
+        public void setRightItem(ItemStack item) {
+            this.getSlot(2).set(CraftItemStack.asNMSCopy(item));
+        }
+
+        @Override
+        public void setRenameVisitor(Function<String, ItemStack> renameVisitor) {
+            this.renameVisitor = renameVisitor;
+        }
+
+        @Override
+        public boolean setItemName(String name) {
+            if (renameVisitor == null) {
+                return super.setItemName(name);
+            }
+
+            // The visitor reads the rename text through StateSnapshot#getText, so it has to be current
+            String previousName = this.itemName;
+            this.itemName = name;
+            ItemStack item = renameVisitor.apply(name);
+            if (item == null) {
+                this.itemName = previousName; // the vanilla method ignores a name equal to the current one
+                return super.setItemName(name);
+            }
+
+            this.getSlot(2).set(CraftItemStack.asNMSCopy(item));
+            createResult();
+            return true;
         }
 
         @Override
