@@ -45,7 +45,7 @@ new AnvilGUI.Builder()
     .open(player);
 ```
 
-[More usage information is available in USAGE.md](USAGE)
+[More usage information is available in USAGE.md](USAGE.md)
 
 ## Installation
 
