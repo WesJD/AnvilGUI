@@ -13,16 +13,14 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.logging.Level;
 import net.md_5.bungee.api.chat.BaseComponent;
-import net.wesjd.anvilgui.version.VersionMatcher;
-import net.wesjd.anvilgui.version.VersionWrapper;
+import net.wesjd.anvilgui.version.*;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.HandlerList;
-import org.bukkit.event.Listener;
+import org.bukkit.event.*;
 import org.bukkit.event.inventory.*;
+import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -98,6 +96,8 @@ public class AnvilGUI {
     private final boolean concurrentClickHandlerExecution;
     /** An {@link BiFunction} that is called when a slot is clicked */
     private final ClickHandler clickHandler;
+    /** A {@link BiConsumer} that is called when the string of the anvil input has been changed. */
+    private final BiConsumer<Player, String> prepareListener;
 
     /**
      * The container id of the inventory, used for NMS methods
@@ -136,6 +136,7 @@ public class AnvilGUI {
      * @param closeListener       A {@link Consumer} when the inventory closes
      * @param concurrentClickHandlerExecution Flag to allow concurrent execution of the click handler
      * @param clickHandler        A {@link ClickHandler} that is called when the player clicks a slot
+     * @param prepareListener     A {@link BiConsumer} that is called when the string of the anvil input has been changed.
      */
     private AnvilGUI(
             Plugin plugin,
@@ -148,7 +149,8 @@ public class AnvilGUI {
             Set<Integer> interactableSlots,
             Consumer<StateSnapshot> closeListener,
             boolean concurrentClickHandlerExecution,
-            ClickHandler clickHandler) {
+            ClickHandler clickHandler,
+            BiConsumer<Player, String> prepareListener) {
         this.plugin = plugin;
         this.player = player;
         this.mainThreadExecutor = mainThreadExecutor;
@@ -160,13 +162,14 @@ public class AnvilGUI {
         this.closeListener = closeListener;
         this.concurrentClickHandlerExecution = concurrentClickHandlerExecution;
         this.clickHandler = clickHandler;
+        this.prepareListener = prepareListener;
     }
 
     /**
      * Opens the anvil GUI
      */
     private void openInventory() {
-        Bukkit.getPluginManager().registerEvents(listener, plugin);
+        registerEvents(listener, plugin);
 
         container = WRAPPER.newContainerAnvil(player, titleComponent);
 
@@ -293,6 +296,41 @@ public class AnvilGUI {
         return inventory;
     }
 
+    public void registerEvents(Listener listener, Plugin plugin) {
+        Bukkit.getPluginManager().registerEvents(listener, plugin);
+
+        // registering the AnvilPrepareEvent listener externally since this event is not
+        // available for MC 1.7 and 1.8.
+        if (!(WRAPPER.getClass() == Wrapper1_7_R4.class
+                || WRAPPER.getClass() == Wrapper1_8_R1.class
+                || WRAPPER.getClass() == Wrapper1_8_R2.class
+                || WRAPPER.getClass() == Wrapper1_8_R3.class)) {
+
+            Bukkit.getPluginManager()
+                    .registerEvent(
+                            PrepareAnvilEvent.class,
+                            listener,
+                            EventPriority.NORMAL,
+                            (listener1, event) -> {
+                                PrepareAnvilEvent prepareEvent = (PrepareAnvilEvent) event;
+
+                                if (prepareEvent.getInventory().equals(inventory)) {
+                                    Player player =
+                                            (Player) prepareEvent.getView().getPlayer();
+                                    if (prepareListener != null) {
+                                        prepareListener.accept(
+                                                player,
+                                                prepareEvent
+                                                        .getResult()
+                                                        .getItemMeta()
+                                                        .getDisplayName());
+                                    }
+                                }
+                            },
+                            plugin);
+        }
+    }
+
     /**
      * Simply holds the listeners for the GUI
      */
@@ -416,6 +454,8 @@ public class AnvilGUI {
         private boolean concurrentClickHandlerExecution = false;
         /** An {@link Function} that is called when a slot in the inventory has been clicked */
         private ClickHandler clickHandler;
+        /** A {@link BiConsumer} that is called when the string of the anvil input has been changed. */
+        private BiConsumer<Player, String> textChangeListener;
         /** A state that decides where the anvil GUI is able to be closed by the user */
         private boolean preventClose = false;
         /** A state that determines whether support for Geyser software is enabled */
@@ -643,6 +683,17 @@ public class AnvilGUI {
         }
 
         /**
+         * Listens for changes in the text input field of the anvil. Ineffective for MC versions 1.7.* and 1.8.*
+         *
+         * @param textChangeListener An {@link BiConsumer} that is called when the string of the input field is changed
+         * @return The {@link Builder} instance
+         */
+        public Builder onTextChange(BiConsumer<Player, String> textChangeListener) {
+            this.textChangeListener = textChangeListener;
+            return this;
+        }
+
+        /**
          * Creates the anvil GUI and opens it for the player
          *
          * @param player The {@link Player} the anvil GUI should open for
@@ -680,7 +731,8 @@ public class AnvilGUI {
                     interactableSlots,
                     closeListener,
                     concurrentClickHandlerExecution,
-                    clickHandler);
+                    clickHandler,
+                    textChangeListener);
             anvilGUI.openInventory();
             return anvilGUI;
         }
